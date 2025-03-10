@@ -23,8 +23,23 @@ function Login() {
       <div>
         <header>서울식</header>
         <div>
-          <h3></h3>
-          <p></p>
+          <h3>환영합니다</h3>
+          <p>로그인하시면 홈페이지를 보다 편리하게 이용하실 수 있습니다.</p>
+        </div>
+        <div>
+          <h1>로그인</h1>
+        </div>
+        <div>
+          <form>
+            <div>
+              <input placeholder="이메일 주소를 입력해 주세요" />
+            </div>
+            <div>
+              <input placeholder="비밀번호를 입력해 주세요" />
+            </div>
+
+            <button></button>
+          </form>
         </div>
       </div>
     </>
