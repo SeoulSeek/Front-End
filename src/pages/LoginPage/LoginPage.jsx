@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router";
 import styles from "./LoginPage.module.css";
 
 const USER = {
@@ -7,20 +8,25 @@ const USER = {
 };
 
 function Login() {
-  const [email, setEmail] = useState(""); // 이메일
-  const [pw, setPw] = useState(""); //비밀번호
+  const [userEmail, setUserEmail] = useState(""); // 이메일
+  const [userPw, setUserPw] = useState(""); //비밀번호
 
-  const [emailVaild, setEmailVaild] = useState(false); //이메일 유효성 확인
-  const [pwVaild, setpwVaild] = useState(false); //비밀번호 유효성 확인
-  const [notAllow, setNotAllow] = useState(true); //로그인버튼 (비)활성화
+  const [isShowPw, setIsShowPW] = useState(false);
 
-  const handleEmail = (e) => {
-    setEmail(e.target.value);
+  const handleLogin = () => {
+    // 로그인 처리 로직 (현재 로컬로 진행 => 서버연결로 코드 수정)
+    if (userEmail === USER.email && userPw === USER.pw) {
+      console.log("로그인 성공");
+    } else {
+      alert(
+        "올바른 이메일이 아니거나 이메일 또는 비밀번호를 잘못 입력했습니다."
+      );
+    }
   };
 
   return (
     <>
-      <div>
+      <div className="login-container">
         <header>서울식</header>
         <div>
           <h3>환영합니다</h3>
@@ -31,15 +37,39 @@ function Login() {
         </div>
         <div>
           <form>
-            <div>
-              <input placeholder="이메일 주소를 입력해 주세요" />
+            <div className="inputEmailWrap">
+              <input
+                type="email"
+                id="email"
+                className="inputEmail"
+                placeholder="이메일 주소를 입력해 주세요"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+              />
+            </div>
+            <div className="inputPwWrap">
+              <input
+                type="password"
+                id="pw"
+                className="inputPw"
+                placeholder="비밀번호를 입력해 주세요"
+                value={userPw}
+                onChange={(e) => setUserPw(e.target.value)}
+              />
             </div>
             <div>
-              <input placeholder="비밀번호를 입력해 주세요" />
+              <button type="submit" onClick={handleLogin}>
+                로그인
+              </button>
             </div>
-
-            <button></button>
+            <div>또는</div>
+            <div>
+              <button type="button">카카오로 시작하기</button>
+            </div>
           </form>
+          <div>
+            서울식 회원이 아니신가요? <Link to="/signin">회원가입</Link>
+          </div>
         </div>
       </div>
     </>
