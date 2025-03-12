@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./Header.module.css"
-import Logo from "../../assets/LogoMobile.png"
+import logo from "../../assets/logoMobile.png"
 import { AiOutlineMenu } from "react-icons/ai";
 
 const Header = () => {
@@ -10,7 +10,7 @@ const Header = () => {
       <div className={styles.header}>
         <Link to="/">
           <img
-            src={Logo}
+            src={logo}
             alt="서울식 로고"
             className={styles.logo}
           />
