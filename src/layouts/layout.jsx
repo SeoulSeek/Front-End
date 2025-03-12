@@ -1,26 +1,17 @@
-/*
-root-layout 예시입니다
-
+import React from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "../components/navbar";
-import Sidebar from "../components/sidebar";
+import styles from "./Layout.module.css"
+import Header from "../components/Header/Header.jsx"
 
-const RootLayout = () => {
+const Layout = () => {
   return (
-    <>
-      <GlobalStyle/>
-      <NavLayout>
-        <Navbar/>
-      </NavLayout>
-      <MainLayout>
-        <Sidebar/>
-        <Content>
-          <Outlet/> 
-        </Content>
-      </MainLayout>
-    </>
+    <div className={styles.container}>
+      <Header />
+      <main className={styles.main}>
+        <Outlet />
+      </main>
+    </div>
   );
 };
 
-export default RootLayout;
-*/
+export default Layout;
