@@ -82,39 +82,65 @@
   opacity: 0.5;
 }
 
+@keyframes drift {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  85% {
+    transform: translateX(-800px);
+    opacity: 1;
+  }
+  /* teleport 시작: 갑자기 사라짐 */
+  86% {
+    transform: translateX(-800px);
+    opacity: 0;
+  }
+  90% {
+    transform: translateX(500px);
+    opacity: 0;
+  }
+  /* teleport 종료: 오른쪽 외부에서 서서히 나타남 */
+  91% {
+    transform: translateX(500px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .tag1 {
   position: absolute;
   z-index: 2;
   top: 14px;
-  left: -34px;
-}
-
-.tag2 {
-  position: absolute;
-  z-index: 2;
-  top: 14px;
-  left: -34px;
+  left: 400px;
+  animation: drift 22s linear infinite;
 }
 
 .tag2 {
   position: absolute;
   z-index: 2;
   top: 75px;
-  left: 85px;
+  left: 400px;
+  animation: drift 15s linear infinite;
 }
 
 .tag3 {
   position: absolute;
   z-index: 2;
   top: 117px;
-  left: 34px;
+  left: 400px;
+  animation: drift 18s linear infinite;
 }
 
 .tag4 {
   position: absolute;
   z-index: 2;
   top: 142px;
-  left: 189px;
+  left: 400px;
+  animation: drift 14s linear infinite;
 }
 
 .special {
