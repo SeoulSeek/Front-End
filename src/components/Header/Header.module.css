@@ -1,0 +1,23 @@
+.header {
+  display: flex;
+  width: 390px;
+  height: 80px;
+  justify-content: center;
+  align-items: center;
+  gap: 90px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #000000;
+}
+
+.logo {
+  width: 220px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.menu {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  aspect-ratio: 1/1;
+}
