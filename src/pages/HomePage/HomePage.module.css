@@ -1,0 +1,122 @@
+.h1 {
+  font-family: "Noto Sans KR";
+  position: relative;
+  z-index: 2;
+  margin-top: 45px;
+  color: #6D8196;
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.h2 {
+  font-family: "Noto Sans KR";
+  color: #000000;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.p {
+  font-family: "Noto Sans KR";
+  color: #6D8196;
+  text-align: right;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: normal;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 373px;
+}
+
+.bannerMap {
+  position: absolute;
+  z-index: 1;
+  top: 165px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 390px;
+  height: 390px;
+}
+
+.recommContainer {
+  margin-top: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 45px;
+}
+
+.recommBox {
+  width: 350px;
+  height: 223px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.recommInnerBox {
+  position: relative;
+  width: 350px;
+  height: 189px;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  overflow: hidden;
+}
+
+.recommImg {
+  width: 350px;
+  height: 189px;
+  opacity: 0.5;
+}
+
+.tag1 {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: -34px;
+}
+
+.tag2 {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: -34px;
+}
+
+.tag2 {
+  position: absolute;
+  z-index: 2;
+  top: 75px;
+  left: 85px;
+}
+
+.tag3 {
+  position: absolute;
+  z-index: 2;
+  top: 117px;
+  left: 34px;
+}
+
+.tag4 {
+  position: absolute;
+  z-index: 2;
+  top: 142px;
+  left: 189px;
+}
+
+.special {
+  color: #968C6E;
+}
