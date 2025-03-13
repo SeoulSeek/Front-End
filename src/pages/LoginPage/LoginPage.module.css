@@ -1,0 +1,80 @@
+.login_box {
+  margin-bottom: 40px;
+}
+
+.login_box div {
+  margin-bottom: 20px;
+}
+
+.btn_login {
+  width: 100%;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 100px;
+  box-sizing: border-box;
+  background: var(--seoul-seek-black);
+}
+
+.btn_text {
+  color: #fff;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.dividing {
+  position: relative;
+  box-sizing: border-box;
+  height: 58px;
+  padding: 29px 0 28px;
+  text-align: center;
+}
+
+.dividing .text {
+  display: inline-block;
+  position: relative;
+  color: var(--seoul-seek-black);
+  transform: translateY(-50%);
+  vertical-align: top;
+}
+
+.btn_kakao {
+  display: inline-flex;
+  height: 45px;
+  padding: 0px 14px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  border: none;
+  background: var(--kakao-bg, #fee500);
+}
+
+.btn_kakao_text {
+  display: flex;
+  padding: 0 86px;
+  gap: 8px;
+  color: var(--kakao-text);
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.regiLink {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.regiLink .text {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.link {
+  font-size: 14px;
+  color: var(--seoul-seek-black);
+}
