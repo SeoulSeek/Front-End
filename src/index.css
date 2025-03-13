@@ -1,0 +1,22 @@
+@import url("//fonts.googleapis.com/earlyaccess/notosanskr.css");
+
+:root {
+  --seoul-seek-black: #000000;
+  --seoul-seek-blue: #6d8196;
+  --seoul-seek-indigo: #303943;
+  --kakao-bg: #fee500;
+  --kakao-lg: #000000;
+  --kakao-text: #000000d9;
+}
+
+body {
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+* {
+  font-family: "inherit";
+}
