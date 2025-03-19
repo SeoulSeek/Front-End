@@ -1,0 +1,21 @@
+h1 {
+  color: #968C6E;
+  font-family: "Noto Sans KR";
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin-top: 45px;
+  margin-left: 20px;
+}
+
+.boxes {
+  margin-top: 45px;
+  display: flex;
+  width: 350px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
