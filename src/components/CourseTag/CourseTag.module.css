@@ -1,0 +1,24 @@
+.TagContainer {
+  display: flex;
+  width: 180px;
+  height: 30px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  gap: 8px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+.TagText {
+  font-family: "Noto Sans KR";
+  color: #ffffff;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 300;
+}
