@@ -1,9 +1,8 @@
 .sidebarContainer {
   position: fixed;
-  top: 80px;
   right: 0;
   width: 250px;
-  height: calc(100% - 80px); /* 헤더 높이(80px)를 제외 */
+  height: 100%;
   background-color: #ffffff;
   transition: transform 0.3s ease;
   z-index: 1001;
@@ -19,10 +18,9 @@
 
 .overlay {
   position: fixed;
-  top: 80px;
   left: 0;
   width: 100%;
-  height: calc(100% - 80px);
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 1000;
 }
@@ -33,7 +31,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 30px;
+  margin-top: 110px;
 }
 
 .userIcon {
