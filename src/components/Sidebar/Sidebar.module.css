@@ -26,3 +26,59 @@
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 1000;
 }
+
+.user {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.userIcon {
+  width: 30px;
+  height: 30px;
+}
+
+.h1 {
+  color: #000;
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.menu {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.menuItem {
+  color: #968C6E;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.linkItem {
+  color: #000;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
