@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import { FaRegUserCircle } from "react-icons/fa";
 
@@ -13,7 +14,7 @@ const Sidebar = ({ onClose }) => {
     setAnimate(false);
     setTimeout(() => {
       onClose();
-    }, 400);
+    }, 300);
   };
 
   return (
@@ -27,10 +28,18 @@ const Sidebar = ({ onClose }) => {
           </h1>
         </div>
         <div className={styles.menu}>
-          <p className={styles.menuItem}>SS MAP</p>
-          <p className={styles.menuItem}>SS 관광코스 추천</p>
-          <p className={styles.menuItem}>SS 관광코스 추천</p>
-          <p className={styles.menuItem}>마이페이지</p>
+          <Link to="/map">
+            <p className={styles.menuItem}>SS MAP</p>
+          </Link>
+          <Link to="/courses">
+            <p className={styles.menuItem}>SS 관광코스 추천</p>
+          </Link>
+          <Link to="/places">
+            <p className={styles.menuItem}>SS 관광명소 추천</p>
+          </Link>
+          <Link to="user">
+            <p className={styles.menuItem}>마이페이지</p>
+          </Link>
           <a
             href="https://www.visitseoul.net/"
             target="_blank"
