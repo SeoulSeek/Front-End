@@ -1,0 +1,61 @@
+.placesPage {
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.titleWrap {
+  padding: 45px 0;
+}
+
+.pageTitle {
+  color: var(--seoul-seek-fadegold);
+  font-family: "Noto Sans KR";
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 48px;
+}
+
+.mapWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 45px 0;
+}
+
+.map {
+  display: block;
+  margin-bottom: 10px;
+  border: 1px solid #000;
+  border-radius: 50px;
+  box-sizing: border-box;
+  width: 350px;
+  height: 350px;
+}
+
+.miniMap {
+  width: 350px;
+  height: 350px;
+}
+
+.message {
+  display: flex;
+  justify-content: center;
+  color: var(--seoul-seek-blue);
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+/* 검색페이지 */
+.tabWrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-bottom: 1px solid #d3d9df;
+  padding: 8px 0;
+  margin-bottom: 45px;
+}
