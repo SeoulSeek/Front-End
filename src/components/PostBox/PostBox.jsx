@@ -24,7 +24,6 @@ const PostBox = ({
     const newLiked = !liked;
     setLiked(newLiked);
     setLikes((prev) => (newLiked ? prev + 1 : prev - 1));
-    onLikeToggle(id, newLiked);
   };
 
   return (

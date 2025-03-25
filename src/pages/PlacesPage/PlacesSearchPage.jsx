@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import $ from "./PlacesPage.module.css";
@@ -6,7 +6,12 @@ import SearchBar from "../../components/Input/SearchBar";
 import PostBox from "../../components/PostBox/PostBox";
 import dummyPosts from "../../data/dummyPosts";
 
+const ITEMS_PER_LOAD = 5;
+
 const Search = () => {
+  const [page, setPage] = useState(1); // 현재페이지
+  const [loadedPosts, setLoadedPosts] = useState([]);
+  const preventRef = useRef(true); //옵저버 중복 실행 방지
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
   const [sortBy, setSortBy] = useState("latest"); // 정렬 상태 (기본값: 최신순)
@@ -18,23 +23,33 @@ const Search = () => {
     { id: 3, name: "유저", key: "username" },
   ];
 
+  // 탭별 필터링
   const filteredPosts = dummyPosts.filter((post) =>
     post.district.includes(searchQuery)
   );
+  // 무한스크롤
+  const loadMorePosts = useCallback(() => {
+    const newPosts = filteredPosts.slice(0, page * ITEMS_PER_LOAD);
+    console.log(page * ITEMS_PER_LOAD);
+    setLoadedPosts(newPosts);
+  }, [page]);
 
-  const handleLikeToggle = (postId, newLiked) => {
-    //좋아요 상태 업뎃
-    setFilteredPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              likes: newLiked ? post.likes + 1 : post.likes - 1,
-            }
-          : post
-      )
-    );
-  };
+  useEffect(() => {
+    loadMorePosts();
+  }, [loadMorePosts]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && preventRef.current) {
+        preventRef.current = false;
+        setPage((prev) => prev + 1);
+      }
+    });
+    const sentinel = document.querySelector("#sentinel");
+    if (sentinel) observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
@@ -84,7 +99,7 @@ const Search = () => {
 
         <div className={$.postListWrap}>
           <ul className={$.postList}>
-            {filteredPosts.map((post) => (
+            {loadedPosts.map((post) => (
               <PostBox
                 key={post.id}
                 id={post.id}
@@ -97,6 +112,7 @@ const Search = () => {
                 comments={post.comments}
               />
             ))}
+            <li id="sentinel" style={{ height: "20px" }}></li>
           </ul>
         </div>
       </div>
