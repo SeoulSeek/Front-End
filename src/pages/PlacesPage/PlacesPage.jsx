@@ -23,7 +23,7 @@ const Places = () => {
     navigate(`/places/result?q=${encodeURIComponent(query)}`);
   };
   const handleCreatePost = () => {
-    navigate("post/new");
+    navigate("/post");
   };
 
   // 유저, 관리자 게시물 필터링
@@ -45,7 +45,7 @@ const Places = () => {
           <h1 className={$.pageTitle}>서울식 관광명소</h1>
         </div>
 
-        <div>
+        <div className={$.searchWrap}>
           <SearchBar
             onSearch={handleSearch}
             placeholder="자치구, 키워드, 유저명으로 방명록을 검색해보세요"
