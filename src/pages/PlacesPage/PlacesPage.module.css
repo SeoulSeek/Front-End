@@ -218,11 +218,24 @@
 .placeSelector,
 .keywordAdd {
   display: flex;
+  white-space: nowrap;
+  overflow-y: hidden;
   justify-content: center;
   border-top: 1px solid #000;
   border-bottom: 1px solid #000;
-  padding: 10px 0;
+  padding: 10px 25px;
   box-sizing: border-box;
+  gap: 20px;
+}
+
+.placeSelector::-webkit-scrollbar,
+.keywordAdd::-webkit-scrollbar {
+  display: none;
+}
+
+.hashtag.selected {
+  border: 1px solid #000;
+  border-radius: 100px;
 }
 
 .tagWrap button {
@@ -235,6 +248,7 @@
   width: 140px;
   height: 30px;
   gap: 5px;
+  flex-shrink: 0;
   border: 1px solid #000;
   border-radius: 100px;
   cursor: pointer;
@@ -289,4 +303,71 @@
   font-size: 15px;
   font-style: normal;
   font-weight: 700;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.placeModal {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow-y: auto;
+  background: #fff;
+  width: 330px;
+  height: 640px;
+}
+
+.searchBarWrap {
+  margin: 30px 15px;
+}
+
+.resultInfo {
+  text-align: center;
+  color: var(--seoul-seek-blue);
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  margin: 15px 0 45px;
+}
+
+.placeList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.placeItem {
+  display: flex;
+  width: auto;
+  white-space: nowrap;
+  overflow-x: auto;
+  padding: 10px 0 10px 20px;
+  gap: 20px;
+  box-sizing: border-box;
+  border-top: 1px solid var(--seoul-seek-gray);
+  border-bottom: 1px solid var(--seoul-seek-gray);
+}
+
+.placeItem p {
+  color: var(--seoul-seek-black);
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.placeItem::-webkit-scrollbar {
+  display: none;
 }
