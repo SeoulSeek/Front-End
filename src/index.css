@@ -3,7 +3,9 @@
 :root {
   --seoul-seek-black: #000000;
   --seoul-seek-blue: #6d8196;
+  --seoul-seek-skyblue: #91c6ff;
   --seoul-seek-indigo: #303943;
+  --seoul-seek-fadegold: #968c6e;
   --kakao-bg: #fee500;
   --kakao-lg: #000000;
   --kakao-text: #000000d9;
@@ -13,7 +15,7 @@ body {
   font-family: "Noto Sans KR";
   font-size: 15px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 300;
   line-height: normal;
 }
 

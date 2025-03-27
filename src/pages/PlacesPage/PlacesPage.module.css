@@ -1,0 +1,129 @@
+.placesPage {
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.titleWrap {
+  padding: 45px 0;
+}
+
+.pageTitle {
+  color: var(--seoul-seek-fadegold);
+  font-family: "Noto Sans KR";
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 48px;
+}
+
+.filterContainer {
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+  font-family: "Noto Sans KR";
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 15px;
+  padding: 0 11px;
+  box-sizing: border-box;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: start;
+  gap: 15px;
+}
+
+.mapWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 45px 0;
+}
+
+.map {
+  display: block;
+  margin-bottom: 10px;
+  border: 1px solid #000;
+  border-radius: 50px;
+  box-sizing: border-box;
+  width: 350px;
+  height: 350px;
+}
+
+.miniMap {
+  width: 350px;
+  height: 350px;
+}
+
+.message {
+  display: flex;
+  justify-content: center;
+  color: var(--seoul-seek-blue);
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.postList li:last-child {
+  margin-bottom: 25px;
+}
+
+.postCreateBtnWrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 25px;
+}
+
+.postCreateBtn {
+  display: flex;
+  align-items: center;
+  font-family: "Noto Sans KR";
+  font-size: 32px;
+  font-weight: 700;
+  padding: 0 20px;
+  gap: 4px;
+  background: none;
+  border: 1px solid #000;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  margin-bottom: 45px;
+}
+
+.pagination button {
+  color: var(--seoul-seek-black);
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 300;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* 검색페이지 */
+.tabWrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-bottom: 1px solid #d3d9df;
+  padding: 8px 0;
+  margin: 15px 0 45px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  cursor: pointer;
+}

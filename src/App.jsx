@@ -1,10 +1,12 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./App.css";
-import Layout from "./layouts/Layout";
+import Layout from "./layouts/layout";
 import Home from "./pages/HomePage/HomePage";
 import Login from "./pages/LoginPage/LoginPage";
 import Signin from "./pages/SigninPage/SigninPage";
+import Places from "./pages/PlacesPage/PlacesPage";
+import Search from "./pages/PlacesPage/PlacesSearchPage";
 import Courses from "./pages/CoursesPage/CoursesPage";
 
 function App() {
@@ -13,6 +15,8 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/places" element={<Places />} />
+          <Route path="/places/result" element={<Search />} />
           <Route path="/courses" element={<Courses />} />
         </Route>
         <Route path="/login" element={<Login />} />
