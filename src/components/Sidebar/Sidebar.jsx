@@ -28,17 +28,17 @@ const Sidebar = ({ onClose }) => {
           </h1>
         </div>
         <div className={styles.menu}>
-          <Link to="/map">
-            <p className={styles.menuItem}>SS MAP</p>
+          <Link to="/map" className={styles.menuItem}>
+            SS MAP
           </Link>
-          <Link to="/courses">
-            <p className={styles.menuItem}>SS 관광코스 추천</p>
+          <Link to="/courses" className={styles.menuItem}>
+            SS 관광코스 추천
           </Link>
-          <Link to="/places">
-            <p className={styles.menuItem}>SS 관광명소 추천</p>
+          <Link to="/places" className={styles.menuItem}>
+            SS 관광명소 추천
           </Link>
-          <Link to="user">
-            <p className={styles.menuItem}>마이페이지</p>
+          <Link to="user" className={styles.menuItem}>
+            마이페이지
           </Link>
           <a
             href="https://www.visitseoul.net/"

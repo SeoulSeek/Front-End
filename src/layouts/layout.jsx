@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import styles from "./Layout.module.css";
 import Header from "../components/Header/Header.jsx";
 import Sidebar from "../components/Sidebar/Sidebar.jsx";
+import Footer from "../components/Footer/Footer.jsx";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,6 +23,7 @@ const Layout = () => {
         <Outlet />
       </main>
       {isSidebarOpen && <Sidebar onClose={handleCloseSidebar} />}
+      <Footer />
     </div>
   );
 };
