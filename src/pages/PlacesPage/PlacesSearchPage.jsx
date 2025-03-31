@@ -19,25 +19,66 @@ const Search = () => {
 
   const tabs = [
     { id: 1, name: "자치구", key: "district" },
-    { id: 2, name: "키워드", key: "place" },
+    { id: 2, name: "키워드", key: "keyword" },
     { id: 3, name: "유저", key: "username" },
   ];
 
   // 탭별 필터링
-  const filteredPosts = dummyPosts.filter((post) =>
-    post.district.includes(searchQuery)
-  );
+  const filteredPostsByTab = useCallback(() => {
+    if (!searchQuery) return dummyPosts;
+
+    switch (activeTab) {
+      case "district":
+        return dummyPosts.filter(
+          (post) => post.district && post.district.includes(searchQuery)
+        );
+      case "keyword":
+        return dummyPosts.filter(
+          (post) =>
+            (post.hashtags &&
+              post.hashtags.some((tag) => tag.includes(searchQuery))) ||
+            (post.place && post.place.includes(searchQuery))
+        );
+      case "username":
+        return dummyPosts.filter(
+          (post) => post.username && post.username.includes(searchQuery)
+        );
+      default:
+        dummyPosts;
+    }
+  }, [searchQuery, activeTab]);
+
+  const filteredPosts = React.useMemo(() => {
+    return filteredPostsByTab();
+  }, [filteredPostsByTab]);
+
   // 무한스크롤
   const loadMorePosts = useCallback(() => {
     const newPosts = filteredPosts.slice(0, page * ITEMS_PER_LOAD);
     console.log(page * ITEMS_PER_LOAD);
     setLoadedPosts(newPosts);
-  }, [page]);
+    // 더 로드할 데이터 없으면 옵저버 비활성
+    if (page * ITEMS_PER_LOAD >= filteredPosts.length) {
+      preventRef.current = false;
+    } else {
+      preventRef.current = true;
+    }
+  }, [page, filteredPosts]);
 
+  // 검색조건 변경시 초기화
+  useEffect(() => {
+    setPage(1);
+    setLoadedPosts([]);
+    preventRef.current = true;
+    loadMorePosts(); // 초기데이터로드
+  }, [searchQuery, activeTab]);
+
+  // 페이지변경시 데이터 로드
   useEffect(() => {
     loadMorePosts();
   }, [loadMorePosts]);
 
+  // 인터셉션옵저버
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && preventRef.current) {
@@ -48,7 +89,7 @@ const Search = () => {
     const sentinel = document.querySelector("#sentinel");
     if (sentinel) observer.observe(sentinel);
 
-    return () => observer.disconnect();
+    return () => observer.disconnect(); // 수정?
   }, []);
 
   return (
@@ -71,29 +112,16 @@ const Search = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.key)}
-              className={$.tab}
-              style={{
-                fontFamily: "Noto Sans KR",
-                fontSize: "20px",
-                fontWeight: "700",
-                color: activeTab === tab.key ? "#6d8196" : "#d3d9df",
-                padding: "0 10px",
-                boxSizing: "border-box",
-              }}
+              className={`${$.tab} ${activeTab === tab.key ? $.activeTab : ""}`}
             >
               {tab.name}
             </button>
           ))}
           <div>
-            {
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="lastest">최신순</option>
-                <option value="popular">추천순</option>
-              </select>
-            }
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <option value="lastest">최신순</option>
+              <option value="popular">추천순</option>
+            </select>
           </div>
         </div>
 

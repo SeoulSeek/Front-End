@@ -128,9 +128,18 @@
 }
 
 .tab {
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-weight: 700;
+  padding: 0 10px;
+  color: var(--seoul-seek-gray);
+  box-sizing: border-box;
   background: none;
   border: none;
   cursor: pointer;
+}
+.activeTab {
+  color: var(--seoul-seek-blue);
 }
 
 /* 게시물 작성 페이지 */
