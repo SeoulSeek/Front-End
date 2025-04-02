@@ -99,7 +99,7 @@ const Search = () => {
           <h1 className={$.pageTitle}>서울식 관광명소</h1>
         </div>
 
-        <div>
+        <div className={$.searchWrap}>
           <SearchBar
             initialValue={searchQuery}
             placeholder="자치구, 키워드, 유저명으로 방명록을 검색해보세요"
@@ -126,22 +126,26 @@ const Search = () => {
         </div>
 
         <div className={$.postListWrap}>
-          <ul className={$.postList}>
-            {loadedPosts.map((post) => (
-              <PostBox
-                key={post.id}
-                id={post.id}
-                title={post.title}
-                place={post.place}
-                district={post.district}
-                hashtags={post.hashtags}
-                username={post.username}
-                likes={post.likes}
-                comments={post.comments}
-              />
-            ))}
-            <li id="sentinel" style={{ height: "20px" }}></li>
-          </ul>
+          {filteredPosts.length === 0 ? (
+            <p className={$.noResults}>검색 결과가 없습니다.</p>
+          ) : (
+            <ul className={$.postList}>
+              {loadedPosts.map((post) => (
+                <PostBox
+                  key={post.id}
+                  id={post.id}
+                  title={post.title}
+                  place={post.place}
+                  district={post.district}
+                  hashtags={post.hashtags}
+                  username={post.username}
+                  likes={post.likes}
+                  comments={post.comments}
+                />
+              ))}
+              <li id="sentinel" style={{ height: "20px" }}></li>
+            </ul>
+          )}
         </div>
       </div>
     </>

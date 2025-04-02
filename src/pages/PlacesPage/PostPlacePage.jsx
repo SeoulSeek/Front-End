@@ -9,7 +9,6 @@ import PlaceSearchBar from "../../components/Input/PlaceSearchBar";
 import HashTag from "../../components/HashTag/HashTag";
 
 const PostPlace = () => {
-  const navigate = useNavigate();
   const [title, setTitle] = useState(""); // 제목
   const [content, setContent] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,7 +23,7 @@ const PostPlace = () => {
 
   // 이미지 업로드 핸들러
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: "image/*",
+    accept: { "image/*": [".jpeg", ".jpg", ".png"] },
     onDrop: (acceptedFiles) => {
       const newFiles = acceptedFiles.map((file) =>
         Object.assign(file, { preview: URL.createObjectURL(file) })

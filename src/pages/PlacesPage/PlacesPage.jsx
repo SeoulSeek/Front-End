@@ -7,7 +7,6 @@ import $ from "./PlacesPage.module.css";
 import SearchBar from "../../components/Input/SearchBar";
 import PostBox from "../../components/PostBox/PostBox";
 import dummyPosts from "../../data/dummyPosts";
-import miniMap from "../../assets/miniMap.png";
 
 const ITEMS_PER_PAGE = 3;
 
@@ -75,10 +74,7 @@ const Places = () => {
         </div>
 
         <div className={$.mapWrap}>
-          <div className={$.map}>
-            {/* 미니맵 지도 API */}
-            <img src={miniMap} alt="minimap" className={$.miniMap} />
-          </div>
+          <div className={$.map}>{/* 미니맵 지도 API */}</div>
           <span className={$.message}>
             서울식 유저들이 가장 많이 방문한
             <br /> 역사 명소를 확인해보세요!
