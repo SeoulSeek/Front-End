@@ -7,6 +7,7 @@ import Login from "./pages/LoginPage/LoginPage";
 import Signin from "./pages/SigninPage/SigninPage";
 import Places from "./pages/PlacesPage/PlacesPage";
 import Search from "./pages/PlacesPage/PlacesSearchPage";
+import Posting from "./pages/PlacesPage/PostPlacePage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/places" element={<Places />} />
           <Route path="/places/result" element={<Search />} />
+          <Route path="/post" element={<Posting />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signin" element={<Signin />} />
