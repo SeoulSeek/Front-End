@@ -10,34 +10,64 @@ const Sidebar = ({ onClose }) => {
     setAnimate(true);
   }, []);
 
-  const handleOverlayClick = () => {
+  // 공통으로 사이드바를 닫는 함수
+  const closeSidebar = () => {
     setAnimate(false);
     setTimeout(() => {
       onClose();
-    }, 300);
+    }, 200);
+  };
+
+  const handleOverlayClick = () => {
+    closeSidebar();
+  };
+
+  // 메뉴 아이템 클릭 시도 동일하게 closeSidebar를 호출
+  const handleMenuItemClick = () => {
+    closeSidebar();
   };
 
   return (
     <>
       <div className={styles.overlay} onClick={handleOverlayClick}></div>
-      <div className={`${styles.sidebarContainer} ${animate ? styles.open : styles.closed}`}>
+      <div
+        className={`${styles.sidebarContainer} ${
+          animate ? styles.open : styles.closed
+        }`}
+      >
         <div className={styles.user}>
-          <FaRegUserCircle className={styles.userIcon}/>
+          <FaRegUserCircle className={styles.userIcon} />
           <h1 className={styles.h1}>
             <span className={styles.bold}>서우리</span> 님
           </h1>
         </div>
         <div className={styles.menu}>
-          <Link to="/map" className={styles.menuItem}>
+          <Link
+            to="/map"
+            className={styles.menuItem}
+            onClick={handleMenuItemClick}
+          >
             SS MAP
           </Link>
-          <Link to="/courses" className={styles.menuItem}>
+          <Link
+            to="/courses"
+            className={styles.menuItem}
+            onClick={handleMenuItemClick}
+          >
             SS 관광코스 추천
           </Link>
-          <Link to="/places" className={styles.menuItem}>
+          <Link
+            to="/places"
+            className={styles.menuItem}
+            onClick={handleMenuItemClick}
+          >
             SS 관광명소 추천
           </Link>
-          <Link to="user" className={styles.menuItem}>
+          <Link
+            to="user"
+            className={styles.menuItem}
+            onClick={handleMenuItemClick}
+          >
             마이페이지
           </Link>
           <a

@@ -18,7 +18,7 @@ const Layout = () => {
 
   return (
     <div className={styles.container}>
-      <Header onMenuClick={handleMenuClick} />
+      <Header onMenuClick={handleMenuClick} onLogoClick={handleCloseSidebar} />
       <main className={styles.main}>
         <Outlet />
       </main>
