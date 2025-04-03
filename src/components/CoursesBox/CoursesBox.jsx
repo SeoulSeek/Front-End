@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import styles from "./CoursesBox.module.css";
 import dummy1 from "../../assets/HomePage/dummy1.jpg";
 import CoursesMobileTag from "../CoursesMobileTag/CoursesMobileTag";
-import { AiOutlineStar } from "react-icons/ai";
 
 const CoursesBox = () => {
   return (
@@ -14,7 +13,6 @@ const CoursesBox = () => {
           className={styles.courseImg}
           alt="코스 대표이미지"
         />
-        <AiOutlineStar className={styles.starIcon}/>
         <div className={styles.tagContainer}>
           <div className={styles.tagInner}>
             <CoursesMobileTag type="all" count={7}/>

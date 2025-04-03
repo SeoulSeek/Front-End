@@ -19,3 +19,8 @@
   gap: 40px;
 }
 
+.sort {
+  position: absolute;
+  right: 20px;
+}
+
