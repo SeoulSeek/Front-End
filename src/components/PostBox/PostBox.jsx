@@ -4,7 +4,9 @@ import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 
 import $ from "./PostBox.module.css";
 import HashTag from "../HashTag/HashTag";
-import profileImg from "../../assets/profile.png";
+import { Link } from "react-router";
+import MiniProfile from "../MiniProfile/MiniProfile";
+import PostInfo from "../MiniProfile/PostInfo";
 
 const PostBox = ({
   id, //방명록 id
@@ -20,52 +22,40 @@ const PostBox = ({
   const [likes, setLikes] = useState(initialLikes); // 좋아요 갯수
 
   // 좋아요 상태 업뎃 함수
-  const handleLikeClick = () => {
+  const handleLikeClick = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
     const newLiked = !liked;
     setLiked(newLiked);
-    setLikes((prev) => (newLiked ? prev + 1 : prev - 1));
+    setLikes(newLiked ? likes + 1 : likes - 1);
   };
 
   return (
     <>
       <li className={$.post}>
-        <div className={$.postBox}>
-          <h3 className={$.postTitle}>{title}</h3>
+        <Link to={`/places/${id}`}>
+          <div className={$.postBox}>
+            <h3 className={$.postTitle}>{title}</h3>
 
-          <div className={$.postHashTagList}>
-            {district && <HashTag text={district} type="district" />}
-            {place && <HashTag text={place} type="place" />}
-            {hashtags.map((tag, index) => (
-              <HashTag key={index} text={tag} />
-            ))}
-          </div>
+            <div className={$.postHashTagList}>
+              {district && <HashTag text={district} type="district" />}
+              {place && <HashTag text={place} type="place" />}
+              {hashtags.map((tag, index) => (
+                <HashTag key={index} text={tag} />
+              ))}
+            </div>
 
-          <div className={$.postUserWrap}>
-            <div className={$.userInfo}>
-              <img
-                src={profileImg}
-                alt="profileImg"
-                className={$.userProfileImg}
+            <div className={$.postUserWrap}>
+              <MiniProfile username={username} />
+              <PostInfo
+                isLiked={liked}
+                likes={likes}
+                comments={comments}
+                onClick={handleLikeClick}
               />
-              <span className={$.username}>{username}</span>
-            </div>
-            <div className={$.postAction}>
-              <button onClick={handleLikeClick} className={$.postLikeBtn}>
-                {liked ? (
-                  <FaHeart size={20} style={{ color: "#000" }} />
-                ) : (
-                  <FaRegHeart size={20} style={{ color: "#000" }} />
-                )}
-                <span className={$.likes}>{likes}</span>
-              </button>
-
-              <button className={$.postCommentBtn}>
-                <FaRegComment size={20} style={{ color: "#000" }} />
-                <span className={$.comments}>{comments}</span>
-              </button>
             </div>
           </div>
-        </div>
+        </Link>
       </li>
     </>
   );

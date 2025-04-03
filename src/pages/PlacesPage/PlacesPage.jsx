@@ -7,7 +7,6 @@ import $ from "./PlacesPage.module.css";
 import SearchBar from "../../components/Input/SearchBar";
 import PostBox from "../../components/PostBox/PostBox";
 import dummyPosts from "../../data/dummyPosts";
-import miniMap from "../../assets/miniMap.png";
 
 const ITEMS_PER_PAGE = 3;
 
@@ -23,7 +22,7 @@ const Places = () => {
     navigate(`/places/result?q=${encodeURIComponent(query)}`);
   };
   const handleCreatePost = () => {
-    navigate("post/new");
+    navigate("/post");
   };
 
   // 유저, 관리자 게시물 필터링
@@ -45,7 +44,7 @@ const Places = () => {
           <h1 className={$.pageTitle}>서울식 관광명소</h1>
         </div>
 
-        <div>
+        <div className={$.searchWrap}>
           <SearchBar
             onSearch={handleSearch}
             placeholder="자치구, 키워드, 유저명으로 방명록을 검색해보세요"
@@ -75,10 +74,7 @@ const Places = () => {
         </div>
 
         <div className={$.mapWrap}>
-          <div className={$.map}>
-            {/* 미니맵 지도 API */}
-            <img src={miniMap} alt="minimap" className={$.miniMap} />
-          </div>
+          <div className={$.map}>{/* 미니맵 지도 API */}</div>
           <span className={$.message}>
             서울식 유저들이 가장 많이 방문한
             <br /> 역사 명소를 확인해보세요!
