@@ -21,4 +21,9 @@
   border: none;
   border-radius: 0;
   box-sizing: border-box;
+  outline: none;
+}
+
+.searchInput:focus::placeholder {
+  color: transparent;
 }

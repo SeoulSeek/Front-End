@@ -8,6 +8,7 @@ import Signin from "./pages/SigninPage/SigninPage";
 import Places from "./pages/PlacesPage/PlacesPage";
 import Search from "./pages/PlacesPage/PlacesSearchPage";
 import Posting from "./pages/PlacesPage/PostPlacePage";
+import PlaceDetail from "./pages/PlacesPage/PlacesDetail";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/places" element={<Places />} />
           <Route path="/places/result" element={<Search />} />
           <Route path="/post" element={<Posting />} />
+          <Route path="/places/:id" element={<PlaceDetail />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signin" element={<Signin />} />

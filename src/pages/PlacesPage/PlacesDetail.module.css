@@ -1,0 +1,151 @@
+.placeDetailPage {
+  display: flex;
+  flex-direction: column;
+}
+
+.imageGallery {
+  text-align: center;
+}
+
+.imageGallery img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 280px;
+}
+
+.postContent {
+  padding: 0 25px;
+  box-sizing: border-box;
+}
+
+.postTitle {
+  color: var(--seoul-seek-black);
+  text-align: left;
+  font-family: "Noto Sans KR";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 60px;
+}
+
+.postUserWrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 5px 0 0;
+}
+
+.text {
+  color: var(--seoul-seek-black);
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 30px; /* 200% */
+  padding: 50px 0;
+  box-sizing: border-box;
+}
+
+.hashtagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.comments {
+  margin-top: 50px;
+}
+
+.mapLink {
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.mapLinkBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  width: 110px;
+  height: 30px;
+  border: 1px solid #000;
+  border-radius: 100px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.commentFormWrap {
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+
+.commentForm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #000;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+.commentForm textarea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 300;
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+}
+
+.commentForm button {
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  width: 50px;
+  height: 50px;
+  border: none;
+  background-color: transparent;
+}
+
+.commentList {
+  margin-bottom: 45px;
+}
+
+.commentItem {
+  display: flex;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  gap: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--seoul-seek-gray);
+}
+
+.commentAuthor {
+  font-weight: 700;
+}
+
+.commentEnd {
+  text-align: center;
+  color: var(--seoul-seek-blue);
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  padding: 45px 0;
+}

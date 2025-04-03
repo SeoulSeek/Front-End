@@ -53,11 +53,9 @@
   box-sizing: border-box;
   width: 350px;
   height: 350px;
-}
-
-.miniMap {
-  width: 350px;
-  height: 350px;
+  background-image: url("../../assets/PlacePage/seoulMap.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 .message {
@@ -128,9 +126,27 @@
 }
 
 .tab {
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-weight: 700;
+  padding: 0 10px;
+  color: var(--seoul-seek-gray);
+  box-sizing: border-box;
   background: none;
   border: none;
   cursor: pointer;
+}
+.activeTab {
+  color: var(--seoul-seek-blue);
+}
+
+.noResults {
+  text-align: center;
+  color: var(--seoul-seek-blue);
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
 }
 
 /* 게시물 작성 페이지 */
@@ -164,7 +180,7 @@
   font-size: 14px;
   font-style: normal;
   font-weight: 700;
-  background-image: url("./../../assets/checker.png");
+  background-image: url("./../../assets/PlacePage/checker.png");
   background-position: center;
 }
 .selectedImageOverlay {
