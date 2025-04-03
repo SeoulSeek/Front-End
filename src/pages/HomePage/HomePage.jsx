@@ -8,6 +8,7 @@ import glass from "../../assets/HomePage/glass.png";
 import dummy1 from "../../assets/HomePage/dummy1.jpg";
 import dummy2 from "../../assets/HomePage/dummy2.jpg";
 import Loading from "../../components/Loading/Loading";
+import { Link } from "react-router";
 
 const Home = () => {
   const [timePeriod, setTimePeriod] = useState("오후");
@@ -33,7 +34,9 @@ const Home = () => {
         <br />이 도시가 지닌 특별한 정체성과 개성을 나타냅니다.
       </p>
       <img src={foldingMap} className={styles.foldingMap} />
-      <img src={glass} className={styles.glass} />
+      <Link to="/map">
+        <img src={glass} className={styles.glass} />
+      </Link>
       <div className={styles.recommContainer}>
         <div className={styles.recommBox}>
           <h2 className={styles.h2}>금주의 추천 관광코스</h2>
