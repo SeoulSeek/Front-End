@@ -1,0 +1,52 @@
+.footer {
+  display: flex;
+  width: 100%;
+  height: 300px;
+  flex-shrink: 0;
+  background-color: #000000;
+  position: relative;
+  z-index: 2000;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  position: absolute;
+  margin-top: 24px;
+  margin-left: 20px;
+}
+
+.linkItem {
+  color: #D3D9DF;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-weight: 300;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
+
+.logo {
+  width: 220px;
+  height: 40px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 47px;
+  left: 20px;
+}
+
+.copyright {
+  color:#6D8196;
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+  font-weight: 300;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
