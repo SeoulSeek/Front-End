@@ -32,6 +32,8 @@ const Home = () => {
         분위기를 의미하는 것을 넘어,
         <br />이 도시가 지닌 특별한 정체성과 개성을 나타냅니다.
       </p>
+      <img src={foldingMap} className={styles.foldingMap} />
+      <img src={glass} className={styles.glass} />
       <div className={styles.recommContainer}>
         <div className={styles.recommBox}>
           <h2 className={styles.h2}>금주의 추천 관광코스</h2>
