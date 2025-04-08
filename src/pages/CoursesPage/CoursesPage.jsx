@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./CoursesPage.module.css";
 import CoursesBox from "../../components/CoursesBox/CoursesBox";
-import SortMenu from "../../components/SortMenu/SortMenu";
+import SortMenu from "../../components/global/SortMenu/SortMenu";
 
 const CoursesPage = () => {
   return (
@@ -14,6 +14,7 @@ const CoursesPage = () => {
         <CoursesBox />
         <CoursesBox />
       </div>
+      <p className={styles.bottomText}>목록이 끝났어요.</p>
     </>
   );
 };

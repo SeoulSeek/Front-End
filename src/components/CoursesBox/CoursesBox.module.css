@@ -5,7 +5,7 @@
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;
-  color: var(--, #000);
+  color: #000;
   font-family: "Noto Sans KR";
   font-size: 20px;
   font-weight: 400;
@@ -23,14 +23,27 @@
   align-self: stretch;
 }
 
+.imageContainer {
+  position: relative;
+  width: 350px;
+  height: 170px;
+}
+
 .courseImg {
   width: 350px;
   height: 170px;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
   border-radius: 50px;
   border: 1px solid #000;
+  display: block;
+}
+
+.starIcon {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
 }
 
 .tagContainer {
