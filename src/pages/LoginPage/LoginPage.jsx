@@ -28,7 +28,6 @@ function Login() {
   return (
     <>
       <AuthLayout
-        title="로그인"
         welcomeTitle="환영합니다!"
         welcomeMessage="로그인하시면 홈페이지를 보다 편리하게 이용하실 수 있습니다."
       >
@@ -58,6 +57,12 @@ function Login() {
               >
                 <span className={styles.btn_text}>로그인</span>
               </button>
+              <div className={styles.regiLink}>
+                <span className={styles.text}>서울식 회원이 아니신가요?</span>{" "}
+                <Link to="/signin" className={`${styles.link}`}>
+                  회원가입
+                </Link>
+              </div>
             </div>
             <div className={styles.dividing}>
               <span className={styles.text}>또는</span>
@@ -67,12 +72,6 @@ function Login() {
             <a id="kakao-login-btn" href="">
               <img src={kakao} alt="카카오 로그인" />
             </a>
-          </div>
-          <div className={styles.regiLink}>
-            <span className={styles.text}>서울식 회원이 아니신가요?</span>{" "}
-            <Link to="/signin" className={`${styles.link}`}>
-              회원가입
-            </Link>
           </div>
         </div>
       </AuthLayout>

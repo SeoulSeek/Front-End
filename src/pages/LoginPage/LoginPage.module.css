@@ -65,16 +65,27 @@
 }
 
 .regiLink {
-  margin-top: 40px;
+  margin-top: 10px;
   text-align: center;
 }
 
 .regiLink .text {
+  font-family: "Noto Sans KR";
   font-size: 14px;
+  font-style: normal;
   color: rgba(0, 0, 0, 0.5);
 }
 
 .link {
+  font-family: "Noto Sans KR";
   font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
   color: var(--seoul-seek-black);
 }

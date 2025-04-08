@@ -1,9 +1,9 @@
 import React, { use, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { FaRegCheckSquare, FaRegSquare } from "react-icons/fa";
 import AuthLayout from "../../layouts/AuthLayout";
 import Input from "../../components/Input/Input";
 import styles from "./SigninPage.module.css";
+import Checkbox from "../../components/Checkbox/Checkbox";
 
 function Signin() {
   const [formData, setFormData] = useState({
@@ -48,49 +48,66 @@ function Signin() {
       [name]: type === "checkbox" ? checked : value,
     });
     // 실시간 유효성 검사
-    if (name === "userName") {
-      setErrors({
-        ...errors,
-        userName: value.length > 20 ? "이름은 20자 이내로 입력해주세요." : "",
-      });
-    } else if (name === "userEmail") {
-      setErrors({
-        ...errors,
-        userEmail: !validateEmail(value)
-          ? "유효한 이메일 형식이 아닙니다."
-          : "",
-      });
-    } else if (name === "userPw") {
-      setErrors({
-        ...errors,
-        userPw: !validatePassword(value)
-          ? "영어, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요."
-          : "",
-      });
-    } else if (name === "confirmPw") {
-      setErrors({
-        ...errors,
-        confirmPw:
-          value !== formData.userPw ? "비밀번호가 일치하지 않습니다." : "",
-      });
-    }
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      const trimmedValue = value.trim();
+
+      switch (name) {
+        case "userName":
+          newErrors.userName =
+            trimmedValue.length > 20 ? "이름은 20자 이내로 입력해주세요." : "";
+          break;
+
+        case "userEmail":
+          newErrors.userEmail =
+            trimmedValue && !validateEmail(value)
+              ? "유효한 이메일 형식이 아닙니다."
+              : "";
+          break;
+
+        case "userPw":
+          newErrors.userPw =
+            trimmedValue && !validatePassword(value)
+              ? "영어, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요."
+              : "";
+          break;
+
+        case "confirmPw":
+          newErrors.confirmPw =
+            trimmedValue && value !== formData.userPw
+              ? "비밀번호가 일치하지 않습니다."
+              : "";
+          break;
+      }
+
+      return newErrors;
+    });
   };
 
   // 회원가입 폼 유효성 검사
   useEffect(() => {
-    const isUsernameVaild =
-      formData.userName.length <= 20 && formData.userName.length > 0;
-    const isUserEmailVaild = validateEmail(formData.userEmail);
-    const isUserPwVaild = validatePassword(formData.userPw);
-    const isConfirmPwVaild = formData.confirmPw === formData.userPw;
-    const isAgreementsVaild = formData.agreeTerms && formData.agreePrivacy;
+    const isUsernameValid =
+      formData.userName.trim() !== "" &&
+      formData.userName.length <= 20 &&
+      formData.userName.length > 0;
+
+    const isUserEmailValid =
+      formData.userEmail.trim() !== "" && validateEmail(formData.userEmail);
+
+    const isUserPwValid =
+      formData.userPw.trim() !== "" && validatePassword(formData.userPw);
+
+    const isConfirmPwValid =
+      formData.confirmPw.trim() !== "" &&
+      formData.confirmPw === formData.userPw;
+    const isAgreementsValid = formData.agreeTerms && formData.agreePrivacy;
 
     setIsFormVaild(
-      isUsernameVaild &&
-        isUserEmailVaild &&
-        isUserPwVaild &&
-        isConfirmPwVaild &&
-        isAgreementsVaild
+      isUsernameValid &&
+        isUserEmailValid &&
+        isUserPwValid &&
+        isConfirmPwValid &&
+        isAgreementsValid
     );
   }, [formData]);
 
@@ -120,15 +137,8 @@ function Signin() {
               name="userName"
             />
             <div className={styles.errorMessagesWrap}>
-              {errors.userName ? (
+              {errors.userName && (
                 <p className={styles.errorMessages}>{errors.userName}</p>
-              ) : (
-                <p
-                  className={styles.errorMessages}
-                  style={{ color: "#6d8196", fontSize: "12px" }}
-                >
-                  닉네임은 마이페이지에서 변경 가능합니다.
-                </p>
               )}
             </div>
 
@@ -174,28 +184,24 @@ function Signin() {
             </div>
           </div>
           <div className={styles.agreements}>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeTerms"
-                checked={formData.agreeTerms}
-                onChange={handleChange}
-              />
-              <Link to="" className={styles.link}>
-                서비스 이용약관
-              </Link>
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreePrivacy"
-                checked={formData.agreePrivacy}
-                onChange={handleChange}
-              />
-              <Link to="" className={styles.link}>
-                개인정보처리방침
-              </Link>
-            </label>
+            <Checkbox
+              checked={formData.agreeTerms}
+              onChange={(checked) =>
+                setFormData((prev) => ({ ...prev, agreeTerms: checked }))
+              }
+              link="/terms" // 실제 약관 페이지 경로로 변경
+            >
+              서비스 이용약관
+            </Checkbox>
+            <Checkbox
+              checked={formData.agreePrivacy}
+              onChange={(checked) =>
+                setFormData((prev) => ({ ...prev, agreePrivacy: checked }))
+              }
+              link="/terms" // 실제 약관 페이지 경로로 변경
+            >
+              개인정보처리방침
+            </Checkbox>
           </div>
 
           <div>
