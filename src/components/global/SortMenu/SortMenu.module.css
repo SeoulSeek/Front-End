@@ -1,4 +1,4 @@
-sortContainer {
+.sortContainer {
   display: flex;
   padding-left: 10px;
   justify-content: center;
@@ -11,9 +11,11 @@ sortContainer {
   font-family: "Noto Sans KR";
   font-size: 15px;
   font-weight: 700;
+  border: 1px solid #000;
+  background: #FFF;
 }
 
-icon {
+.icon {
   width: 40px;
   height: 40px;
 }

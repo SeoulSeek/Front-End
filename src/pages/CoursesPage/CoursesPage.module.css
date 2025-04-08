@@ -9,6 +9,12 @@
   margin-left: 20px;
 }
 
+.sortWrapper {
+  position: absolute;
+  right: 20px;
+  margin-top: 23px;
+}
+
 .boxes {
   margin-top: 45px;
   display: flex;
@@ -28,9 +34,3 @@
   font-weight: 700;
   margin-bottom: 45px;
 }
-
-.sort {
-  position: absolute;
-  right: 20px;
-}
-

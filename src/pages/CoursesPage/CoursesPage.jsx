@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./CoursesPage.module.css";
 import CoursesBox from "../../components/CoursesBox/CoursesBox";
 import SortMenu from "../../components/global/SortMenu/SortMenu";
@@ -7,7 +7,9 @@ const CoursesPage = () => {
   return (
     <>
       <h1 className={styles.h1}>서울식 관광코스</h1>
-      <SortMenu className={styles.sort}/>
+      <div className={styles.sortWrapper}>
+        <SortMenu />
+      </div>
       <div className={styles.boxes}>
         <CoursesBox />
         <CoursesBox />

@@ -6,7 +6,7 @@ import { IoMdArrowDropdown } from "react-icons/io";
 const SortMenu = () => {
   return (
     <div className={styles.sortContainer}>
-        추천순
+        최신순
         <IoMdArrowDropdown className={styles.icon}/>
     </div>
   );
