@@ -10,7 +10,7 @@ const Sidebar = ({ onClose }) => {
     setAnimate(true);
   }, []);
 
-  // 공통으로 사이드바를 닫는 함수
+  // 공통으로 사이드바를 닫는 함수입니다.
   const closeSidebar = () => {
     setAnimate(false);
     setTimeout(() => {
@@ -22,7 +22,6 @@ const Sidebar = ({ onClose }) => {
     closeSidebar();
   };
 
-  // 메뉴 아이템 클릭 시도 동일하게 closeSidebar를 호출
   const handleMenuItemClick = () => {
     closeSidebar();
   };
