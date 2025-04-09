@@ -11,10 +11,10 @@ const CoursesPage = () => {
         <SortMenu />
       </div>
       <div className={styles.boxes}>
-        <CoursesBox />
-        <CoursesBox />
-        <CoursesBox />
-        <CoursesBox />
+        <CoursesBox id={1} />
+        <CoursesBox id={2} />
+        <CoursesBox id={3} />
+        <CoursesBox id={4} />
       </div>
       <p className={styles.bottomText}>목록이 끝났어요.</p>
     </>
