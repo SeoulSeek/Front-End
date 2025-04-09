@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 import $ from "./AuthLayout.module.css";
-import LogoMobile from "../components/Logo/Logo";
+import Logo from "./../assets/LogoMobile.png";
 
 const AuthLayout = ({ title, welcomeTitle, welcomeMessage, children }) => {
   return (
@@ -9,7 +9,9 @@ const AuthLayout = ({ title, welcomeTitle, welcomeMessage, children }) => {
       <div className={$.container}>
         <div className={$.login_container}>
           <header>
-            <LogoMobile />
+            <Link to="/">
+              <img src={Logo} alt="서울식 로고" className={$.logo} />
+            </Link>
           </header>
           {welcomeTitle && (
             <div className={$.welcomeText}>
@@ -17,7 +19,7 @@ const AuthLayout = ({ title, welcomeTitle, welcomeMessage, children }) => {
               <p className={$.welcomeMessage}>{welcomeMessage}</p>
             </div>
           )}
-          <h2 className={$.title}>{title}</h2>
+          {title && <h2 className={$.title}>{title}</h2>}
           {children}
         </div>
       </div>
