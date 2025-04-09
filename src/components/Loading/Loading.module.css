@@ -1,3 +1,7 @@
+.showbox {
+  z-index: 2000;
+}
+
 .loader {
   position: relative;
   margin: 0 auto;
@@ -22,7 +26,7 @@
 .path {
   stroke-dasharray: 1, 200;
   stroke-dashoffset: 0;
-  animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+  animation: dash 1.5s ease-in-out infinite /*, color 6s ease-in-out infinite*/;
   stroke-linecap: round;
   stroke: var(--seoul-seek-skyblue);
 }
@@ -34,7 +38,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
   align-items: center;
-  font-size: 40px; /* 이모지 크기 조정 */
+  width: 40px; /* 이모지 크기 조정 */
+  height: 40px; /* 이모지 크기 조정 */
 }
 
 /* 텍스트 스타일 */
@@ -49,33 +54,27 @@
   color: var(--seoul-seek-skyblue);
   text-align: center;
   white-space: nowrap;
-  animation: color 6s ease-in-out infinite;
+  /*animation: color 6s ease-in-out infinite;*/
 }
 
 .dot {
-  opacity: 0;
-  animation: dotsAnimation 6.5s infinite;
+  padding: 1px;
+  animation: dotsAnimation 1s infinite;
 }
 
 .dot:nth-child(1) {
   animation-delay: 0s;
 }
 .dot:nth-child(2) {
-  animation-delay: 1s;
+  animation-delay: 250ms;
 }
 .dot:nth-child(3) {
-  animation-delay: 2s;
+  animation-delay: 500s;
 }
 
 @keyframes dotsAnimation {
-  0% {
-    opacity: 0;
-  }
   50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
+    color: transparent;
   }
 }
 
