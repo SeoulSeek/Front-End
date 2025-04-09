@@ -6,6 +6,8 @@ import { AiOutlineEdit } from "react-icons/ai";
 import $ from "./PlacesPage.module.css";
 import SearchBar from "../../components/Input/SearchBar";
 import PostBox from "../../components/PostBox/PostBox";
+import Checkbox from "../../components/Checkbox/Checkbox";
+import SortMenu from "../../components/global/SortMenu/SortMenu";
 import dummyPosts from "../../data/dummyPosts";
 
 const ITEMS_PER_PAGE = 3;
@@ -22,12 +24,12 @@ const Places = () => {
     navigate(`/places/result?q=${encodeURIComponent(query)}`);
   };
   const handleCreatePost = () => {
-    navigate("/post");
+    navigate("/places/edit");
   };
 
   // 유저, 관리자 게시물 필터링
   const filteredPosts = dummyPosts.filter((post) => {
-    const isAdminPost = post.admin;
+    const isAdminPost = post.author.admin;
     return (showAdminPosts && isAdminPost) || (showUserPosts && !isAdminPost);
   });
 
@@ -50,26 +52,18 @@ const Places = () => {
             placeholder="자치구, 키워드, 유저명으로 방명록을 검색해보세요"
           />
           <div className={$.filterContainer}>
-            <label className={$.checkboxLabel}>
-              <input
-                type="checkbox"
-                name="adminPosts"
-                checked={showAdminPosts}
-                onChange={() => setShowAdminPosts(!showAdminPosts)}
-                className={$.checkboxStyle}
-              />
+            <Checkbox
+              checked={showAdminPosts}
+              onChange={() => setShowAdminPosts(!showAdminPosts)}
+            >
               관리자 추천 명소만 보기
-            </label>
-            <label className={$.checkboxLabel}>
-              <input
-                type="checkbox"
-                name="userPosts"
-                checked={showUserPosts}
-                onChange={() => setShowUserPosts(!showUserPosts)}
-                className={$.checkboxStyle}
-              />
+            </Checkbox>
+            <Checkbox
+              checked={showUserPosts}
+              onChange={() => setShowUserPosts(!showUserPosts)}
+            >
               유저 추천 명소만 보기
-            </label>
+            </Checkbox>
           </div>
         </div>
 
@@ -88,12 +82,12 @@ const Places = () => {
                 key={post.id}
                 id={post.id}
                 title={post.title}
-                place={post.place}
-                district={post.district}
-                hashtags={post.hashtags}
-                username={post.username}
-                likes={post.likes}
-                comments={post.comments}
+                place={post.metadata.location.name}
+                district={post.metadata.location.district}
+                hashtags={post.metadata.tags}
+                username={post.author.username}
+                likes={post.stats.likes}
+                comments={post.comments.length}
               />
             ))}
           </ul>
