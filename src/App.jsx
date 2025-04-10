@@ -11,6 +11,7 @@ import Posting from "./pages/PlacesPage/PostPlacePage";
 import PlaceDetail from "./pages/PlacesPage/PlacesDetail";
 import Courses from "./pages/CoursesPage/CoursesPage";
 import CoursesDetail from "./pages/CoursesPage/CoursesDetail";
+import NotFound from "./pages/NotFoundPage/NotFoundPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signin" element={<Signin />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
