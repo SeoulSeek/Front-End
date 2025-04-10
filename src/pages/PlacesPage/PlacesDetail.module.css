@@ -72,12 +72,13 @@
   font-size: 14px;
   font-style: normal;
   font-weight: 700;
-  width: 110px;
+  padding: 0 10px;
   height: 30px;
   border: 1px solid #000;
   border-radius: 100px;
   background: #fff;
   box-sizing: border-box;
+  color: var(--seoul-seek-black);
 }
 
 .commentFormWrap {
@@ -95,8 +96,9 @@
 }
 
 .commentForm textarea {
-  display: flex;
-  justify-content: center;
+  flex: 1;
+  max-height: 120px;
+  padding: 10px;
   align-items: center;
   font-family: "Noto Sans KR";
   font-size: 14px;
@@ -106,6 +108,7 @@
   resize: none;
   border: none;
   outline: none;
+  overflow-y: auto;
 }
 
 .commentForm button {
@@ -124,6 +127,7 @@
 }
 
 .commentItem {
+  position: relative;
   display: flex;
   font-family: "Noto Sans KR";
   font-size: 15px;
@@ -135,6 +139,7 @@
 }
 
 .commentAuthor {
+  flex-shrink: 0;
   font-weight: 700;
 }
 
@@ -148,4 +153,11 @@
   font-weight: 700;
   line-height: normal;
   padding: 45px 0;
+}
+
+.commentDelete {
+  position: absolute;
+  top: 15px;
+  right: 0;
+  color: var(--seoul-seek-blue);
 }

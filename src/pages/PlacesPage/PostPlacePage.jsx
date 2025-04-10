@@ -6,7 +6,7 @@ import { AiOutlineCloseCircle, AiOutlineSearch } from "react-icons/ai";
 import $ from "./PlacesPage.module.css";
 import dummyPlaces from "../../data/dummyPlaces";
 import PlaceSearchBar from "../../components/Input/PlaceSearchBar";
-import HashTag from "../../components/HashTag/HashTag";
+import HashTag from "../../components/global/HashTag/HashTag";
 
 const PostPlace = () => {
   const [title, setTitle] = useState(""); // 제목
@@ -14,7 +14,6 @@ const PostPlace = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showPlaceList, setShowPlaceList] = useState(false);
   const [customKeyword, setCustomKeyword] = useState("");
-  const [showCustomInput, setShowCustomInput] = useState(false);
   const [hashtags, setHashtags] = useState([]);
   const [selectedTagIndex, setSelectedTagIndex] = useState(-1);
   const [files, setFiles] = useState([]);
@@ -193,23 +192,15 @@ const PostPlace = () => {
                 <HashTag text={tag} />
               </div>
             ))}
-            {showCustomInput && (
-              <input
-                type="text"
-                value={customKeyword}
-                onChange={(e) => setCustomKeyword(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && addTag()}
-                autoFocus
-                className={$.keywordInput}
-                placeholder="태그를 입력하세요"
-              />
-            )}
-            <button
-              onClick={() => setShowCustomInput(true)}
-              className={$.keywordAddBtn}
-            >
-              직접 추가하기
-            </button>
+
+            <input
+              type="text"
+              value={customKeyword}
+              onChange={(e) => setCustomKeyword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addTag()}
+              className={$.keywordInput}
+              placeholder="직접 추가하기"
+            />
           </div>
         </div>
 

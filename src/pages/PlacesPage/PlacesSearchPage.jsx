@@ -4,7 +4,9 @@ import { useSearchParams } from "react-router";
 import $ from "./PlacesPage.module.css";
 import SearchBar from "../../components/Input/SearchBar";
 import PostBox from "../../components/PostBox/PostBox";
+import SortMenu from "../../components/global/SortMenu/SortMenu";
 import dummyPosts from "../../data/dummyPosts";
+import MiniPostBox from "../../components/MiniPostBox/MiniPostBox";
 
 const ITEMS_PER_LOAD = 5;
 
@@ -117,36 +119,51 @@ const Search = () => {
               {tab.name}
             </button>
           ))}
-          <div>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="lastest">최신순</option>
-              <option value="popular">추천순</option>
-            </select>
-          </div>
+          <SortMenu />
         </div>
 
-        <div className={$.postListWrap}>
-          {filteredPosts.length === 0 ? (
-            <p className={$.noResults}>검색 결과가 없습니다.</p>
-          ) : (
-            <ul className={$.postList}>
-              {loadedPosts.map((post) => (
-                <PostBox
-                  key={post.id}
-                  id={post.id}
-                  title={post.title}
-                  place={post.place}
-                  district={post.district}
-                  hashtags={post.hashtags}
-                  username={post.username}
-                  likes={post.likes}
-                  comments={post.comments}
-                />
-              ))}
-              <li id="sentinel" style={{ height: "20px" }}></li>
-            </ul>
-          )}
-        </div>
+        {activeTab === "username" ? (
+          <div className={$.postListWrap}>
+            {filteredPosts.length === 0 ? (
+              <p className={$.noResults}>검색 결과가 없습니다.</p>
+            ) : (
+              <ul className={$.postList}>
+                {loadedPosts.map((post) => (
+                  <MiniPostBox
+                    key={post.id}
+                    id={post.id}
+                    title={post.title}
+                    username={post.username}
+                  />
+                ))}
+                <li id="sentinel" style={{ height: "20px" }}></li>
+              </ul>
+            )}
+          </div>
+        ) : (
+          <div className={$.postListWrap}>
+            {filteredPosts.length === 0 ? (
+              <p className={$.noResults}>검색 결과가 없습니다.</p>
+            ) : (
+              <ul className={$.postList}>
+                {loadedPosts.map((post) => (
+                  <PostBox
+                    key={post.id}
+                    id={post.id}
+                    title={post.title}
+                    place={post.place}
+                    district={post.district}
+                    hashtags={post.hashtags}
+                    username={post.username}
+                    likes={post.likes}
+                    comments={post.comments}
+                  />
+                ))}
+                <li id="sentinel" style={{ height: "20px" }}></li>
+              </ul>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

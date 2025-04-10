@@ -1,9 +1,8 @@
 // ./src/components/PostBox/PostBox
 import React, { useState } from "react";
-import { FaHeart, FaRegHeart, FaRegComment } from "react-icons/fa";
 
 import $ from "./PostBox.module.css";
-import HashTag from "../HashTag/HashTag";
+import HashTag from "../global/HashTag/HashTag";
 import { Link } from "react-router";
 import MiniProfile from "../MiniProfile/MiniProfile";
 import PostInfo from "../MiniProfile/PostInfo";
@@ -40,9 +39,10 @@ const PostBox = ({
             <div className={$.postHashTagList}>
               {district && <HashTag text={district} type="district" />}
               {place && <HashTag text={place} type="place" />}
-              {hashtags.map((tag, index) => (
-                <HashTag key={index} text={tag} />
-              ))}
+              {hashtags &&
+                hashtags.map((tag, index) => (
+                  <HashTag key={index} text={tag} />
+                ))}
             </div>
 
             <div className={$.postUserWrap}>
