@@ -12,6 +12,7 @@ import PlaceDetail from "./pages/PlacesPage/PlacesDetail";
 import Courses from "./pages/CoursesPage/CoursesPage";
 import CoursesDetail from "./pages/CoursesPage/CoursesDetail";
 import NotFound from "./pages/NotFoundPage/NotFoundPage";
+import MyPage from "./pages/MyPage/MyPage";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/places/edit/" element={<Posting />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/courses/:id" element={<CoursesDetail />} />
+          <Route path="/mypage" element={<MyPage />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signin" element={<Signin />} />

@@ -63,7 +63,7 @@ const Sidebar = ({ onClose }) => {
             SS 관광명소 추천
           </Link>
           <Link
-            to="user"
+            to="/mypage"
             className={styles.menuItem}
             onClick={handleMenuItemClick}
           >
