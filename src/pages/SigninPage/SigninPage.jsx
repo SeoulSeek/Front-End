@@ -127,7 +127,7 @@ function Signin() {
   return (
     <>
       <AuthLayout title="회원가입">
-        <form onSubmit={handleSignin}>
+        <form onSubmit={handleSignin} className={styles.form}>
           <div className={styles.login_box}>
             <Input
               type="text"
