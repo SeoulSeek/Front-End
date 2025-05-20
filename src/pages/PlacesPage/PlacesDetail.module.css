@@ -1,6 +1,8 @@
 .placeDetailPage {
+  position: relative;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .imageGallery {
@@ -18,6 +20,7 @@
 .postContent {
   padding: 0 25px;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .postTitle {

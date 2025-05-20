@@ -4,6 +4,7 @@ import { BiLinkAlt } from "react-icons/bi";
 import { CgClose } from "react-icons/cg";
 
 import $ from "./PlacesDetail.module.css";
+import ScrollToTopBtn from "../../components/ScrollToTop/ScrollToTop";
 import sampleImg from "../../assets/PlacePage/sample.jpg";
 import dummyPosts from "../../data/dummyPosts";
 import MiniProfile from "../../components/MiniProfile/MiniProfile";
@@ -129,6 +130,7 @@ const PlaceDetail = () => {
             <div className={$.commentEnd}>댓글 목록이 끝났어요.</div>
           </div>
         </div>
+        <ScrollToTopBtn />
       </div>
     </>
   );
