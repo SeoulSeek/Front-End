@@ -1,29 +1,51 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+
 import Input from "../../components/Input/Input";
 import AuthLayout from "../../layouts/AuthLayout";
 import styles from "./LoginPage.module.css";
 import LogoKakao from "../../assets/LoginPage/LogoKakao.png";
 
-const USER = {
-  email: "abcd@naver.com",
-  pw: "asdw1234@",
-};
-
-function Login() {
+const Login = () => {
+  const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState(""); // 이메일
   const [userPw, setUserPw] = useState(""); //비밀번호
 
-  const handleLogin = () => {
-    // 로그인 처리 로직 (현재 로컬로 진행 => 서버연결로 코드 수정)
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (userEmail === USER.email && userPw === USER.pw) {
-      console.log("로그인 성공");
-    } else {
-      alert(
-        "올바른 이메일이 아니거나 이메일 또는 비밀번호를 잘못 입력했습니다."
-      );
+    // 로그인 처리 로직
+    try {
+      const res = await fetch("http://43.203.7.11:8080/sign-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+        credentials: "include", // <- 쿠키 저장/전송 필수
+        body: JSON.stringify({
+          email: userEmail,
+          password: userPw,
+          rememberMe: true,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("로그인 실패");
+      }
+
+      // 성공 시 페이지 이동만
+      navigate("/");
+    } catch (err) {
+      console.error("로그인 에러:", err);
+      alert("로그인에 실패했습니다.");
     }
+  };
+
+  const handleKakaoLogin = () => {
+    const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
+    const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    window.location.href = kakaoAuthUrl;
   };
 
   return (
@@ -67,7 +89,7 @@ function Login() {
             <span className={styles.text}>또는</span>
           </div>
         </form>
-        <div className={styles.kakao_wrap}>
+        <div className={styles.kakao_wrap} onClick={handleKakaoLogin}>
           <img
             src={LogoKakao}
             alt="카카오 로고"
@@ -80,6 +102,6 @@ function Login() {
       </AuthLayout>
     </>
   );
-}
+};
 
 export default Login;
