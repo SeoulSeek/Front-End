@@ -33,7 +33,7 @@ const Login = () => {
       }
 
       // 성공 시 페이지 이동만
-      navigate("/");
+      navigate("/callback");
     } catch (err) {
       console.error("로그인 에러:", err);
       alert("로그인에 실패했습니다.");

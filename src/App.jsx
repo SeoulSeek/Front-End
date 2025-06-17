@@ -4,6 +4,7 @@ import "./App.css";
 import Layout from "./layouts/Layout";
 import Home from "./pages/HomePage/HomePage";
 import Login from "./pages/LoginPage/LoginPage";
+import LoginCallback from "./pages/LoginPage/LoginCallback";
 import Signin from "./pages/SigninPage/SigninPage";
 import Places from "./pages/PlacesPage/PlacesPage";
 import Search from "./pages/PlacesPage/PlacesSearchPage";
@@ -29,6 +30,7 @@ function App() {
           <Route path="/view" element={<MapHistoryView />} />
         </Route>
         <Route path="/login" element={<Login />} />
+        <Route path="/callback" element={<LoginCallback />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
