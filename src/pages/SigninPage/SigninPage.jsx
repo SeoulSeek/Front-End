@@ -6,6 +6,8 @@ import styles from "./SigninPage.module.css";
 import Checkbox from "../../components/Checkbox/Checkbox";
 
 function Signin() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     userName: "", // 유저이름
     userEmail: "", // 이메일
@@ -13,6 +15,7 @@ function Signin() {
     confirmPw: "", // 재확인
     agreeTerms: false, // 서비스 이용약관
     agreePrivacy: false, // 개인정보처리방침
+    userFile: null, // 프로필사진?
   });
 
   const [errors, setErrors] = useState({
@@ -36,9 +39,32 @@ function Signin() {
     return regex.test(password);
   };
 
-  const handleEmailVerification = () => {
+  const handleEmailVerification = async () => {
     alert("이메일 인증 요청이 전송되었습니다.");
     // 이메일 인증 로직 추가
+    try {
+      const res = await fetch("http://43.203.7.11:8080/valid", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+        body: JSON.stringify({ email: formData.userEmail }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        alert(
+          "이메일 인증 요청에 실패했습니다: " + (data.message || "오류 발생")
+        );
+        return;
+      }
+
+      alert("인증 메일이 전송되었습니다. 메일함을 확인해주세요.");
+    } catch (error) {
+      console.error("이메일 인증 요청 오류:", error);
+      alert("서버 연결 중 문제가 발생했습니다.");
+    }
   };
 
   const handleChange = (e) => {
@@ -111,7 +137,7 @@ function Signin() {
     );
   }, [formData]);
 
-  const handleSignin = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
 
     if (!isFormVaild) {
@@ -121,13 +147,46 @@ function Signin() {
     }
 
     console.log("회원가입 데이터:", formData);
-    // 회원가입 처리 로직 (로컬진행=>추후 백연결)
+    // 회원가입 처리 로직
+    try {
+      const form = new FormData();
+      form.append("name", formData.userName);
+      form.append("email", formData.userEmail);
+      form.append("password", formData.userPw);
+      if (formData.userFile) form.append("file", formData.userFile);
+
+      const response = await fetch("http://43.203.7.11:8080/sign-up", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+        body: JSON.stringify({
+          name: formData.userName,
+          file: "file", // 파일 업로드 기능 추가 시 수정 필요
+          email: formData.userEmail,
+          password: formData.userPw,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        alert("회원가입에 실패했습니다: " + (data.message || "오류 발생"));
+        return;
+      }
+
+      alert("회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.");
+      navigate("/login"); // 가입 후 이동할 경로
+    } catch (err) {
+      console.error("회원가입 요청 실패:", err);
+      alert("서버에 연결할 수 없습니다.");
+    }
   };
 
   return (
     <>
       <AuthLayout title="회원가입">
-        <form onSubmit={handleSignin}>
+        <form onSubmit={handleSignup} className={styles.form}>
           <div className={styles.login_box}>
             <Input
               type="text"
@@ -209,7 +268,7 @@ function Signin() {
               type="submit"
               disabled={!isFormVaild}
               className={styles.btn_login}
-              onClick={handleSignin}
+              onClick={handleSignup}
             >
               <span className={styles.btn_text}>회원가입</span>
             </button>

@@ -34,8 +34,8 @@ const Loading = () => {
             cy="50"
             r="20"
             fill="none"
-            stroke-width="1"
-            stroke-miterlimit="10"
+            strokeWidth="1"
+            strokeMiterlimit="10"
           />
         </svg>
         <img className={$.emoji} src={randomLoader.icon} alt="loading icon" />

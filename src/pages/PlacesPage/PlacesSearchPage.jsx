@@ -25,28 +25,46 @@ const Search = () => {
     { id: 3, name: "유저", key: "username" },
   ];
 
+  // 유틸: 안전한 깊은 키 접근 함수
+  const getValue = (obj, path, defaultValue = undefined) => {
+    return (
+      path
+        .split(".")
+        .reduce(
+          (acc, part) =>
+            acc && acc[part] !== undefined ? acc[part] : undefined,
+          obj
+        ) ?? defaultValue
+    );
+  };
+
   // 탭별 필터링
   const filteredPostsByTab = useCallback(() => {
     if (!searchQuery) return dummyPosts;
 
     switch (activeTab) {
       case "district":
-        return dummyPosts.filter(
-          (post) => post.district && post.district.includes(searchQuery)
-        );
+        return dummyPosts.filter((post) => {
+          const district = getValue(post, "metadata.location.district");
+          return district && district.includes(searchQuery);
+        });
       case "keyword":
-        return dummyPosts.filter(
-          (post) =>
-            (post.hashtags &&
-              post.hashtags.some((tag) => tag.includes(searchQuery))) ||
-            (post.place && post.place.includes(searchQuery))
-        );
+        return dummyPosts.filter((post) => {
+          const tags = getValue(post, "metadata.tags", []);
+          const placeName = getValue(post, "metadata.location.name");
+          return (
+            (Array.isArray(tags) &&
+              tags.some((tag) => tag.includes(searchQuery))) ||
+            (placeName && placeName.includes(searchQuery))
+          );
+        });
       case "username":
-        return dummyPosts.filter(
-          (post) => post.username && post.username.includes(searchQuery)
-        );
+        return dummyPosts.filter((post) => {
+          const username = getValue(post, "author.username");
+          return username && username.includes(searchQuery);
+        });
       default:
-        dummyPosts;
+        return dummyPosts;
     }
   }, [searchQuery, activeTab]);
 
@@ -78,7 +96,7 @@ const Search = () => {
   // 페이지변경시 데이터 로드
   useEffect(() => {
     loadMorePosts();
-  }, [loadMorePosts]);
+  }, [filteredPosts, page]);
 
   // 인터셉션옵저버
   useEffect(() => {
@@ -133,7 +151,7 @@ const Search = () => {
                     key={post.id}
                     id={post.id}
                     title={post.title}
-                    username={post.username}
+                    username={post.author.username}
                   />
                 ))}
                 <li id="sentinel" style={{ height: "20px" }}></li>
@@ -151,12 +169,12 @@ const Search = () => {
                     key={post.id}
                     id={post.id}
                     title={post.title}
-                    place={post.place}
-                    district={post.district}
-                    hashtags={post.hashtags}
-                    username={post.username}
-                    likes={post.likes}
-                    comments={post.comments}
+                    place={post.metadata.location.name}
+                    district={post.metadata.location.district}
+                    hashtags={post.metadata.tags}
+                    username={post.author.username}
+                    likes={post.stats.likes}
+                    comments={post.comments.length}
                   />
                 ))}
                 <li id="sentinel" style={{ height: "20px" }}></li>

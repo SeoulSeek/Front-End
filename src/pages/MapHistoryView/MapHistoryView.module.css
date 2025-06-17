@@ -1,0 +1,123 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 764px;
+  position: relative;
+  overflow: hidden;
+}
+
+.left {
+  height: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.roadview {
+  width: 100%;
+  height: 100%;
+}
+
+.splitter {
+  position: relative;
+  width: 30px;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  z-index: 10;
+}
+
+.right {
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  pointer-events: auto;
+}
+
+.photoArea {
+  height: 100%;
+}
+
+.photo {
+  display: block;
+  height: 100%;
+}
+
+.tutorialBubbleLeft {
+  position: absolute;
+  top: 30%;
+  left: 35%;
+  background: #000;
+  color: #fff;
+  font-family: "Noto Sans KR";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 19px;
+  padding: 24px 32px;
+  margin-right: 5px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  cursor: pointer;
+}
+
+.tutorialBubbleLeft::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #000;
+}
+
+.tutorialBubbleRight {
+  position: absolute;
+  bottom: 20px;
+  right: 50px;
+  background: #000;
+  color: #fff;
+  font-family: "Noto Sans KR";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 19px;
+  padding: 24px 32px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  z-index: 2000;
+  cursor: pointer;
+  animation: fadeIn 0.5s;
+}
+
+.tutorialBubbleRight::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #000;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
