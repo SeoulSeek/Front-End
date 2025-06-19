@@ -44,7 +44,6 @@ const MyPage = () => {
 
   return (
     <div className={styles.myContainer}>
-      {/* 상단 정보 */}
       <div className={styles.myInfoContainer}>
         <img
           src={defaultProfile}
@@ -52,7 +51,6 @@ const MyPage = () => {
           alt="프로필 이미지"
         />
         <div className={styles.myInfo}>
-          {/* 닉네임/타이틀 */}
           <div className={styles.myName}>
             {isEditing ? (
               <input
@@ -69,7 +67,6 @@ const MyPage = () => {
             )}
           </div>
 
-          {/* 언어 */}
           {isEditing ? (
             <div className={styles.langSelector}>
               {LANGUAGES.map((lang) => (
@@ -106,7 +103,6 @@ const MyPage = () => {
             </div>
           )}
 
-          {/* 통계 */}
           <div className={styles.myStats}>
             <span className={styles.stats}>
               작성한 방명록 수 100
@@ -159,20 +155,35 @@ const MyPage = () => {
       </div>
 
       <div className={styles.listContainer}>
+        {activeTab === "places" && (
           <div className={styles.placesList}>
-            <span className={styles.emptyText}>지도에서 다양한 서울을 경험해 보세요!</span>
+            <span className={styles.emptyText}>
+              지도에서 다양한 서울을 경험해 보세요!
+            </span>
           </div>
+        )}
+
+        {activeTab === "guestbook" && (
           <div className={styles.logList}>
-            <span className={styles.emptyText}>관광 기록을 방명록으로 남겨 보는 건 어떨까요?</span>
+            <span className={styles.emptyText}>
+              관광 기록을 방명록으로 남겨 보는 건 어떨까요?
+            </span>
           </div>
-          <span className={styles.listTitle}>스크랩한 관광코스</span>
-          <div className={styles.scrapList}>
-            <span className={styles.emptyText}>스크랩한 관광코스가 없습니다.</span>
-          </div>
-          <span className={styles.listTitle}>좋아요를 누른 방명록</span>
-          <div className={styles.likeList}>
-            <span className={styles.emptyText}>좋아요한 방명록이 없습니다.</span>
-          </div>
+        )}
+
+        <span className={styles.listTitle}>스크랩한 관광코스</span>
+        <div className={styles.scrapList}>
+          <span className={styles.emptyText}>
+            스크랩한 관광코스가 없습니다.
+          </span>
+        </div>
+
+        <span className={styles.listTitle}>좋아요를 누른 방명록</span>
+        <div className={styles.likeList}>
+          <span className={styles.emptyText}>
+            좋아요한 방명록이 없습니다.
+          </span>
+        </div>
       </div>
     </div>
   );
