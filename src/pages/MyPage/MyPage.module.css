@@ -51,7 +51,7 @@
   text-align: center;
   font-family: "Noto Sans KR";
   font-size: 11px;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .myStats {
@@ -122,3 +122,67 @@
   justify-content: center;
   gap: 10px;
 }
+
+.nameInput {
+  width: 230px;
+  border: 1px solid #91C6FF;
+  color: #000;
+  font-family: "Noto Sans KR";
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.nameInput::placeholder {
+  color: rgba(0, 0, 0, 0.50);
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 300;
+}
+
+.langSelector {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 235px;  
+  height: 30px;
+  overflow-x: auto; 
+  overflow-y: hidden; 
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+  overflow-x: auto;
+  border-top: 1px solid #91C6FF;
+  border-bottom: 1px solid #91C6FF;
+  margin: 4px 0;
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  
+}
+
+.langSelector::-webkit-scrollbar {
+  display: none;          
+}
+
+.langItem {
+  display: flex;
+  flex: 0 0 auto;     
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+
+
+.langItem svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+
+.langText {
+  font-family: "Noto Sans KR";
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 20px;         
+  white-space: nowrap;    
+}
+
