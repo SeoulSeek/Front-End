@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styles from "./MyPage.module.css";
 import defaultProfile from "../../assets/MyPage/defaultProfile.png";
 import MyEditBtn from "../../components/MyEditBtn/MyEditBtn";
@@ -13,10 +13,14 @@ const LANGUAGES = ["한국어", "English", "中國語", "日本語"];
 const MyPage = () => {
   const [activeTab, setActiveTab] = useState("places");
   const [isPublic, setIsPublic] = useState(false);
-
   const [isEditing, setIsEditing] = useState(false);
+
   const [name, setName] = useState("서우리");
   const [tempName, setTempName] = useState(name);
+
+  const [savedProfile, setSavedProfile] = useState(defaultProfile);
+  const [tempProfile, setTempProfile] = useState(savedProfile);
+  const fileInputRef = useRef(null);
 
   const [selectedLangs, setSelectedLangs] = useState([
     "한국어",
@@ -27,9 +31,11 @@ const MyPage = () => {
   const handleEditClick = () => {
     if (isEditing) {
       setName(tempName.trim() || name);
+      setSavedProfile(tempProfile);
       setIsEditing(false);
     } else {
       setTempName(name);
+      setTempProfile(savedProfile);
       setIsEditing(true);
     }
   };
@@ -42,14 +48,39 @@ const MyPage = () => {
     );
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setTempProfile(previewUrl);
+    }
+  };
+
   return (
     <div className={styles.myContainer}>
       <div className={styles.myInfoContainer}>
-        <img
-          src={defaultProfile}
-          className={styles.profilePic}
-          alt="프로필 이미지"
-        />
+        <div className={styles.profileWrapper}>
+          <img
+            src={isEditing ? tempProfile : savedProfile}
+            className={styles.profilePic}
+            alt="프로필 이미지"
+          />
+          {isEditing && tempProfile === savedProfile && (
+            <div
+              className={styles.overlay}
+              onClick={() => fileInputRef.current.click()}
+            >
+              업로드
+            </div>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleImageChange}
+          />
+        </div>
         <div className={styles.myInfo}>
           <div className={styles.myName}>
             {isEditing ? (
@@ -114,7 +145,6 @@ const MyPage = () => {
         </div>
       </div>
 
-      {/* 탭, 버튼들입니다 */}
       <div className={styles.myMenuContainer}>
         <div className={styles.tabMenu}>
           <span
@@ -123,7 +153,6 @@ const MyPage = () => {
             style={{
               color:
                 activeTab === "places" ? "#000000" : "#D3D9DF",
-              cursor: "pointer",
             }}
           >
             나의 장소
@@ -136,7 +165,6 @@ const MyPage = () => {
                 activeTab === "guestbook"
                   ? "#000000"
                   : "#D3D9DF",
-              cursor: "pointer",
             }}
           >
             나의 방명록

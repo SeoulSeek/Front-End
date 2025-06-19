@@ -15,6 +15,44 @@
   gap: 10px;
 }
 
+.profileWrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin-left: 20px;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.profileWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 100%;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #00000099;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #FFF;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.profileWrapper:hover .overlay {
+  opacity: 1;
+}
+
 .myInfo {
   display: flex;
   width: 250px;
@@ -76,7 +114,6 @@
   flex-shrink: 0;
   aspect-ratio: 1/1;
   border-radius: 100px;
-  margin-left: 20px;
 }
 
 .blue {
@@ -150,7 +187,6 @@
   align-items: center;
   gap: 20px;
   align-self: stretch;
-  overflow-x: auto;
   border-top: 1px solid #91C6FF;
   border-bottom: 1px solid #91C6FF;
   margin: 4px 0;
@@ -170,13 +206,11 @@
   cursor: pointer;
 }
 
-
 .langItem svg {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
 }
-
 
 .langText {
   font-family: "Noto Sans KR";
@@ -191,41 +225,23 @@
   flex-direction: column;
 }
 
-.placesList {
-  width: 390px;
-  display: inline-flex;
-  height: 446px;
-  justify-content: center;
-  align-items: center;
-  gap: 50px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  background: #FFF;
-}
-
+.placesList,
 .logList {
   width: 390px;
-  display: inline-flex;
+  display: flex;
   height: 446px;
   justify-content: center;
   align-items: center;
-  gap: 50px;
-  flex-shrink: 0;
-  display: flex;
   flex-direction: column;
   background: #FFF;
 }
 
 .scrapList {
   width: 390px;
-  display: inline-flex;
+  display: flex;
   height: 446px;
   justify-content: center;
   align-items: center;
-  gap: 50px;
-  flex-shrink: 0;
-  display: flex;
   flex-direction: column;
   border-top: 1px solid #000;
   border-bottom: 1px solid #000;
@@ -235,13 +251,10 @@
 
 .likeList {
   width: 390px;
-  display: inline-flex;
+  display: flex;
   height: 290px;
   justify-content: center;
   align-items: center;
-  gap: 50px;
-  flex-shrink: 0;
-  display: flex;
   flex-direction: column;
   border-top: 1px solid #000;
   border-bottom: 1px solid #000;
@@ -259,12 +272,10 @@
 
 .listTitle {
   margin-left: 20px;
-  color: var(--, #000);
+  color: #000;
   font-family: "Noto Sans KR";
   font-size: 32px;
-  font-style: normal;
   font-weight: 700;
-  line-height: normal;
   margin-top: 50px;
   margin-bottom: 30px;
 }
