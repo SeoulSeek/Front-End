@@ -5,7 +5,10 @@ import { FaUserEdit } from "react-icons/fa";
 const MyEditBtn = () => {
   return (
     <>
-      
+      <div className={styles.btnContainer}>
+        <span className={styles.btnName}>수정</span>
+        <FaUserEdit className={styles.btnIcon} />
+      </div>
     </>
   );
 };

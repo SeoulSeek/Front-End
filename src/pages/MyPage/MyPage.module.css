@@ -111,3 +111,14 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.btnMenu {
+  margin-top: 20px;
+  margin-right: 20px;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+}

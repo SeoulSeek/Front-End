@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import styles from "./MyPage.module.css";
 import defaultProfile from "../../assets/MyPage/defaultProfile.png";
+import MyEditBtn from "../../components/MyEditBtn/MyEditBtn";
+import MyPublicBtn from "../../components/MyPublicBtn/MyPublicBtn";
 
 const MyPage = () => {
 
   const [activeTab, setActiveTab] = useState("places");
+  const [isPublic, setIsPublic] = useState(false);
 
   return (
     <div className={styles.myContainer}>
@@ -52,6 +55,13 @@ const MyPage = () => {
           >
             나의 방명록
           </span>
+        </div>
+        <div className={styles.btnMenu}>
+          <MyPublicBtn
+            isPublic={isPublic}
+            onClick={() => setIsPublic((prev) => !prev)}
+          />
+          <MyEditBtn />
         </div>
       </div>
     </div>
