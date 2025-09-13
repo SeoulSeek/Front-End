@@ -41,7 +41,7 @@
 .bannerMap {
   position: absolute;
   z-index: 1;
-  top: 165px;
+  top: 85px;
   left: 50%;
   transform: translateX(-50%);
   width: 390px;
@@ -149,8 +149,8 @@
 
 .foldingMap {
   position: absolute;
-  left: 20px;
-  top: 360px;
+  left: 10%;
+  top: 23%;
   z-index: 1000;
   width: 200px;
   height: 200px;
@@ -158,8 +158,8 @@
 
 .glass {
   position: absolute;
-  left: 142px;
-  top: 450px;
+  left: 42%;
+  top: 30%;
   z-index: 1001;
   width: 100px;
   height: 100px;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Outlet } from "react-router-dom";
 import styles from "./Layout.module.css";
 import Header from "../components/Header/Header.jsx";
@@ -8,13 +8,13 @@ import Footer from "../components/Footer/Footer.jsx";
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleMenuClick = () => {
+  const handleMenuClick = useCallback(() => {
     setIsSidebarOpen(true);
-  };
+  }, []);
 
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = useCallback(() => {
     setIsSidebarOpen(false);
-  };
+  }, []);
 
   return (
     <div className={styles.container}>
