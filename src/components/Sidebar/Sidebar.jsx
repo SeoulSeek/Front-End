@@ -69,30 +69,6 @@ const Sidebar = ({ onClose }) => {
           >
             마이페이지
           </Link>
-          <a
-            href="https://www.visitseoul.net/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkItem}
-          >
-            VISIT SEOUL NET
-          </a>
-          <a
-            href="https://www.sto.or.kr/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkItem}
-          >
-            서울관광재단
-          </a>
-          <a
-            href="https://m.map.kakao.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkItem}
-          >
-            카카오맵 kakaomap
-          </a>
         </div>
       </div>
     </>
