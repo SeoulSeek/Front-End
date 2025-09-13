@@ -1,0 +1,77 @@
+.sortMenu {
+  display: inline-block;
+  position: relative;
+  font-family: "Noto Sans KR";
+}
+
+.selectedContainer {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+  align-items: center;
+  width: 92px;
+  height: 40px;
+  padding-left: 10px;
+  border: 1px solid #000;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 92px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+  border: 1px solid transparent; 
+  border-top: none;
+  box-sizing: border-box;
+}
+
+.open {
+  max-height: 120px;
+  border-color: #000;
+  border-top: none;
+}
+
+.dropdownItem {
+  width: 92px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 400;
+  border-bottom: 1px solid #000;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+.dropdown:not(.open) .dropdownItem {
+  opacity: 0;
+  transition: opacity 0s;
+}
+
+.dropdown.open .dropdownItem {
+  opacity: 1;
+  transition: opacity 0s;
+}

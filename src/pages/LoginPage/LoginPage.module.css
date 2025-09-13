@@ -1,3 +1,60 @@
+.welcomeText {
+  display: flex;
+  flex-direction: column;
+  color: var(--seoul-seek-blue);
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: normal;
+  gap: 10px;
+  width: 70%;
+  padding: 50px 0;
+}
+
+.welcomeText p {
+  font-size: 15px;
+  line-height: 18px;
+}
+@media screen and (min-width: 768px) {
+  .welcomeText {
+    width: 70%;
+  }
+  .welcomeText h3 {
+    font-size: 24px;
+  }
+  .welcomeText p {
+    font-size: 16px;
+  }
+}
+@media screen and (min-width: 1280px) {
+  .welcomeText {
+    width: 100%;
+  }
+  .welcomeText h3 {
+    font-size: 28px;
+  }
+  .welcomeText p {
+    font-size: 18px;
+  }
+}
+@media screen and (min-width: 1920px) {
+  .welcomeText {
+    width: 100%;
+  }
+  .welcomeText h3 {
+    font-size: 32px;
+  }
+  .welcomeText p {
+    font-size: 20px;
+  }
+}
+
+.form {
+  width: 300px;
+}
+
 .login_box {
   margin-bottom: 40px;
 }
@@ -41,40 +98,63 @@
   vertical-align: top;
 }
 
-.btn_kakao {
-  display: inline-flex;
-  height: 45px;
-  padding: 0px 14px;
-  justify-content: center;
-  align-items: center;
-  border-radius: 6px;
-  border: none;
-  background: var(--kakao-bg, #fee500);
-}
-
-.btn_kakao_text {
-  display: flex;
-  padding: 0 86px;
-  gap: 8px;
-  color: var(--kakao-text);
-  font-family: "Noto Sans KR";
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 24px;
-}
-
 .regiLink {
-  margin-top: 40px;
+  margin-top: 10px;
   text-align: center;
 }
 
 .regiLink .text {
+  font-family: "Noto Sans KR";
   font-size: 14px;
+  font-style: normal;
   color: rgba(0, 0, 0, 0.5);
 }
 
+.kakao_wrap {
+  display: inline-flex;
+  width: 300px;
+  height: 45px;
+  padding: 0px 14px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: var(--kakao-bg);
+  box-sizing: border-box;
+}
+
+.kakao_logo {
+  width: 18px;
+  height: 18px;
+}
+
+.kakao_label {
+  display: flex;
+  padding: 0px 70px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.kakao_label p {
+  color: var(--kakao-text, rgba(0, 0, 0, 0.85));
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%; /* 22.5px */
+}
+
 .link {
+  font-family: "Noto Sans KR";
   font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
   color: var(--seoul-seek-black);
 }

@@ -1,0 +1,281 @@
+.myContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.myInfoContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.profileWrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin-left: 20px;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.profileWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 100%;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #00000099;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #FFF;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.profileWrapper:hover .overlay {
+  opacity: 1;
+}
+
+.myInfo {
+  display: flex;
+  width: 250px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-right: 10px;
+}
+
+.myName {
+  color: #000;
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  height: 30px;
+  flex-direction: row;
+  gap: 5px;
+  justify-content: start;
+  align-self: stretch;
+}
+
+.myLang {
+  display: flex;
+  height: 30px;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.lang {
+  color: #000;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.myStats {
+  display: flex;
+  height: 30px;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.stats {
+  color: #303943;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.profilePic {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  aspect-ratio: 1/1;
+  border-radius: 100px;
+}
+
+.blue {
+  color: #6D8196;
+}
+
+.myMenuContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 45px;
+}
+
+.tabMenu {
+  margin-top: 14px;
+  margin-left: 20px;
+  width: 155px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+}
+
+.tab {
+  color: #000;
+  text-align: left;
+  font-family: "Noto Sans KR";
+  font-size: 32px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btnMenu {
+  margin-top: 20px;
+  margin-right: 20px;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+}
+
+.nameInput {
+  width: 230px;
+  border: 1px solid #91C6FF;
+  color: #000;
+  font-family: "Noto Sans KR";
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.nameInput::placeholder {
+  color: rgba(0, 0, 0, 0.50);
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 300;
+}
+
+.langSelector {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 235px;  
+  height: 30px;
+  overflow-x: auto; 
+  overflow-y: hidden; 
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+  border-top: 1px solid #91C6FF;
+  border-bottom: 1px solid #91C6FF;
+  margin: 4px 0;
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  
+}
+
+.langSelector::-webkit-scrollbar {
+  display: none;          
+}
+
+.langItem {
+  display: flex;
+  flex: 0 0 auto;     
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.langItem svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.langText {
+  font-family: "Noto Sans KR";
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 20px;         
+  white-space: nowrap;    
+}
+
+.listContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.placesList,
+.logList {
+  width: 390px;
+  display: flex;
+  height: 446px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: #FFF;
+}
+
+.scrapList {
+  width: 390px;
+  display: flex;
+  height: 446px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  background: #FFF;
+  margin-bottom: 50px;
+}
+
+.likeList {
+  width: 390px;
+  display: flex;
+  height: 290px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  background: #FFF;
+  margin-bottom: 100px;
+}
+
+.emptyText {
+  color: #6D8196;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.listTitle {
+  margin-left: 20px;
+  color: #000;
+  font-family: "Noto Sans KR";
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 50px;
+  margin-bottom: 30px;
+}

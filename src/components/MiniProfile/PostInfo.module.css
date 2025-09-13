@@ -31,5 +31,6 @@
   justify-content: center;
   gap: 10px;
   border: none;
+  color: var(--seoul-seek-black);
   background-color: transparent;
 }

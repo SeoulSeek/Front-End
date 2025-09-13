@@ -68,6 +68,8 @@ const Input = ({
             padding: "5px 10px",
             cursor: "pointer",
             fontSize: "15px",
+            fontFamily: "Noto Sans KR",
+            fontWeight: "700",
           }}
         >
           인증

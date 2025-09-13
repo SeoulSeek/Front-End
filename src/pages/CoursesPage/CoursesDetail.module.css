@@ -1,0 +1,75 @@
+.detailContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.courseImage {
+  width: 390px;
+  height: 280px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.title {
+  width: 390px;
+  color: #000;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 60px;
+  margin-bottom: 10px;
+}
+
+.detailText {
+  width: 340px;
+  color: #000;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 30px;
+  margin-bottom: 20px;
+}
+
+.tags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 44px;
+}
+
+.tagRow {
+  display: flex;
+  align-items: center;
+  width: 390px;
+  height: 60px;
+  padding: 0px 25px;
+}
+
+.tagName,
+.tagCount {
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.toggleIcon {
+  cursor: pointer;
+}
+ 
+.tagContainer {
+  width: 390px;
+  margin-bottom: 20px;
+}
+
+.expandedArea {
+  height: 100px;
+  background-color: #fff;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}

@@ -35,7 +35,8 @@ const MiniProfile = ({ username, profileImg = defaultProfileImg, userId }) => {
       )}
       {}
       <span className={$.username}>
-        {username} {username === "서울식" ? <RiVerifiedBadgeFill /> : ""}
+        {username}{" "}
+        {username === "서울식" ? <RiVerifiedBadgeFill size={14} /> : ""}
       </span>
     </div>
   );
