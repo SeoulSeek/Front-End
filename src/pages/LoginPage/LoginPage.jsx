@@ -15,7 +15,7 @@ const Login = () => {
     e.preventDefault();
     // 로그인 처리 로직
     try {
-      const res = await fetch("http://43.203.7.11:8080/sign-in", {
+      const res = await fetch("https://43.203.7.11:8080/sign-in", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",

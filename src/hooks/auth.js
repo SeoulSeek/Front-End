@@ -12,7 +12,7 @@ export const mapLanguageToUI = (apiLanguage) => {
 // 사용자 정보 가져오기
 export const fetchUserInfo = async () => {
   try {
-    const response = await fetch('http://43.203.7.11:8080/auth/user', {
+    const response = await fetch('https://43.203.7.11:8080/auth/user', {
       method: 'GET',
       credentials: 'include',
       headers: {

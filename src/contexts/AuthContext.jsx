@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   // 사용자 정보 가져오기
   const fetchUser = async () => {
     try {
-      const response = await fetch('http://43.203.7.11:8080/auth/user', {
+      const response = await fetch('https://43.203.7.11:8080/auth/user', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (user?.id) {
-        await fetch('http://43.203.7.11:8080/auth/logout', {
+        await fetch('https://43.203.7.11:8080/auth/logout', {
           method: 'POST',
           credentials: 'include',
           headers: {
