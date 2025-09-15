@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./MyPage.module.css";
 import defaultProfile from "../../assets/MyPage/defaultProfile.png";
 import MyEditBtn from "../../components/MyEditBtn/MyEditBtn";
@@ -7,26 +8,36 @@ import {
   AiFillCheckSquare,
   AiOutlineCheckSquare,
 } from "react-icons/ai";
+import { useAuth } from "../../contexts/AuthContext";
 
 const LANGUAGES = ["한국어", "English", "中國語", "日本語"];
 
 const MyPage = () => {
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("places");
   const [isPublic, setIsPublic] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [name, setName] = useState("서우리");
+  const [name, setName] = useState(user?.name || "서우리");
   const [tempName, setTempName] = useState(name);
 
-  const [savedProfile, setSavedProfile] = useState(defaultProfile);
+  const [savedProfile, setSavedProfile] = useState(user?.file || defaultProfile);
   const [tempProfile, setTempProfile] = useState(savedProfile);
   const fileInputRef = useRef(null);
 
-  const [selectedLangs, setSelectedLangs] = useState([
-    "한국어",
-    "English",
-    "中國語",
-  ]);
+  const [selectedLangs, setSelectedLangs] = useState(
+    user?.language || ["한국어", "English", "中國語"]
+  );
+
+  // 사용자 정보가 변경될 때 로컬 상태 업데이트
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setSavedProfile(user.file || defaultProfile);
+      setSelectedLangs(user.language || ["한국어", "English", "中國語"]);
+    }
+  }, [user]);
 
   const handleEditClick = () => {
     if (isEditing) {
@@ -56,6 +67,61 @@ const MyPage = () => {
     }
   };
 
+  const handleContainerClick = () => {
+    if (!user) {
+      navigate('/login');
+    }
+  };
+
+  // 로그인하지 않은 경우
+  if (!isLoading && !user) {
+    return (
+      <div 
+        className={styles.myContainer}
+        onClick={handleContainerClick}
+        style={{ cursor: 'pointer' }}
+      >
+        <div className={styles.myInfoContainer}>
+          <div className={styles.profileWrapper}>
+            <img
+              src={defaultProfile}
+              className={styles.profilePic}
+              alt="기본 프로필 이미지"
+            />
+          </div>
+          <div className={styles.myInfo}>
+            <div className={styles.myName}>
+              <span>로그인해주세요.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 로딩 중인 경우
+  if (isLoading) {
+    return (
+      <div className={styles.myContainer}>
+        <div className={styles.myInfoContainer}>
+          <div className={styles.profileWrapper}>
+            <img
+              src={defaultProfile}
+              className={styles.profilePic}
+              alt="기본 프로필 이미지"
+            />
+          </div>
+          <div className={styles.myInfo}>
+            <div className={styles.myName}>
+              <span>로딩 중...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 로그인한 경우
   return (
     <div className={styles.myContainer}>
       <div className={styles.myInfoContainer}>
@@ -136,10 +202,10 @@ const MyPage = () => {
 
           <div className={styles.myStats}>
             <span className={styles.stats}>
-              작성한 방명록 수 100
+              작성한 방명록 수 {user?.bookmark || 0}
             </span>
             <span className={styles.stats}>
-              누적 좋아요 수 50
+              누적 좋아요 수 {user?.like || 0}
             </span>
           </div>
         </div>

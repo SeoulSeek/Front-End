@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./App.css";
+import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./layouts/Layout";
 import Home from "./pages/HomePage/HomePage";
 import Login from "./pages/LoginPage/LoginPage";
@@ -18,25 +19,27 @@ import MyPage from "./pages/MyPage/MyPage";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/places" element={<Places />} />
-          <Route path="/places/result" element={<Search />} />
-          <Route path="/places/:id" element={<PlaceDetail />} />
-          <Route path="/places/edit/" element={<Posting />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/courses/:id" element={<CoursesDetail />} />
-          <Route path="/view" element={<MapHistoryView />} />
-          <Route path="/mypage" element={<MyPage />} />
-        </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/callback" element={<LoginCallback />} />
-        <Route path="/signin" element={<Signin />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/places" element={<Places />} />
+            <Route path="/places/result" element={<Search />} />
+            <Route path="/places/:id" element={<PlaceDetail />} />
+            <Route path="/places/edit/" element={<Posting />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/courses/:id" element={<CoursesDetail />} />
+            <Route path="/view" element={<MapHistoryView />} />
+            <Route path="/mypage" element={<MyPage />} />
+          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/callback" element={<LoginCallback />} />
+          <Route path="/signin" element={<Signin />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
