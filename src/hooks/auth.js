@@ -1,3 +1,5 @@
+import { API_ENDPOINTS } from '../config/api';
+
 // 언어 매핑 함수
 export const mapLanguageToUI = (apiLanguage) => {
   const languageMap = {
@@ -12,7 +14,7 @@ export const mapLanguageToUI = (apiLanguage) => {
 // 사용자 정보 가져오기
 export const fetchUserInfo = async () => {
   try {
-    const response = await fetch('https://43.203.7.11:8080/auth/user', {
+    const response = await fetch(API_ENDPOINTS.AUTH_USER, {
       method: 'GET',
       credentials: 'include',
       headers: {

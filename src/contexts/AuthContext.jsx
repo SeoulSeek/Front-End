@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const AuthContext = createContext();
 
@@ -17,7 +18,7 @@ export const AuthProvider = ({ children }) => {
   // 사용자 정보 가져오기
   const fetchUser = async () => {
     try {
-      const response = await fetch('https://43.203.7.11:8080/auth/user', {
+      const response = await fetch(API_ENDPOINTS.AUTH_USER, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -48,7 +49,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (user?.id) {
-        await fetch('https://43.203.7.11:8080/auth/logout', {
+        await fetch(API_ENDPOINTS.AUTH_LOGOUT, {
           method: 'POST',
           credentials: 'include',
           headers: {

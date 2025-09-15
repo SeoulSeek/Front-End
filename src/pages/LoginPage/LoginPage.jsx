@@ -5,6 +5,7 @@ import Input from "../../components/Input/Input";
 import AuthLayout from "../../layouts/AuthLayout";
 import styles from "./LoginPage.module.css";
 import LogoKakao from "../../assets/LoginPage/LogoKakao.png";
+import { API_ENDPOINTS } from "../../config/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Login = () => {
     e.preventDefault();
     // 로그인 처리 로직
     try {
-      const res = await fetch("https://43.203.7.11:8080/sign-in", {
+      const res = await fetch(API_ENDPOINTS.SIGN_IN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
