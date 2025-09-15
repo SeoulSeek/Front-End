@@ -86,3 +86,18 @@
   text-underline-offset: auto;
   text-underline-position: from-font;
 }
+
+.logoutItem {
+  color: #000;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: color 0.2s ease;
+}
+
+.logoutItem:hover {
+  color: #666;
+}
