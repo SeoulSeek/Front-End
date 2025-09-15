@@ -1,22 +1,37 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import { FaRegUserCircle } from "react-icons/fa";
+import { useAuth } from "../../contexts/AuthContext";
+import LogoutModal from "../LogoutModal/LogoutModal";
 
 const Sidebar = ({ onClose }) => {
   const [animate, setAnimate] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { user, isLoading, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setAnimate(true);
+    document.body.style.overflow = 'hidden';
+
+    const timer = setTimeout(() => {
+      setAnimate(true);
+    }, 10); 
+
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = 'unset';
+    };
   }, []);
 
   // 공통으로 사이드바를 닫는 함수입니다.
-  const closeSidebar = () => {
+  const closeSidebar = useCallback(() => {
     setAnimate(false);
+    document.body.style.overflow = 'unset';
     setTimeout(() => {
       onClose();
-    }, 200);
-  };
+    }, 300);
+  }, [onClose]);
 
   const handleOverlayClick = () => {
     closeSidebar();
@@ -26,6 +41,39 @@ const Sidebar = ({ onClose }) => {
     closeSidebar();
   };
 
+  const handleUserClick = () => {
+    if (!user) {
+      navigate('/login');
+      closeSidebar();
+    }
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    await logout();
+    setShowLogoutModal(false);
+    closeSidebar();
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
+  };
+
+  // ESC 키로 사이드바 닫기
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        closeSidebar();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [closeSidebar]);
+
   return (
     <>
       <div className={styles.overlay} onClick={handleOverlayClick}></div>
@@ -34,10 +82,22 @@ const Sidebar = ({ onClose }) => {
           animate ? styles.open : styles.closed
         }`}
       >
-        <div className={styles.user}>
+        <div 
+          className={styles.user} 
+          onClick={handleUserClick}
+          style={{ cursor: !user ? 'pointer' : 'default' }}
+        >
           <FaRegUserCircle className={styles.userIcon} />
           <h1 className={styles.h1}>
-            <span className={styles.bold}>서우리</span> 님
+            {isLoading ? (
+              <span>로딩 중...</span>
+            ) : user ? (
+              <>
+                <span className={styles.bold}>{user.name}</span> 님
+              </>
+            ) : (
+              <span>로그인</span>
+            )}
           </h1>
         </div>
         <div className={styles.menu}>
@@ -69,32 +129,21 @@ const Sidebar = ({ onClose }) => {
           >
             마이페이지
           </Link>
-          <a
-            href="https://www.visitseoul.net/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkItem}
-          >
-            VISIT SEOUL NET
-          </a>
-          <a
-            href="https://www.sto.or.kr/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkItem}
-          >
-            서울관광재단
-          </a>
-          <a
-            href="https://m.map.kakao.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkItem}
-          >
-            카카오맵 kakaomap
-          </a>
+          {user && (
+            <div
+              className={styles.logoutItem}
+              onClick={handleLogoutClick}
+            >
+              로그아웃
+            </div>
+          )}
         </div>
       </div>
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onConfirm={handleLogoutConfirm}
+        onCancel={handleLogoutCancel}
+      />
     </>
   );
 };

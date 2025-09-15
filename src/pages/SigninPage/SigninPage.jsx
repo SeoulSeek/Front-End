@@ -43,7 +43,7 @@ function Signin() {
     alert("이메일 인증 요청이 전송되었습니다.");
     // 이메일 인증 로직 추가
     try {
-      const res = await fetch("http://43.203.7.11:8080/valid", {
+      const res = await fetch("https://43.203.7.11:8080/valid", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
@@ -155,7 +155,7 @@ function Signin() {
       form.append("password", formData.userPw);
       if (formData.userFile) form.append("file", formData.userFile);
 
-      const response = await fetch("http://43.203.7.11:8080/sign-up", {
+      const response = await fetch("https://43.203.7.11:8080/sign-up", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
