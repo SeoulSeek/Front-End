@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./HomePage.module.css";
 import CourseTag from "../../components/CourseTag/CourseTag";
+import HashTag from "../../components/global/HashTag/HashTag";
 
 import bannerMap from "../../assets/HomePage/bannerMap.png";
 import foldingMap from "../../assets/HomePage/foldingMap.png";
@@ -73,6 +74,9 @@ const Home = () => {
             명소
           </h2>
           <div className={styles.recommInnerBox}>
+            <div className={styles.hashTagContainer}>
+              <HashTag type="district" text="종로구" />
+            </div>
             <img
               alt="서울 명소 이미지"
               src={dummy2}
