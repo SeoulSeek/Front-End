@@ -13,6 +13,7 @@ import Posting from "./pages/PlacesPage/PostPlacePage";
 import PlaceDetail from "./pages/PlacesPage/PlacesDetail";
 import Courses from "./pages/CoursesPage/CoursesPage";
 import CoursesDetail from "./pages/CoursesPage/CoursesDetail";
+import MapPage from "./pages/MapPage/MapPage";
 import MapHistoryView from "./pages/MapHistoryView/MapHistoryView";
 import NotFound from "./pages/NotFoundPage/NotFoundPage";
 import MyPage from "./pages/MyPage/MyPage";
@@ -30,6 +31,7 @@ function App() {
             <Route path="/places/edit/" element={<Posting />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:id" element={<CoursesDetail />} />
+            <Route path="/map" element={<MapPage />} />
             <Route path="/view" element={<MapHistoryView />} />
             <Route path="/mypage" element={<MyPage />} />
           </Route>
