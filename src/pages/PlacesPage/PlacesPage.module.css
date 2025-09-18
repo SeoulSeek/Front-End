@@ -1,29 +1,36 @@
 .placesPage {
-  padding: 0 20px;
+  padding: 0 4vw;
   box-sizing: border-box;
 }
 
+/* 모바일 */
+.contentWrap {
+  margin-top: 3rem;
+}
+
 .titleWrap {
-  padding-top: 45px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .pageTitle {
   color: var(--seoul-seek-fadegold);
   font-family: "Noto Sans KR";
-  font-size: 40px;
+  font-size: clamp(40px, 5vw, 96px);
   font-style: normal;
   font-weight: 700;
-  line-height: 48px;
 }
 
 .searchWrap {
-  margin-top: 45px;
+  margin-top: 25px;
+  min-width: 350px;
 }
 
 .filterContainer {
   display: flex;
   text-align: center;
-  justify-content: space-between;
+  justify-content: space-evenly;
   font-family: "Noto Sans KR";
   font-size: 11px;
   font-weight: 700;
@@ -32,17 +39,17 @@
   box-sizing: border-box;
 }
 
-.checkboxLabel {
+.contentsWrap {
   display: flex;
-  align-items: start;
-  gap: 15px;
+  flex-direction: column; /* 기본 모바일 */
+  gap: 45px;
+  margin: 45px auto 0;
 }
 
 .mapWrap {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  margin: 45px 0;
+  align-items: center;
 }
 
 .map {
@@ -51,11 +58,21 @@
   border: 1px solid #000;
   border-radius: 50px;
   box-sizing: border-box;
-  width: 350px;
-  height: 350px;
-  background-image: url("../../assets/PlacePage/seoulMap.jpg");
-  background-size: cover;
-  background-position: center;
+  position: relative;
+  width: 100%;
+  min-width: 350px;
+  min-height: 350px;
+  height: 0;
+  padding-bottom: 100%;
+  overflow: hidden;
+}
+.map img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .message {
@@ -64,14 +81,23 @@
   color: var(--seoul-seek-blue);
   text-align: center;
   font-family: "Noto Sans KR";
-  font-size: 15px;
+  font-size: clamp(15px, 2.5vw, 20px);
   font-style: normal;
   font-weight: 700;
-  line-height: 18px;
+  line-height: clamp(18px, 2.5vw, 24px);
+  word-break: keep-all;
+  padding: 0 20%;
 }
 
-.postList li:last-child {
+.postListWrap {
+  box-sizing: border-box;
   margin-bottom: 25px;
+}
+
+.postList {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 30px;
 }
 
 .postCreateBtnWrap {
@@ -115,6 +141,49 @@
   cursor: pointer;
 }
 
+@media screen and (min-width: 768px) {
+  .titleWrap {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .map {
+    padding-bottom: 56.26%;
+  }
+
+  .postList {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .contentsWrap {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pageTitle {
+    flex: 1;
+  }
+  .searchWrap {
+    flex: 1;
+    max-width: 60%;
+  }
+
+  .map {
+    padding-bottom: 100%;
+  }
+
+  .postList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+}
+
 /* 검색페이지 */
 .tabWrap {
   display: flex;
@@ -150,6 +219,12 @@
 }
 
 /* 게시물 작성 페이지 */
+.titles {
+  padding: 0 4vw;
+  box-sizing: border-box;
+  margin-top: 3rem;
+}
+
 .subTitle {
   color: var(--seoul-seek-black);
   font-family: "Noto Sans KR";
@@ -165,7 +240,7 @@
   font-size: 20px;
   font-style: normal;
   font-weight: 700;
-  padding: 20px 27.5px;
+  padding: 20px 4vw;
   box-sizing: border-box;
 }
 
@@ -325,9 +400,14 @@
 .inputForm {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
   padding: 0 45px;
   box-sizing: border-box;
+}
+
+.inputGroup {
+  width: 100%;
 }
 
 .inputStyle,
@@ -350,6 +430,8 @@
 
 .submitBtn {
   width: 100%;
+  max-width: 300px;
+  text-align: center;
   margin: 25px 0 45px;
   padding: 13px 20px;
   border: none;
@@ -428,4 +510,19 @@
 
 .placeItem::-webkit-scrollbar {
   display: none;
+}
+
+@media screen and (min-width: 1024px) {
+  .contentWrap {
+    display: flex;
+    flex-direction: row;
+    gap: 5rem;
+    padding: 0 4vw;
+  }
+  .image {
+    flex: 1;
+  }
+  .tagWrap {
+    flex: 1;
+  }
 }

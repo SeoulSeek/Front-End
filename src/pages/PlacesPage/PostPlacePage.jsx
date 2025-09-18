@@ -105,15 +105,13 @@ const PostPlace = () => {
         </div>
       )}
 
-      <div className={$.placesPage}>
-        <div className={$.titleWrap}>
-          <h1 className={$.pageTitle}>서울식 관광명소</h1>
-          <h2 className={$.subTitle}>방명록 작성</h2>
-        </div>
-      </div>
-
       <div className={$.contentWrap}>
         <div className={$.image}>
+          <div className={$.titles}>
+            <h1 className={$.pageTitle}>서울식 관광명소</h1>
+            <h2 className={$.subTitle}>방명록 작성</h2>
+          </div>
+
           <h3>이미지 선택</h3>
           <div {...getRootProps()} className={$.dropZone}>
             <input {...getInputProps()} />
@@ -202,37 +200,32 @@ const PostPlace = () => {
               placeholder="직접 추가하기"
             />
           </div>
-        </div>
-
-        <div className={$.inputFormWrap}>
-          <h3>내용 작성</h3>
-          <form onSubmit={handleSubmit} className={$.inputForm}>
-            <div className={$.inputGroup}>
-              <input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="방명록 제목"
-                className={$.inputStyle}
-                required
-              />
-            </div>
-            <div className={$.inputGroup}>
-              <textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="다녀온 명소에 대해 설명해주세요.                    
-                &#13;&#10;언제 다녀왔나요?                                               
-                &#13;&#10; 어떤 역사적 이야기를 발견했나요?"
-                className={$.textAreaStyle}
-                required
-              ></textarea>
-            </div>
-            <button type="submit" className={$.submitBtn}>
-              작성하기
-            </button>
-          </form>
+          <div className={$.inputFormWrap}>
+            <h3>내용 작성</h3>
+            <form onSubmit={handleSubmit} className={$.inputForm}>
+              <div className={$.inputGroup}>
+                <input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="방명록 제목"
+                  className={$.inputStyle}
+                  required
+                />
+              </div>
+              <div className={$.inputGroup}>
+                <textarea
+                  id="content"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="다녀온 명소에 대해 설명해주세요.&#13;&#10;언제 다녀왔나요?&#10;어떤 역사적 이야기를 발견했나요?"
+                  className={$.textAreaStyle}
+                  required
+                ></textarea>
+              </div>
+              <div className={$.submitBtn}>작성하기</div>
+            </form>
+          </div>
         </div>
       </div>
     </>
