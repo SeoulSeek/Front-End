@@ -1,9 +1,8 @@
 const getApiBaseUrl = () => {
-  // 이전에 작동하던 IP 주소로 되돌리기
   if (import.meta.env.PROD) {
-    return 'https://43.203.7.11:8080';
+    return 'https://seoulseek.com';
   } else {
-    return 'http://43.203.7.11:8080';
+    return 'https://seoulseek.com';
   }
 };
 

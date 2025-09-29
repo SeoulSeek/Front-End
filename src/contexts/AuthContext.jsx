@@ -44,11 +44,19 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
+      const headers = {
+        'Content-Type': 'application/json;charset=UTF-8',
+      };
+      
+      // Authorization 헤더에도 토큰 추가
+      if (storedToken) {
+        headers['Authorization'] = `Bearer ${storedToken}`;
+        console.log('토큰 재발급 요청에 Authorization 헤더 추가');
+      }
+
       const response = await fetch(API_ENDPOINTS.AUTH_REFRESH, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
+        headers,
         body: JSON.stringify({
           refreshToken: storedToken
         }),
@@ -85,11 +93,19 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('사용자 정보 요청 URL:', API_ENDPOINTS.AUTH_USER);
 
+      const headers = {
+        'Content-Type': 'application/json;charset=UTF-8',
+      };
+      
+      // 토큰이 있으면 Authorization 헤더에 추가
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('Authorization 헤더 추가:', `Bearer ${token.substring(0, 20)}...`);
+      }
+
       const response = await fetch(API_ENDPOINTS.AUTH_USER, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
+        headers,
         credentials: 'include', // 쿠키 기반 인증도 지원
       });
 
@@ -101,10 +117,26 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         if (responseText.trim()) {
           try {
-            const userData = JSON.parse(responseText);
-            console.log('사용자 정보:', userData);
-            setUser(userData);
-            return userData;
+            const responseData = JSON.parse(responseText);
+            console.log('사용자 정보 응답:', responseData);
+            
+            // 실제 API 응답 형식에 맞게 처리
+            if (responseData.error === false && responseData.data) {
+              // 성공 응답인 경우 data 객체에서 사용자 정보 추출
+              const userData = responseData.data;
+              console.log('사용자 정보:', userData);
+              setUser(userData);
+              return userData;
+            } else if (responseData.name || responseData.email) {
+              // 직접 사용자 정보가 최상위에 있는 경우
+              console.log('사용자 정보 (직접):', responseData);
+              setUser(responseData);
+              return responseData;
+            } else {
+              console.warn('사용자 정보를 찾을 수 없습니다:', responseData);
+              setUser(null);
+              return null;
+            }
           } catch (jsonError) {
             console.error('사용자 정보 JSON 파싱 에러:', jsonError);
             setUser(null);
@@ -167,16 +199,46 @@ export const AuthProvider = ({ children }) => {
         // 응답이 비어있지 않은 경우에만 JSON 파싱 시도
         if (responseText.trim()) {
           try {
-            const data = JSON.parse(responseText);
-            if (data.refreshToken) {
-              storeToken(data.refreshToken);
-              // 로그인 성공 후 사용자 정보 가져오기
-              await fetchUser();
-              return { success: true };
+            const responseData = JSON.parse(responseText);
+            console.log('로그인 응답 파싱 결과:', responseData);
+            
+            // 실제 API 응답 형식에 맞게 처리
+            if (responseData.error === false) {
+              // 성공 응답인 경우
+              const data = responseData.data;
+              
+              if (data && data.refreshToken) {
+                // refreshToken이 data 객체 안에 있는 경우
+                storeToken(data.refreshToken);
+                console.log('refreshToken 저장 완료:', data.refreshToken);
+                // 로그인 성공 후 사용자 정보 가져오기
+                await fetchUser();
+                return { success: true };
+              } else if (responseData.refreshToken) {
+                // refreshToken이 최상위에 있는 경우 (명세서 형식)
+                storeToken(responseData.refreshToken);
+                console.log('refreshToken 저장 완료:', responseData.refreshToken);
+                await fetchUser();
+                return { success: true };
+              } else {
+                // refreshToken이 없는 경우
+                console.warn('refreshToken이 응답에 없습니다:', responseData);
+                console.warn('data 객체 내용:', data);
+                
+                // 로그인은 성공했지만 토큰이 없는 경우 (쿠키 기반일 수 있음)
+                if (responseData.error === false) {
+                  console.log('토큰 없이 로그인 성공, 사용자 정보 가져오기 시도');
+                  await fetchUser();
+                  return { success: true };
+                } else {
+                  return { success: false, message: 'refreshToken을 받지 못했습니다.' };
+                }
+              }
             } else {
-              // refreshToken이 없는 경우 (API 명세서와 다른 응답)
-              console.warn('refreshToken이 응답에 없습니다:', data);
-              return { success: false, message: 'API 응답 형식이 올바르지 않습니다.' };
+              // 에러 응답인 경우
+              const errorMessage = responseData.message || '로그인에 실패했습니다.';
+              console.error('로그인 실패:', errorMessage);
+              return { success: false, message: errorMessage };
             }
           } catch (jsonError) {
             console.error('JSON 파싱 에러:', jsonError);
@@ -227,11 +289,19 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
+      const headers = {
+        'Content-Type': 'application/json;charset=UTF-8',
+      };
+      
+      // Authorization 헤더에 토큰 추가
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('프로필 업데이트 요청에 Authorization 헤더 추가');
+      }
+
       const response = await fetch(API_ENDPOINTS.AUTH_USER_PROFILE, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
+        headers,
         credentials: 'include',
         body: JSON.stringify(profileData),
       });
