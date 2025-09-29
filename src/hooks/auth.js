@@ -9,28 +9,30 @@ export const mapLanguageToUI = (apiLanguage) => {
   return languageMap[apiLanguage] || apiLanguage;
 };
 
-// 사용자 정보 가져오기
-export const fetchUserInfo = async () => {
-  try {
-    const response = await fetch('https://43.203.7.11:8080/auth/user', {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-    });
+// 토큰 유틸리티 함수들
+export const getStoredToken = () => {
+  return localStorage.getItem('refreshToken');
+};
 
-    if (response.ok) {
-      const userData = await response.json();
-      return {
-        ...userData,
-        language: userData.language?.map(mapLanguageToUI) || []
-      };
-    } else {
-      throw new Error('사용자 정보를 가져올 수 없습니다.');
-    }
+export const storeToken = (token) => {
+  if (token) {
+    localStorage.setItem('refreshToken', token);
+  }
+};
+
+export const removeToken = () => {
+  localStorage.removeItem('refreshToken');
+};
+
+// 토큰 유효성 검사 (필요시 사용)
+export const isTokenValid = (token) => {
+  if (!token) return false;
+  
+  try {
+    // JWT 토큰인 경우 만료 시간 확인 (실제 구현은 토큰 형식에 따라 다름)
+    // 현재는 단순히 토큰 존재 여부만 확인
+    return true;
   } catch (error) {
-    console.error('사용자 정보 가져오기 실패:', error);
-    throw error;
+    return false;
   }
 };

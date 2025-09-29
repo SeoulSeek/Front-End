@@ -9,41 +9,87 @@ import {
   AiOutlineCheckSquare,
 } from "react-icons/ai";
 import { useAuth } from "../../contexts/AuthContext";
+import { mapLanguageToUI } from "../../hooks/auth";
 
 const LANGUAGES = ["한국어", "English", "中國語", "日本語"];
 
+// API 언어 코드를 UI 언어로 매핑하는 함수
+const mapApiLanguagesToUI = (apiLanguages) => {
+  if (!Array.isArray(apiLanguages)) return [];
+  return apiLanguages.map(lang => mapLanguageToUI(lang));
+};
+
+// UI 언어를 API 언어 코드로 매핑하는 함수
+const mapUILanguagesToAPI = (uiLanguages) => {
+  const reverseMap = {
+    '한국어': 'Korean',
+    'English': 'English',
+    '日本語': 'Japanese',
+    '中國語': 'Chinese'
+  };
+  return uiLanguages.map(lang => reverseMap[lang] || lang);
+};
+
 const MyPage = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, updateProfile } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("places");
   const [isPublic, setIsPublic] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [name, setName] = useState(user?.name || "서우리");
+  const [name, setName] = useState(user?.name || "");
   const [tempName, setTempName] = useState(name);
 
   const [savedProfile, setSavedProfile] = useState(user?.file || defaultProfile);
   const [tempProfile, setTempProfile] = useState(savedProfile);
   const fileInputRef = useRef(null);
 
-  const [selectedLangs, setSelectedLangs] = useState(
-    user?.language || ["한국어", "English", "中國語"]
-  );
+  const [selectedLangs, setSelectedLangs] = useState([]);
 
   // 사용자 정보가 변경될 때 로컬 상태 업데이트
   useEffect(() => {
     if (user) {
-      setName(user.name);
+      setName(user.name || "");
+      setTempName(user.name || "");
       setSavedProfile(user.file || defaultProfile);
-      setSelectedLangs(user.language || ["한국어", "English", "中國語"]);
+      setTempProfile(user.file || defaultProfile);
+      // API에서 받은 영어 언어 코드를 UI 언어로 변환
+      const uiLanguages = mapApiLanguagesToUI(user.language || []);
+      console.log('API languages:', user.language);
+      console.log('UI languages:', uiLanguages);
+      setSelectedLangs(uiLanguages);
     }
   }, [user]);
 
-  const handleEditClick = () => {
+  const handleEditClick = async () => {
     if (isEditing) {
-      setName(tempName.trim() || name);
-      setSavedProfile(tempProfile);
-      setIsEditing(false);
+      try {
+        // API에 전송할 데이터 준비
+        const apiLanguages = mapUILanguagesToAPI(selectedLangs);
+        const profileData = {
+          name: tempName.trim() || name,
+          file: tempProfile,
+          languages: apiLanguages // API 명세서에 따르면 'languages' (복수형)
+        };
+
+        console.log('프로필 업데이트 데이터:', profileData);
+
+        // API 호출
+        const result = await updateProfile(profileData);
+        
+        if (result.success) {
+          // 성공 시 로컬 상태 업데이트
+          setName(tempName.trim() || name);
+          setSavedProfile(tempProfile);
+          setIsEditing(false);
+          alert('프로필이 성공적으로 업데이트되었습니다.');
+        } else {
+          alert(result.message || '프로필 업데이트에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('프로필 업데이트 중 오류:', error);
+        alert('프로필 업데이트 중 오류가 발생했습니다.');
+      }
     } else {
       setTempName(name);
       setTempProfile(savedProfile);
@@ -62,8 +108,14 @@ const MyPage = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // 미리보기용 URL 생성
       const previewUrl = URL.createObjectURL(file);
       setTempProfile(previewUrl);
+      
+      // TODO: 실제 파일 업로드 API 구현 필요
+      // 현재는 미리보기만 지원하며, 실제 파일 업로드를 위해서는
+      // 별도의 파일 업로드 API가 필요할 수 있습니다.
+      console.log('선택된 파일:', file);
     }
   };
 
@@ -159,7 +211,7 @@ const MyPage = () => {
               />
             ) : (
               <span>
-                <span className={styles.blue}>{name}</span>님의 역사 탐험록
+                <span className={styles.blue}>{name || "사용자"}</span>님의 역사 탐험록
               </span>
             )}
           </div>
@@ -202,10 +254,10 @@ const MyPage = () => {
 
           <div className={styles.myStats}>
             <span className={styles.stats}>
-              작성한 방명록 수 {user?.bookmark || 0}
+              북마크 개수 {user?.bookmark || 0}
             </span>
             <span className={styles.stats}>
-              누적 좋아요 수 {user?.like || 0}
+              좋아요 개수 {user?.like || 0}
             </span>
           </div>
         </div>

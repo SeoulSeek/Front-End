@@ -5,38 +5,42 @@ import Input from "../../components/Input/Input";
 import AuthLayout from "../../layouts/AuthLayout";
 import styles from "./LoginPage.module.css";
 import LogoKakao from "../../assets/LoginPage/LogoKakao.png";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [userEmail, setUserEmail] = useState(""); // 이메일
   const [userPw, setUserPw] = useState(""); //비밀번호
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // 로그인 처리 로직
+    
+    if (!userEmail || !userPw) {
+      alert("이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    setIsLoading(true);
+    
     try {
-      const res = await fetch("https://43.203.7.11:8080/sign-in", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-        },
-        credentials: "include", // <- 쿠키 저장/전송 필수
-        body: JSON.stringify({
-          email: userEmail,
-          password: userPw,
-          rememberMe: true,
-        }),
+      const result = await login({
+        email: userEmail,
+        password: userPw,
+        rememberMe: true,
       });
 
-      if (!res.ok) {
-        throw new Error("로그인 실패");
+      if (result.success) {
+        navigate("/");
+      } else {
+        alert(result.message || "로그인에 실패했습니다.");
       }
-
-      // 성공 시 페이지 이동만
-      navigate("/callback");
     } catch (err) {
       console.error("로그인 에러:", err);
-      alert("로그인에 실패했습니다.");
+      alert("로그인 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -76,8 +80,11 @@ const Login = () => {
             type="submit"
             className={styles.btn_login}
             onClick={handleLogin}
+            disabled={isLoading}
           >
-            <span className={styles.btn_text}>로그인</span>
+            <span className={styles.btn_text}>
+              {isLoading ? "로그인 중..." : "로그인"}
+            </span>
           </button>
           <div className={styles.regiLink}>
             <span className={styles.text}>서울식 회원이 아니신가요?</span>{" "}
