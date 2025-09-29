@@ -20,6 +20,7 @@ const HashTag = ({ type = "default", text }) => {
           alignItems: "center",
           borderRadius: "100px",
           backgroundColor: getBackgroundColor[type],
+          fontFamily: "Noto Sans KR",
           fontSize: "14px",
           fontWeight: "700",
           color: "#fff",
