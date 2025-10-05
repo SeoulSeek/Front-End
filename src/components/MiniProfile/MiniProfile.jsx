@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 import $ from "./MiniProfile.module.css";
-import defaultProfileImg from "../../assets/PlacePage/profile.png";
+import defaultProfileImg from "../../assets/PlacePage/profile_a.jpg";
 import managerProfileImg from "../../assets/PlacePage/Icon.png";
 
 const MiniProfile = ({ username, profileImg = defaultProfileImg, userId }) => {

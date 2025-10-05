@@ -26,7 +26,3 @@
   border: none;
   box-shadow: none;
 }
-
-.inputItem:focus::placeholder {
-  color: transparent;
-}
