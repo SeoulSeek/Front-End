@@ -1,0 +1,188 @@
+/* 기본 (모바일) 스타일 */
+.placesPage {
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.pageTitle {
+  color: #968c6e;
+  font-family: "Noto Sans KR";
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin-top: 25px;
+}
+
+.searchWrap {
+  margin-top: 30px;
+  width: 100%;
+}
+
+.filterContainer {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.contentsWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.mapWrap {
+  text-align: center;
+}
+
+.map {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+  aspect-ratio: 1 / 1; /* 1:1 비율 유지 */
+}
+
+/* KakaoMiniMap 컴포넌트가 이 공간을 채우도록 스타일 추가 */
+.map > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.message {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #6d8196;
+  font-size: 0.9rem;
+}
+
+.postList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px; /* PostBox 사이의 간격 */
+}
+
+.postCreateBtnWrap {
+  display: flex;
+  justify-content: flex-end;
+}
+.postCreateBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  background-color: #333;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: "Noto Sans KR";
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.pagination button {
+  border: 1px solid #ddd;
+  background-color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.pagination .activePage {
+  font-family: "Noto Sans KR";
+  font-weight: 600;
+  background-color: #333;
+  color: white;
+  border-color: #333;
+}
+
+/* ================================== */
+/* PC 반응형 스타일 (1024px 이상) */
+/* ================================== */
+@media (min-width: 1024px) {
+  .placesPage {
+    padding: 40px 80px;
+    max-height: 1080px;
+  }
+
+  .titleWrap {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 50px;
+  }
+
+  .pageTitle {
+    text-align: left;
+    font-size: 4rem;
+    flex-shrink: 0;
+  }
+
+  .searchWrap {
+    flex-grow: 1;
+  }
+
+  .filterContainer {
+    justify-content: center;
+  }
+
+  .contentsWrap {
+    flex-direction: row;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .mapWrap {
+    position: sticky;
+    top: 20px;
+    flex-basis: 450px; /* 지도의 이상적인 기본 너비를 450px로 설정 */
+    flex-shrink: 0;
+  }
+  .postList {
+    flex-grow: 1;
+    min-width: 0;
+    /* 뷰포트 높이에서 헤더, 여백 등의 예상 높이(250px)를 뺀 값으로 최대 높이를 제한 */
+    max-height: calc(100vh - 250px);
+    overflow-y: scroll;
+    padding-left: 10px; /* 스크롤바와 컨텐츠 사이 여백 */
+    box-sizing: border-box;
+    justify-content: flex-start;
+  }
+  /* 웹킷 브라우저(크롬, 사파리 등) 스크롤바 스타일링 */
+  .postListWrap::-webkit-scrollbar {
+    width: 8px;
+  }
+  .postListWrap::-webkit-scrollbar-thumb {
+    background-color: #000;
+    border-radius: 4px;
+  }
+  .postListWrap::-webkit-scrollbar-track {
+    background-color: #000;
+  }
+}

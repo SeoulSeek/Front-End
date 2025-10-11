@@ -1,0 +1,350 @@
+/* PlacesDetail.module.css */
+
+/* 전체 페이지 레이아웃 (모바일 기본) */
+.placeDetailPage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex; /* 모바일에선 수직 정렬이 기본 */
+  flex-direction: column;
+  gap: 30px; /* 섹션 간 간격 */
+}
+
+/* 1. 이미지 갤러리 */
+.imageGallery {
+  width: 100%;
+  position: relative; /* 화살표 버튼을 절대 위치로 배치하기 위한 기준 */
+  overflow: hidden; /* 둥근 모서리 적용을 위해 */
+  border-radius: 8px;
+}
+
+.imageGallery img {
+  width: 100%;
+  height: 400px; /* 이미지 높이 재조정 */
+  object-fit: cover;
+  display: block; /* 이미지 하단 여백 제거 */
+}
+
+/* 화살표 공통 스타일 */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 기본 상태에서는 숨김 */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* 마우스를 갤러리 위에 올렸을 때 화살표 표시 */
+.imageGallery:hover .arrow {
+  opacity: 1;
+  visibility: visible;
+}
+
+.leftArrow {
+  left: 15px;
+}
+
+.rightArrow {
+  right: 15px;
+}
+
+/* 2. 게시물 콘텐츠 */
+.postContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.postTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: "Noto Sans KR";
+}
+.postUserWrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+}
+.miniProfile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.profileImage {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #000;
+}
+.username {
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: "Noto Sans KR";
+}
+.postInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 10px;
+}
+.postInfo span {
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--seoul-seek-indigo);
+}
+.postCounts {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.infoButton,
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.1rem;
+  font-family: "Noto Sans KR";
+}
+.infoButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+.text {
+  line-height: 1.6;
+  font-family: "Noto Sans KR";
+  font-size: 1rem;
+  font-weight: 400;
+  min-height: 150px; /* 본문 영역 최소 높이 */
+}
+.hashtagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.mapLink {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.mapLinkBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  padding: 0 10px;
+  height: 30px;
+  border: 1px solid #000;
+  border-radius: 100px;
+  background: #fff;
+  box-sizing: border-box;
+  color: var(--seoul-seek-black);
+}
+
+/* 3. 댓글 */
+.comments {
+  width: 100%;
+}
+
+.commentForm {
+  display: flex;
+  align-items: center;
+  border: 1px solid #000; /* 요청하신 border 스타일 */
+  padding: 4px 4px 4px 12px;
+  overflow: hidden; /* border-radius가 내부 요소에 적용되도록 */
+  transition: border-color 0.2s ease;
+}
+commentForm:focus-within {
+  border-color: #333; /* 입력창 활성화 시 border 색상 변경 */
+}
+.commentForm textarea {
+  flex-grow: 1; /* 남는 공간을 모두 차지 */
+  border: none;
+  outline: none;
+  resize: none; /* 사용자가 크기 조절 못하게 */
+  background-color: transparent;
+  padding-right: 10px;
+  font-size: 0.95rem;
+  font-family: "Noto Sans KR";
+  height: 24px; /* 초기 높이 */
+}
+.commentForm button {
+  flex-shrink: 0; /* 버튼 크기 고정 */
+  border: none;
+  background-color: transparent;
+  color: black;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: "Noto Sans KR";
+  transition: background-color 0.2s ease;
+}
+.commentForm button:hover {
+  background-color: black;
+  color: white;
+}
+
+/* --- 댓글 목록 스타일 (수정 및 추가) --- */
+.commentList {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+.commentItem {
+  display: flex;
+  align-items: center; /* 댓글이 길어질 경우를 대비해 상단 정렬 */
+  padding: 16px 4px;
+  gap: 12px;
+  border-bottom: 1px solid #f0f0f0; /* 요청하신 댓글 구분선 */
+}
+.commentAuthor {
+  font-family: "Noto Sans KR";
+  font-weight: 600; /* bold보다 부드럽게 */
+  flex-shrink: 0;
+}
+.commentText {
+  flex-grow: 1;
+  color: #333;
+  font-weight: 400;
+  font-family: "Noto Sans KR";
+}
+.commentDelete {
+  margin-left: auto; /* X 버튼을 가장 오른쪽으로 밀어냄 */
+  flex-shrink: 0;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.commentDelete:hover {
+  color: #000;
+}
+.commentEnd {
+  margin-top: 60px;
+  text-align: center;
+  color: var(--seoul-seek-blue);
+  font-family: "Noto Sans KR";
+  font-weight: 600; /* bold보다 부드럽게 */
+  font-size: 0.9rem;
+  padding: 20px 0;
+}
+
+.toast {
+  position: fixed; /* 화면 기준으로 위치 고정 */
+  bottom: 50px;
+  left: 50%;
+  /* transform: translateX(-50%); */ /* 애니메이션에서 처리 */
+
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 25px; /* 둥근 알약 모양 */
+  font-family: "Noto Sans KR";
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 1000; /* 다른 요소들 위에 보이도록 */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+  /* 애니메이션 적용 */
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+/* 나타나고 사라지는 애니메이션 정의 */
+@keyframes fadeInOut {
+  /* 0~10%: 아래에서 위로 나타남 */
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  /* 10%~90%: 화면에 머무름 */
+  90% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  /* 90%~100%: 아래로 사라짐 */
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+}
+/* ======================================================= */
+/* ====== PC 화면을 위한 반응형 스타일 (미디어 쿼리) ====== */
+/* ======================================================= */
+
+/* 화면 너비가 1024px 이상일 때 적용 */
+@media (min-width: 1024px) {
+  .placeDetailPage {
+    display: grid;
+    /* 2개의 열, 첫 번째 열은 사진, 두 번째 열은 콘텐츠 */
+    grid-template-columns: 1fr 1fr;
+    /* 행은 자동으로 설정 */
+    grid-template-rows: auto auto;
+    /* 각 영역의 이름 지정 */
+    grid-template-areas:
+      "gallery content"
+      "comments comments"; /* 댓글은 두 열을 모두 차지 */
+    gap: 40px; /* PC에선 간격을 더 넓게 */
+    padding: 40px;
+  }
+
+  /* grid-template-areas에 따라 각 섹션 배치 */
+  .imageGallery {
+    grid-area: gallery;
+  }
+  .postContent {
+    grid-area: content;
+  }
+  .comments {
+    grid-area: comments;
+    padding: 0 15%;
+    width: auto;
+  }
+
+  .imageGallery img {
+    height: 500px; /* PC에서는 이미지 높이를 더 크게 */
+  }
+
+  .postTitle {
+    font-size: 2.5rem;
+  }
+
+  .mapLink {
+    gap: 10px;
+    justify-content: flex-start;
+  }
+}

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 
-import $ from "./PlacesPage.module.css";
+import $ from "./PlacesPage2.module.css";
 import SearchBar from "../../components/Input/SearchBar";
-import PostBox from "../../components/PostBox/PostBox";
+import PostBox from "../../components/PostBox/PostBox2";
 import SortMenu from "../../components/global/SortMenu/SortMenu";
 import dummyPosts from "../../data/dummyPosts";
 import MiniPostBox from "../../components/MiniPostBox/MiniPostBox";
