@@ -25,5 +25,6 @@
 }
 
 .searchInput:focus::placeholder {
+  font-family: "Noto Sans KR";
   color: transparent;
 }

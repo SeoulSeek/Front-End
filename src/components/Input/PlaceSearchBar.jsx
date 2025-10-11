@@ -5,7 +5,7 @@ import $ from "./PlaceSearchBar.module.css";
 const PlaceSearchBar = ({ value, onChange, placeholder }) => {
   return (
     <>
-      <form className={$.searchBar}>
+      <div className={$.searchBar}>
         <input
           type="text"
           value={value}
@@ -13,24 +13,8 @@ const PlaceSearchBar = ({ value, onChange, placeholder }) => {
           placeholder={placeholder}
           className={$.searchInput}
         />
-        <button
-          type="submit"
-          style={{
-            position: "absolute",
-            right: "5px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <AiOutlineSearch size={30} style={{ color: "#000" }} />
-        </button>
-      </form>
+        <AiOutlineSearch size={30} style={{ color: "#000" }} />
+      </div>
     </>
   );
 };
