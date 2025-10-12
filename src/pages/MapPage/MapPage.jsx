@@ -13,6 +13,7 @@ import langKor from "../../assets/MapPage/lang_kor.png";
 import langEng from "../../assets/MapPage/lang_eng.png";
 import langChn from "../../assets/MapPage/lang_chn.png";
 import langJpn from "../../assets/MapPage/lang_jpn.png";
+import sampleImage from "../../assets/LoginPage/sample1.jpg";
 
 const MapPage = () => {
   const navigate = useNavigate();
@@ -33,8 +34,45 @@ const MapPage = () => {
     period: "조선시대",
     hours: "09:00 - 18:00 (월요일 휴무)",
     phone: "02-3700-3900",
-    imageUrl: "https://via.placeholder.com/400x250",
+    imageUrl: sampleImage,
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [bottomSheetState, setBottomSheetState] = useState("peek");
+  
+  // 검색 결과 더미 데이터
+  const searchResults = [
+    {
+      id: 1,
+      placeName: "경복궁",
+      distance: "1.2km",
+      imageUrl: sampleImage,
+    },
+    {
+      id: 2,
+      placeName: "창덕궁",
+      distance: "2.5km",
+      imageUrl: sampleImage,
+    },
+    {
+      id: 3,
+      placeName: "북촌 한옥마을",
+      distance: "1.8km",
+      imageUrl: sampleImage,
+    },
+    {
+      id: 4,
+      placeName: "인사동",
+      distance: "1.5km",
+      imageUrl: sampleImage,
+    },
+    {
+      id: 5,
+      placeName: "종묘",
+      distance: "2.0km",
+      imageUrl: sampleImage,
+    },
+  ];
 
   // 현재 위치 가져오기
   useEffect(() => {
@@ -235,11 +273,22 @@ const MapPage = () => {
     // setSelectedPlace(null);
   };
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const inputValue = e.target.elements[0].value.trim();
+    
+    if (inputValue) {
+      setSearchQuery(inputValue);
+      setIsSearchMode(true);
+      setBottomSheetState("full");
+    }
+  };
+
   return (
     <>
       <div className={styles.container} onClick={handleContainerClick}>
         <div className={styles.search} onClick={(e) => e.stopPropagation()}>
-          <form className={styles.searchWrap}>
+          <form className={styles.searchWrap} onSubmit={handleSearchSubmit}>
             <input
               type="text"
               placeholder="장소를 검색해보세요"
@@ -249,7 +298,7 @@ const MapPage = () => {
               type="submit"
               style={{
                 position: "absolute",
-                right: "5px",
+                right: "10px",
                 top: "50%",
                 transform: "translateY(-50%)",
                 background: "none",
@@ -260,7 +309,7 @@ const MapPage = () => {
                 justifyContent: "center",
               }}
             >
-              <AiOutlineSearch size={30} style={{ color: "#000" }} />
+              <AiOutlineSearch size={28} style={{ color: "#000" }} />
             </button>
           </form>
         </div>
@@ -449,6 +498,11 @@ const MapPage = () => {
         placeData={selectedPlace}
         isOpen={isBottomSheetOpen}
         onClose={handleBottomSheetClose}
+        isSearchMode={isSearchMode}
+        searchQuery={searchQuery}
+        searchResults={searchResults}
+        bottomSheetState={bottomSheetState}
+        setBottomSheetState={setBottomSheetState}
       />
     </>
   );

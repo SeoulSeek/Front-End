@@ -210,3 +210,48 @@
   height: 100%;
 }
 
+/* 검색 모드 스타일 */
+.searchResultTitle {
+  color: #6D8196;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.searchResultList {
+  margin-top: 45px; /* 제목 아래 45px */
+  padding: 0 20px 20px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(80vh - 150px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px; /* PlaceCard 간격 40px */
+}
+
+/* 스크롤바 스타일링 */
+.searchResultList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.searchResultList::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.searchResultList::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.searchResultList::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 검색 모드일 때 peek 상태에서 숨기기 */
+.bottomSheet.searchMode.peek .searchResultTitle,
+.bottomSheet.searchMode.peek .searchResultList {
+  display: none;
+}
+

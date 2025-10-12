@@ -25,7 +25,7 @@
   position: relative;
   height: 40px;
   width: 100%;
-  padding: 5px 10px 5px 30px;
+  padding: 5px 15px;
   border: 1px solid #000000;
   border-radius: 50px;
   box-sizing: border-box;
@@ -38,12 +38,13 @@
   color: var(--seoul-seek-black);
   font-family: "Noto Sans KR";
   font-size: 12px;
-  line-height: normal;
+  line-height: 30px;
   border: none;
   border-radius: 0;
   box-sizing: border-box;
   outline: none;
   text-align: center;
+  padding: 0 40px 0 20px;
 }
 
 .searchInput::placeholder {
@@ -153,7 +154,7 @@
 .audioPopup {
   position: absolute;
   left: 15px;
-  top: 324px; /* 검색바 top(50px) + 검색바 높이(40px) + 234px */
+  top: 234px; /* 검색바 top(50px) + 검색바 높이(40px) + 144px */
   width: 200px;
   height: 200px;
   background-color: #000000;
@@ -266,7 +267,7 @@
 .audioSummaryPopup {
   position: absolute;
   left: 15px;
-  top: 544px; /* 오디오 재생 팝업(324px + 200px) + 20px */
+  top: 454px; /* 오디오 재생 팝업(234px + 200px) + 20px */
   width: 360px;
   height: 200px;
   background-color: #000000;
@@ -341,7 +342,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  top: 404px; /* 검색바 top(50px) + 검색바 높이(40px) + 314px */
+  top: 314px; /* 검색바 top(50px) + 검색바 높이(40px) + 224px */
   width: 360px;
   height: 340px;
   background-color: #000000;
@@ -416,7 +417,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  top: 404px; /* 검색바 top(50px) + 검색바 높이(40px) + 314px */
+  top: 314px; /* 검색바 top(50px) + 검색바 높이(40px) + 224px */
   width: 360px;
   height: 340px;
   background-color: #000000;
