@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
 import styles from "./MapPage.module.css";
+import PlaceCard from "../../components/PlaceCard/PlaceCard";
 import widgetAudio from "../../assets/MapPage/widget_audio.png";
 import widgetHistory from "../../assets/MapPage/widget_history.png";
 import widgetLang from "../../assets/MapPage/widget_lang.png";
@@ -13,6 +14,7 @@ import langChn from "../../assets/MapPage/lang_chn.png";
 import langJpn from "../../assets/MapPage/lang_jpn.png";
 
 const MapPage = () => {
+  const navigate = useNavigate();
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const currentLocationMarker = useRef(null);
@@ -21,6 +23,8 @@ const MapPage = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
   const [showAudioSummary, setShowAudioSummary] = useState(false);
+  const [showTextPopup, setShowTextPopup] = useState(false);
+  const [showPlacesPopup, setShowPlacesPopup] = useState(false);
 
   // 현재 위치 가져오기
   useEffect(() => {
@@ -95,6 +99,20 @@ const MapPage = () => {
     }
   }, [showAudioPlayer, showAudioSummary, activeWidget]);
 
+  // 텍스트 팝업이 닫혔을 때 텍스트 위젯 비활성화
+  useEffect(() => {
+    if (!showTextPopup && activeWidget === "text") {
+      setActiveWidget(null);
+    }
+  }, [showTextPopup, activeWidget]);
+
+  // 연관 장소 팝업이 닫혔을 때 연관 장소 위젯 비활성화
+  useEffect(() => {
+    if (!showPlacesPopup && activeWidget === "places") {
+      setActiveWidget(null);
+    }
+  }, [showPlacesPopup, activeWidget]);
+
   const widgets = [
     { id: "lang", icon: widgetLang, alt: "언어" },
     { id: "audio", icon: widgetAudio, alt: "오디오" },
@@ -110,6 +128,14 @@ const MapPage = () => {
     { id: "jpn", icon: langJpn, alt: "일본어" },
   ];
 
+  const relatedPlaces = [
+    { id: 1, name: "창덕궁", distance: "1.2km" },
+    { id: 2, name: "북촌 한옥마을", distance: "0.8km" },
+    { id: 3, name: "인사동", distance: "1.5km" },
+    { id: 4, name: "청와대", distance: "1.0km" },
+    { id: 5, name: "종묘", distance: "1.8km" },
+  ];
+
   const handleWidgetClick = (widgetId) => {
     if (widgetId === "audio") {
       // 오디오 위젯은 두 팝업 모두 표시
@@ -119,6 +145,21 @@ const MapPage = () => {
         setIsAudioPlaying(true);
         setActiveWidget("audio");
       }
+    } else if (widgetId === "text") {
+      // 텍스트 위젯은 팝업 표시
+      if (!showTextPopup) {
+        setShowTextPopup(true);
+        setActiveWidget("text");
+      }
+    } else if (widgetId === "places") {
+      // 연관 장소 위젯은 팝업 표시
+      if (!showPlacesPopup) {
+        setShowPlacesPopup(true);
+        setActiveWidget("places");
+      }
+    } else if (widgetId === "history") {
+      // 역사뷰 위젯은 /view로 이동
+      navigate("/view");
     } else {
       if (activeWidget === widgetId) {
         setActiveWidget(null);
@@ -142,6 +183,14 @@ const MapPage = () => {
         setShowAudioSummary(false);
         setIsAudioPlaying(false);
       }
+      // 텍스트 팝업도 닫기
+      if (activeWidget === "text") {
+        setShowTextPopup(false);
+      }
+      // 연관 장소 팝업도 닫기
+      if (activeWidget === "places") {
+        setShowPlacesPopup(false);
+      }
     }
   };
 
@@ -160,6 +209,14 @@ const MapPage = () => {
 
   const handleAudioWaveformClick = () => {
     setIsAudioPlaying(!isAudioPlaying);
+  };
+
+  const handleTextPopupClose = () => {
+    setShowTextPopup(false);
+  };
+
+  const handlePlacesPopupClose = () => {
+    setShowPlacesPopup(false);
   };
 
   return (
@@ -309,10 +366,61 @@ const MapPage = () => {
               경복궁은 조선 시대의 법궁으로, 1395년 태조 이성계가 창건한
               서울의 대표적인 궁궐이다. 근정전, 경회루 등 아름다운 건축물이
               있으며, 한국 전통문화와 역사를 체험할 수 있는 관광 명소다.
-              가나다라마바사
-              가나다라마바사
-              가나다라마바사
-              가나다라마바사
+            </div>
+          </div>
+        )}
+
+        {/* 텍스트 설명 팝업 */}
+        {showTextPopup && (
+          <div
+            className={styles.textPopup}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className={styles.textCloseButton}
+              onClick={handleTextPopupClose}
+            >
+              <AiOutlineClose size={20} />
+            </button>
+
+            <h3 className={styles.textTitle}>텍스트 설명</h3>
+
+            <div className={styles.textContent}>
+              경복궁은 조선 왕조의 법궁으로, 1395년 태조 이성계가 한양 도읍과
+              함께 건립한 궁궐이다. '경복'은 '큰 복을 누린다'는 뜻을 지니며,
+              조선 왕실의 정치·행정 중심지 역할을 했다. 근정전, 경회루, 강녕전,
+              교태전 등 주요 건물이 있으며, 정교한 건축미를 자랑한다.
+              임진왜란 때 소실되었으나, 고종 때 재건되었고 현재는 일부
+              복원되어 관광지로 활용된다. 경복궁 수문장 교대식, 한복 체험
+              등이 가능하며, 한국 전통문화와 역사를 직접 경험할 수 있는
+              대표적인 명소이다.
+            </div>
+          </div>
+        )}
+
+        {/* 연관 장소 목록 팝업 */}
+        {showPlacesPopup && (
+          <div
+            className={styles.placesPopup}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className={styles.placesCloseButton}
+              onClick={handlePlacesPopupClose}
+            >
+              <AiOutlineClose size={20} />
+            </button>
+
+            <h3 className={styles.placesTitle}>연관 장소 목록</h3>
+
+            <div className={styles.placesContent}>
+              {relatedPlaces.map((place) => (
+                <PlaceCard
+                  key={place.id}
+                  placeName={place.name}
+                  distance={place.distance}
+                />
+              ))}
             </div>
           </div>
         )}
