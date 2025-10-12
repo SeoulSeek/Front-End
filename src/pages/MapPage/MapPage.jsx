@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
 import styles from "./MapPage.module.css";
 import PlaceCard from "../../components/PlaceCard/PlaceCard";
+import BottomSheet from "../../components/BottomSheet/BottomSheet";
 import widgetAudio from "../../assets/MapPage/widget_audio.png";
 import widgetHistory from "../../assets/MapPage/widget_history.png";
 import widgetLang from "../../assets/MapPage/widget_lang.png";
@@ -25,6 +26,15 @@ const MapPage = () => {
   const [showAudioSummary, setShowAudioSummary] = useState(false);
   const [showTextPopup, setShowTextPopup] = useState(false);
   const [showPlacesPopup, setShowPlacesPopup] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(true);
+  const [selectedPlace, setSelectedPlace] = useState({
+    name: "경복궁",
+    address: "서울특별시 종로구 사직로 161",
+    period: "조선시대",
+    hours: "09:00 - 18:00 (월요일 휴무)",
+    phone: "02-3700-3900",
+    imageUrl: "https://via.placeholder.com/400x250",
+  });
 
   // 현재 위치 가져오기
   useEffect(() => {
@@ -217,6 +227,12 @@ const MapPage = () => {
 
   const handlePlacesPopupClose = () => {
     setShowPlacesPopup(false);
+  };
+
+  const handleBottomSheetClose = () => {
+    // 바텀 시트를 닫지 않고 peek 상태로 유지
+    // setIsBottomSheetOpen(false);
+    // setSelectedPlace(null);
   };
 
   return (
@@ -427,6 +443,13 @@ const MapPage = () => {
 
         <div ref={mapRef} className={styles.map}></div>
       </div>
+
+      {/* 바텀 시트 */}
+      <BottomSheet
+        placeData={selectedPlace}
+        isOpen={isBottomSheetOpen}
+        onClose={handleBottomSheetClose}
+      />
     </>
   );
 };
