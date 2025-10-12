@@ -1,0 +1,69 @@
+.placeCard {
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 40px;
+}
+
+.placeCard:last-child {
+  margin-bottom: 0;
+}
+
+.placeHeader {
+  width: 100%;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.placeName {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  padding-left: 10px;
+  flex-shrink: 0;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.distance {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 400;
+  position: absolute;
+  right: 60px;
+}
+
+.saveButton {
+  position: absolute;
+  right: 15px;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeImageWrapper {
+  width: 100%;
+  height: 160px;
+  border: 1px solid #ffffff;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.placeImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+

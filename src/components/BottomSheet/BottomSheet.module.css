@@ -1,0 +1,257 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1500;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.bottomSheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 30px 30px 0 0;
+  z-index: 1501;
+  transition: bottom 0.3s ease, height 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.bottomSheet.closed {
+  bottom: -100%;
+  height: 0;
+}
+
+.bottomSheet.peek {
+  bottom: 0;
+  height: 80px;
+}
+
+.bottomSheet.half {
+  bottom: 0;
+  height: 400px;
+}
+
+.bottomSheet.full {
+  bottom: 0;
+  height: 80vh;
+  max-height: 800px;
+}
+
+.dragHandle {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  cursor: grab;
+  padding-top: 20px;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragBar {
+  width: 80px;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+}
+
+.placeImage {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.placeImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.titleSection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  padding: 0 30px;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+}
+
+.placeName {
+  color: #000000;
+  font-size: 40px;
+  font-weight: 400;
+  margin: 0;
+  text-align: center;
+}
+
+.saveButton {
+  position: absolute;
+  right: 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.infoSection {
+  display: flex;
+  justify-content: center;
+  padding: 20px 30px;
+  overflow-y: auto;
+  max-height: calc(80vh - 400px);
+}
+
+.infoContainer {
+  width: 300px;
+}
+
+.address {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #000000;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.address span {
+  flex: 1;
+  text-align: left;
+}
+
+.copyButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+
+.periodTag {
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.periodTag span {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--seoul-seek-indigo, #4A5FFF);
+  color: #ffffff;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 25px;
+  text-align: center;
+}
+
+.hours {
+  color: #000000;
+  font-size: 15px;
+  font-weight: 400;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.phone {
+  color: #000000;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+}
+
+/* peek 상태에서는 드래그 핸들만 보이도록 */
+.bottomSheet.peek .placeImage,
+.bottomSheet.peek .titleSection,
+.bottomSheet.peek .infoSection {
+  display: none;
+}
+
+/* half 상태에서는 정보 칸 숨김 */
+.bottomSheet.half .infoSection {
+  display: none;
+}
+
+/* peek 상태 특별 처리 */
+.bottomSheet.peek {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottomSheet.peek .dragHandle {
+  height: 100%;
+}
+
+/* 검색 모드 스타일 */
+.searchResultTitle {
+  color: #6D8196;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.searchResultList {
+  margin-top: 45px; /* 제목 아래 45px */
+  padding: 0 20px 20px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(80vh - 150px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px; /* PlaceCard 간격 40px */
+}
+
+/* 스크롤바 스타일링 */
+.searchResultList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.searchResultList::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.searchResultList::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.searchResultList::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 검색 모드일 때 peek 상태에서 숨기기 */
+.bottomSheet.searchMode.peek .searchResultTitle,
+.bottomSheet.searchMode.peek .searchResultList {
+  display: none;
+}
+

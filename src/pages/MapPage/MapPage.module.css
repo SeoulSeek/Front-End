@@ -25,7 +25,7 @@
   position: relative;
   height: 40px;
   width: 100%;
-  padding: 5px 10px 5px 30px;
+  padding: 5px 15px;
   border: 1px solid #000000;
   border-radius: 50px;
   box-sizing: border-box;
@@ -38,12 +38,13 @@
   color: var(--seoul-seek-black);
   font-family: "Noto Sans KR";
   font-size: 12px;
-  line-height: normal;
+  line-height: 30px;
   border: none;
   border-radius: 0;
   box-sizing: border-box;
   outline: none;
   text-align: center;
+  padding: 0 40px 0 20px;
 }
 
 .searchInput::placeholder {
@@ -52,4 +53,432 @@
 
 .searchInput:focus::placeholder {
   color: transparent;
+}
+
+.widgetMenu {
+  position: absolute;
+  top: 130px; /* 검색바(50px) + 검색바 높이(40px) + 간격(40px) */
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 1000;
+}
+
+.widgetButton {
+  width: 60px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.widgetIcon {
+  width: 60px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1001;
+}
+
+.languageMenu {
+  position: absolute;
+  top: 130px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1002;
+}
+
+.languageButton {
+  width: 200px;
+  height: 60px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideDown 0.4s ease-out forwards;
+}
+
+.languageButton:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.languageButton:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.languageButton:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.languageButton:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.languageIcon {
+  width: 200px;
+  height: 60px;
+  display: block;
+  object-fit: contain;
+}
+
+/* 오디오 팝업 */
+.audioPopup {
+  position: absolute;
+  left: 15px;
+  top: 234px; /* 검색바 top(50px) + 검색바 높이(40px) + 144px */
+  width: 200px;
+  height: 200px;
+  background-color: #000000;
+  border-radius: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.audioCloseButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audioWaveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 80px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.waveBar {
+  width: 6px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: 3px;
+}
+
+.waveBar.playing {
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 20px;
+  }
+  50% {
+    height: 60px;
+  }
+}
+
+.audioStatus {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dots {
+  display: inline-block;
+  width: 30px;
+}
+
+.dot {
+  opacity: 0;
+  animation: dotTyping 1.5s infinite;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes dotTyping {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 오디오 요약 팝업 */
+.audioSummaryPopup {
+  position: absolute;
+  left: 15px;
+  top: 454px; /* 오디오 재생 팝업(234px + 200px) + 20px */
+  width: 360px;
+  height: 200px;
+  background-color: #000000;
+  border-radius: 50px;
+  z-index: 1002;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.audioSummaryCloseButton {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audioSummaryTitle {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.audioSummaryContent {
+  width: 340px;
+  height: 140px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 30px;
+  text-align: center;
+  overflow-y: auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* 스크롤바 스타일링 (선택사항) */
+.audioSummaryContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.audioSummaryContent::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.audioSummaryContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.audioSummaryContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 텍스트 설명 팝업 */
+.textPopup {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 314px; /* 검색바 top(50px) + 검색바 높이(40px) + 224px */
+  width: 360px;
+  height: 340px;
+  background-color: #000000;
+  border-radius: 50px;
+  z-index: 1002;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.textCloseButton {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.textTitle {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.textContent {
+  width: 340px;
+  height: 270px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 30px;
+  text-align: center;
+  overflow-y: auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* 스크롤바 스타일링 */
+.textContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.textContent::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.textContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.textContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 연관 장소 팝업 */
+.placesPopup {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 314px; /* 검색바 top(50px) + 검색바 높이(40px) + 224px */
+  width: 360px;
+  height: 340px;
+  background-color: #000000;
+  border-radius: 50px;
+  z-index: 1002;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.placesCloseButton {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placesTitle {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 20px;
+}
+
+.placesContent {
+  width: 320px;
+  height: 270px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 스크롤바 스타일링 */
+.placesContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.placesContent::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.placesContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.placesContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
