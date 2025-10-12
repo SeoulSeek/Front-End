@@ -1,0 +1,82 @@
+/* 탭 & 정렬 메뉴 */
+.searchTitle {
+  font-family: "Noto Sans KR";
+  font-size: 0.8rem;
+  font-weight: 300;
+}
+.tabWrap {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #d3d9df;
+  margin: 15px 0 45px;
+}
+.tab {
+  font-family: "Noto Sans KR";
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  color: var(--seoul-seek-gray);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.tab:hover {
+  color: var(--seoul-seek-blue);
+}
+.activeTab {
+  color: var(--seoul-seek-blue);
+  border-bottom-color: var(--seoul-seek-blue);
+}
+.sortMenuWrapper {
+  margin-left: auto; /* 정렬 메뉴를 오른쪽 끝으로 */
+}
+
+/* 검색 결과 리스트 */
+.postList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px; /* PostBox 사이의 간격 */
+}
+.noResults {
+  text-align: center;
+  color: var(--seoul-seek-blue);
+  font-family: "Noto Sans KR";
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  padding: 4rem 0;
+}
+/* ============================================= */
+/* 🖥️ PC 반응형 스타일 (1024px 이상) */
+/* ============================================= */
+@media (min-width: 1024px) {
+  .tabWrap {
+    margin-bottom: 30px;
+  }
+  /* PC에서는 그리드 레이아웃으로 변경 */
+  .postList {
+    flex-grow: 1;
+    min-width: 0;
+    /* 뷰포트 높이에서 헤더, 여백 등의 예상 높이(250px)를 뺀 값으로 최대 높이를 제한 */
+    max-height: calc(100vh - 250px);
+    overflow-y: scroll;
+    padding-left: 10px; /* 스크롤바와 컨텐츠 사이 여백 */
+    box-sizing: border-box;
+    justify-content: flex-start;
+  }
+  /* 웹킷 브라우저(크롬, 사파리 등) 스크롤바 스타일링 */
+  .postListWrap::-webkit-scrollbar {
+    width: 8px;
+  }
+  .postListWrap::-webkit-scrollbar-thumb {
+    background-color: #000;
+    border-radius: 4px;
+  }
+  .postListWrap::-webkit-scrollbar-track {
+    background-color: #000;
+  }
+}
