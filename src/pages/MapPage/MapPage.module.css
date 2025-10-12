@@ -148,3 +148,190 @@
   display: block;
   object-fit: contain;
 }
+
+/* 오디오 팝업 */
+.audioPopup {
+  position: absolute;
+  left: 15px;
+  top: 324px; /* 검색바 top(50px) + 검색바 높이(40px) + 234px */
+  width: 200px;
+  height: 200px;
+  background-color: #000000;
+  border-radius: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.audioCloseButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audioWaveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 80px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.waveBar {
+  width: 6px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: 3px;
+}
+
+.waveBar.playing {
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 20px;
+  }
+  50% {
+    height: 60px;
+  }
+}
+
+.audioStatus {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dots {
+  display: inline-block;
+  width: 30px;
+}
+
+.dot {
+  opacity: 0;
+  animation: dotTyping 1.5s infinite;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes dotTyping {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 오디오 요약 팝업 */
+.audioSummaryPopup {
+  position: absolute;
+  left: 15px;
+  top: 544px; /* 오디오 재생 팝업(324px + 200px) + 20px */
+  width: 360px;
+  height: 200px;
+  background-color: #000000;
+  border-radius: 50px;
+  z-index: 1002;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.audioSummaryCloseButton {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audioSummaryTitle {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.audioSummaryContent {
+  width: 340px;
+  height: 140px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 30px;
+  text-align: center;
+  overflow-y: auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* 스크롤바 스타일링 (선택사항) */
+.audioSummaryContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.audioSummaryContent::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.audioSummaryContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.audioSummaryContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
