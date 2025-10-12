@@ -9,6 +9,7 @@ import {
   AiOutlineQuestionCircle 
 } from "react-icons/ai";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import CourseCard from "../../components/CourseCard/CourseCard";
 
 const CoursesDetail = () => {
   const { id } = useParams();
@@ -37,6 +38,44 @@ const CoursesDetail = () => {
       { type: "landmark", count: 4 },
       { type: "special", count: 2 },
       { type: "mission", count: 1 },
+    ],
+  };
+
+  // 각 태그 타입별 더미 데이터
+  const placeData = {
+    landmark: [
+      {
+        title: "경복궁",
+        description: "1395년 조선 태조가 창건한 법궁으로, 한국에서 가장 웅장한 궁궐입니다. 근정전과 경회루가 대표적인 건축물이며, 전통문화 체험과 함께 한국 역사의 중심을 느낄 수 있습니다.",
+      },
+      {
+        title: "창덕궁",
+        description: "1405년 태종이 건립한 조선의 이궁으로, 자연과 조화를 이루는 아름다운 후원이 특징입니다. 유네스코 세계문화유산으로 등재되어 있습니다.",
+      },
+      {
+        title: "덕수궁",
+        description: "서울 도심 한복판에 위치한 궁궐로, 근대와 전통이 공존하는 특별한 공간입니다. 석조전과 함께 고종황제의 애환이 서린 역사적 장소입니다.",
+      },
+      {
+        title: "창경궁",
+        description: "1484년 성종이 건립한 궁궐로, 봄에는 벚꽃이 아름답기로 유명합니다. 한국의 전통 정원과 건축미를 잘 보존하고 있습니다.",
+      },
+    ],
+    special: [
+      {
+        title: "덕수궁 돌담길",
+        description: "덕수궁을 둘러싸고 있는 아름다운 산책로로, 연인과 가족들에게 인기 있는 장소입니다. 가을철 단풍이 특히 아름다워 걷기 좋은 코스로 유명합니다.",
+      },
+      {
+        title: "북촌한옥마을",
+        description: "전통 한옥이 밀집된 지역으로, 조선시대의 정취를 느낄 수 있는 곳입니다. 좁은 골목길을 따라 걸으며 한국의 전통문화를 체험할 수 있습니다.",
+      },
+    ],
+    mission: [
+      {
+        title: "경복궁 한복 체험하기",
+        description: "한복을 대여하여 경복궁과 북촌한옥마을을 방문하며 전통적인 분위기를 만끽하세요. 한복을 입으면 경복궁 입장료가 무료입니다!",
+      },
     ],
   };
 
@@ -123,7 +162,14 @@ const CoursesDetail = () => {
                 </div>
                 {expanded[tag.type] && (
                   <div className={styles.expandedArea}>
-                    {/* 추가정보 표시예정 */}
+                    {placeData[tag.type]?.map((place, placeIndex) => (
+                      <CourseCard
+                        key={placeIndex}
+                        title={place.title}
+                        description={place.description}
+                        type={tag.type}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
