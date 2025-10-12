@@ -177,3 +177,14 @@
   height: 30px;
   padding-top: 80px;
 }
+
+.errorText {
+  font-family: "Noto Sans KR";
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+  padding: 5px 10px;
+  transform: translateX(-70px);
+}
