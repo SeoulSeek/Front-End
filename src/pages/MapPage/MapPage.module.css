@@ -78,3 +78,73 @@
   display: block;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1001;
+}
+
+.languageMenu {
+  position: absolute;
+  top: 130px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1002;
+}
+
+.languageButton {
+  width: 200px;
+  height: 60px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideDown 0.4s ease-out forwards;
+}
+
+.languageButton:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.languageButton:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.languageButton:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.languageButton:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.languageIcon {
+  width: 200px;
+  height: 60px;
+  display: block;
+  object-fit: contain;
+}

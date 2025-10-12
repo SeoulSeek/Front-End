@@ -6,12 +6,17 @@ import widgetAudio from "../../assets/MapPage/widget_audio.png";
 import widgetHistory from "../../assets/MapPage/widget_history.png";
 import widgetLang from "../../assets/MapPage/widget_lang.png";
 import widgetText from "../../assets/MapPage/widget_text.png";
+import langKor from "../../assets/MapPage/lang_kor.png";
+import langEng from "../../assets/MapPage/lang_eng.png";
+import langChn from "../../assets/MapPage/lang_chn.png";
+import langJpn from "../../assets/MapPage/lang_jpn.png";
 
 const MapPage = () => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const currentLocationMarker = useRef(null);
   const [userLocation, setUserLocation] = useState(null);
+  const [activeWidget, setActiveWidget] = useState(null);
 
   // 현재 위치 가져오기
   useEffect(() => {
@@ -83,12 +88,30 @@ const MapPage = () => {
     { id: "lang", icon: widgetLang, alt: "언어" },
     { id: "audio", icon: widgetAudio, alt: "오디오" },
     { id: "text", icon: widgetText, alt: "텍스트" },
-    { id: "history", icon: widgetHistory, alt: "히스토리" },
+    { id: "history", icon: widgetHistory, alt: "역사뷰" },
+  ];
+
+  const languageButtons = [
+    { id: "kor", icon: langKor, alt: "한국어" },
+    { id: "eng", icon: langEng, alt: "영어" },
+    { id: "chn", icon: langChn, alt: "중국어" },
+    { id: "jpn", icon: langJpn, alt: "일본어" },
   ];
 
   const handleWidgetClick = (widgetId) => {
-    console.log(`Widget clicked: ${widgetId}`);
-    // TODO: 각 위젯별 기능 구현
+    if (activeWidget === widgetId) {
+      setActiveWidget(null);
+    } else {
+      setActiveWidget(widgetId);
+    }
+  };
+
+  const handleOverlayClick = () => {
+    setActiveWidget(null);
+  };
+
+  const handleLanguageClick = (langId) => {
+    alert("언어 변경 기능은 추후 구현될 예정입니다. 양해해 주셔서 감사합니다.");
   };
 
   return (
@@ -127,6 +150,11 @@ const MapPage = () => {
               key={widget.id}
               className={styles.widgetButton}
               onClick={() => handleWidgetClick(widget.id)}
+              style={{
+                opacity:
+                  activeWidget && activeWidget !== widget.id ? 0.5 : 1,
+                zIndex: activeWidget === widget.id ? 1002 : 1000,
+              }}
             >
               <img
                 src={widget.icon}
@@ -136,6 +164,30 @@ const MapPage = () => {
             </button>
           ))}
         </div>
+
+        {/* 오버레이 */}
+        {activeWidget && (
+          <div className={styles.overlay} onClick={handleOverlayClick}></div>
+        )}
+
+        {/* 언어 선택 메뉴 */}
+        {activeWidget === "lang" && (
+          <div className={styles.languageMenu}>
+            {languageButtons.map((lang) => (
+              <button
+                key={lang.id}
+                className={styles.languageButton}
+                onClick={() => handleLanguageClick(lang.id)}
+              >
+                <img
+                  src={lang.icon}
+                  alt={lang.alt}
+                  className={styles.languageIcon}
+                />
+              </button>
+            ))}
+          </div>
+        )}
 
         <div ref={mapRef} className={styles.map}></div>
       </div>
