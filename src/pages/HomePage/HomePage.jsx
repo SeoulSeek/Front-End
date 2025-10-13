@@ -12,6 +12,35 @@ import Loading from "../../components/Loading/Loading";
 import { Link } from "react-router";
 import { API_ENDPOINTS } from "../../config/api";
 
+const DISTRICT_MAP = {
+  TEMP: "temp",
+  JONGNO: "종로구",
+  JUNG: "중구",
+  YONGSAN: "용산구",
+  SEONGDONG: "성동구",
+  GWANGJIN: "광진구",
+  DONGDAEMUN: "동대문구",
+  JUNGRANG: "중랑구",
+  SEONGBUK: "성북구",
+  GANGBUK: "강북구",
+  DOBONG: "도봉구",
+  NOWON: "노원구",
+  EUNPYEONG: "은평구",
+  SEODAEMUN: "서대문구",
+  MAPO: "마포구",
+  YANGCHEON: "양천구",
+  GANGSEO: "강서구",
+  GURO: "구로구",
+  GEUMCHEON: "금천구",
+  YEONGDEUNGPO: "영등포구",
+  DONGJAK: "동작구",
+  GWANAK: "관악구",
+  SEOCHO: "서초구",
+  GANGNAM: "강남구",
+  SONGPA: "송파구",
+  GANGDONG: "강동구",
+};
+
 const Home = () => {
   const [timePeriod, setTimePeriod] = useState("오후");
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +50,6 @@ const Home = () => {
   useEffect(() => {
     const fetchDailyLocation = async () => {
       try {
-        console.log("API 요청 URL:", API_ENDPOINTS.DAILY_LOCATION);
         const response = await fetch(API_ENDPOINTS.DAILY_LOCATION, {
           method: "GET",
           headers: {
@@ -29,17 +57,11 @@ const Home = () => {
           },
         });
 
-        console.log("Response status:", response.status);
-        console.log("Response ok:", response.ok);
-
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error("API 에러 응답:", errorText);
           throw new Error(`API 호출 실패: ${response.status}`);
         }
 
         const result = await response.json();
-        console.log("API 응답 데이터:", result);
         
         if (result.error || !result.data) {
           throw new Error("데이터 오류");
@@ -49,7 +71,6 @@ const Home = () => {
         setTimePeriod(result.data.ampm ? "오전" : "오후");
         setHasError(false);
       } catch (error) {
-        console.error("일일 명소 조회 실패:", error);
         setHasError(true);
       } finally {
         setIsLoading(false);
@@ -116,7 +137,9 @@ const Home = () => {
               ) : (
                 <HashTag 
                   type="district" 
-                  text={dailyLocation?.territory || "종로구"} 
+                  text={DISTRICT_MAP[dailyLocation?.territory] || dailyLocation?.territory || "종로구"}
+                  color="#91C6FF"
+                  width="80px"
                 />
               )}
             </div>
