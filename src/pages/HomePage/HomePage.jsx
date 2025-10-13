@@ -46,6 +46,8 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [dailyLocation, setDailyLocation] = useState(null);
   const [hasError, setHasError] = useState(false);
+  const [weeklyCourse, setWeeklyCourse] = useState(null);
+  const [courseError, setCourseError] = useState(false);
 
   useEffect(() => {
     const fetchDailyLocation = async () => {
@@ -77,7 +79,34 @@ const Home = () => {
       }
     };
 
+    const fetchWeeklyCourse = async () => {
+      try {
+        const response = await fetch(API_ENDPOINTS.WEEKLY_COURSE, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`API 호출 실패: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.error || !result.data) {
+          throw new Error("데이터 오류");
+        }
+
+        setWeeklyCourse(result.data);
+        setCourseError(false);
+      } catch (error) {
+        setCourseError(true);
+      }
+    };
+
     fetchDailyLocation();
+    fetchWeeklyCourse();
   }, []);
 
   return (
@@ -103,21 +132,27 @@ const Home = () => {
         <div className={styles.recommBox}>
           <h2 className={styles.h2}>금주의 추천 관광코스</h2>
           <div className={styles.recommInnerBox}>
-            <div className={styles.tag1}>
-              <CourseTag type="all" count={7} />
-            </div>
-            <div className={styles.tag2}>
-              <CourseTag type="special" count={2} />
-            </div>
-            <div className={styles.tag3}>
-              <CourseTag type="landmark" count={4} />
-            </div>
-            <div className={styles.tag4}>
-              <CourseTag type="mission" count={1} />
-            </div>
+            {courseError ? (
+              <div className={styles.courseErrorText}>페이지를 새로고침해주세요.</div>
+            ) : (
+              <>
+                <div className={styles.tag1}>
+                  <CourseTag type="all" count={weeklyCourse?.totalLocations || 7} />
+                </div>
+                <div className={styles.tag2}>
+                  <CourseTag type="special" count={weeklyCourse?.specialTourElements || 2} />
+                </div>
+                <div className={styles.tag3}>
+                  <CourseTag type="landmark" count={weeklyCourse?.landmarkTourElements || 4} />
+                </div>
+                <div className={styles.tag4}>
+                  <CourseTag type="mission" count={weeklyCourse?.missionTourElements || 1} />
+                </div>
+              </>
+            )}
             <img
               alt="추천 관광코스 이미지"
-              src={dummy1}
+              src={weeklyCourse?.imageUrl || dummy1}
               className={styles.recommImg}
             />
           </div>
