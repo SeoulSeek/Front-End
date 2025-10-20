@@ -18,4 +18,7 @@ export const API_ENDPOINTS = {
   EMAIL_VALID: `${API_BASE_URL}/valid`,
   DAILY_LOCATION: `${API_BASE_URL}/location/daily`,
   WEEKLY_COURSE: `${API_BASE_URL}/courses/weekly`,
+  COURSES: `${API_BASE_URL}/courses`,
+  COURSE_DETAIL: (id) => `${API_BASE_URL}/courses/${id}`,
+  COURSE_SCRAP: (id) => `${API_BASE_URL}/auth/courses/${id}/scrap`,
 };

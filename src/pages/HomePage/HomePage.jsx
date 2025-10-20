@@ -131,11 +131,16 @@ const Home = () => {
       <div className={styles.recommContainer}>
         <div className={styles.recommBox}>
           <h2 className={styles.h2}>금주의 추천 관광코스</h2>
-          <div className={styles.recommInnerBox}>
-            {courseError ? (
+          {courseError ? (
+            <div className={styles.recommInnerBox}>
               <div className={styles.courseErrorText}>페이지를 새로고침해주세요.</div>
-            ) : (
-              <>
+            </div>
+          ) : (
+            <Link 
+              to={weeklyCourse?.id ? `/courses/${weeklyCourse.id}` : '#'} 
+              style={{ textDecoration: 'none', cursor: weeklyCourse?.id ? 'pointer' : 'default' }}
+            >
+              <div className={styles.recommInnerBox}>
                 <div className={styles.tag1}>
                   <CourseTag type="all" count={weeklyCourse?.totalLocations || 7} />
                 </div>
@@ -148,14 +153,14 @@ const Home = () => {
                 <div className={styles.tag4}>
                   <CourseTag type="mission" count={weeklyCourse?.missionTourElements || 1} />
                 </div>
-              </>
-            )}
-            <img
-              alt="추천 관광코스 이미지"
-              src={weeklyCourse?.imageUrl || dummy1}
-              className={styles.recommImg}
-            />
-          </div>
+                <img
+                  alt="추천 관광코스 이미지"
+                  src={weeklyCourse?.imageUrl || dummy1}
+                  className={styles.recommImg}
+                />
+              </div>
+            </Link>
+          )}
         </div>
         <div className={styles.recommBox}>
           <h2 className={styles.h2}>
