@@ -21,6 +21,7 @@ const BottomSheet = ({
   const [currentY, setCurrentY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const sheetRef = useRef(null);
+  const dragHandleRef = useRef(null);
 
   // 외부에서 bottomSheetState를 제어하는 경우
   useEffect(() => {
@@ -29,51 +30,83 @@ const BottomSheet = ({
     }
   }, [bottomSheetState]);
 
-  const handleTouchStart = (e) => {
-    setStartY(e.touches[0].clientY);
-    setIsDragging(true);
-  };
+  // 터치 이벤트를 passive: false로 등록
+  useEffect(() => {
+    const dragHandle = dragHandleRef.current;
+    if (!dragHandle) return;
 
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    setCurrentY(e.touches[0].clientY);
-  };
+    let touchStartY = 0;
+    let touchCurrentY = 0;
+    let isTouchDragging = false;
 
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
+    const handleTouchStart = (e) => {
+      e.stopPropagation();
+      touchStartY = e.touches[0].clientY;
+      isTouchDragging = true;
+      setStartY(touchStartY);
+      setIsDragging(true);
+    };
 
-    const deltaY = currentY - startY;
+    const handleTouchMove = (e) => {
+      if (!isTouchDragging) return;
+      e.preventDefault(); // 화면 스크롤 방지
+      e.stopPropagation();
+      touchCurrentY = e.touches[0].clientY;
+      setCurrentY(touchCurrentY);
+    };
 
-    // 드래그 방향과 거리에 따라 상태 변경
-    if (Math.abs(deltaY) < 50) return; // 최소 드래그 거리
+    const handleTouchEnd = (e) => {
+      if (!isTouchDragging) return;
+      e.stopPropagation();
+      isTouchDragging = false;
+      setIsDragging(false);
 
-    let newState = sheetState;
-    if (deltaY > 0) {
-      // 아래로 드래그
-      if (sheetState === "full") {
-        newState = "half";
-      } else if (sheetState === "half") {
-        newState = "peek";
+      const deltaY = touchCurrentY - touchStartY;
+
+      // 드래그 방향과 거리에 따라 상태 변경
+      if (Math.abs(deltaY) < 50) {
+        setStartY(0);
+        setCurrentY(0);
+        return;
       }
-      // peek 상태에서는 더 이상 닫히지 않음
-    } else {
-      // 위로 드래그
-      if (sheetState === "peek") {
-        newState = "half";
-      } else if (sheetState === "half") {
-        newState = "full";
+
+      let newState = sheetState;
+      if (deltaY > 0) {
+        // 아래로 드래그
+        if (sheetState === "full") {
+          newState = "half";
+        } else if (sheetState === "half") {
+          newState = "peek";
+        }
+      } else {
+        // 위로 드래그
+        if (sheetState === "peek") {
+          newState = "half";
+        } else if (sheetState === "half") {
+          newState = "full";
+        }
       }
-    }
 
-    setSheetState(newState);
-    if (setBottomSheetState) {
-      setBottomSheetState(newState);
-    }
+      setSheetState(newState);
+      if (setBottomSheetState) {
+        setBottomSheetState(newState);
+      }
 
-    setStartY(0);
-    setCurrentY(0);
-  };
+      setStartY(0);
+      setCurrentY(0);
+    };
+
+    // passive: false 옵션으로 이벤트 리스너 등록
+    dragHandle.addEventListener('touchstart', handleTouchStart, { passive: false });
+    dragHandle.addEventListener('touchmove', handleTouchMove, { passive: false });
+    dragHandle.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      dragHandle.removeEventListener('touchstart', handleTouchStart);
+      dragHandle.removeEventListener('touchmove', handleTouchMove);
+      dragHandle.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [sheetState, setBottomSheetState]);
 
   const handleMouseDown = (e) => {
     setStartY(e.clientY);
@@ -174,12 +207,10 @@ const BottomSheet = ({
       <div
         ref={sheetRef}
         className={`${styles.bottomSheet} ${styles[sheetState]} ${isSearchMode ? styles.searchMode : ''}`}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {/* 드래그 핸들 */}
         <div
+          ref={dragHandleRef}
           className={styles.dragHandle}
           onMouseDown={handleMouseDown}
         >
