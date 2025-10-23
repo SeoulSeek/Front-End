@@ -17,11 +17,13 @@ import MapPage from "./pages/MapPage/MapPage";
 import MapHistoryView from "./pages/MapHistoryView/MapHistoryView";
 import NotFound from "./pages/NotFoundPage/NotFoundPage";
 import MyPage from "./pages/MyPage/MyPage";
+import ScrollToTopOnNavigation from "./components/ScrollToTop/ScrollToTopOnNavigation";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTopOnNavigation />
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />

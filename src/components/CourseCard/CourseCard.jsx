@@ -7,11 +7,22 @@ import mapButton from "../../assets/CoursesPage/mapButton.png";
 import { AiOutlineQuestionCircle, AiOutlineDollar } from "react-icons/ai";
 import { CgSandClock } from "react-icons/cg";
 
-const CourseCard = ({ title, description, type }) => {
+const CourseCard = ({ 
+  title, 
+  description, 
+  type, 
+  image, 
+  recommend, 
+  runtime, 
+  cost 
+}) => {
   const [showOverlay, setShowOverlay] = useState(false);
 
-  // type에 따라 이미지 선택
+  // type에 따라 이미지 선택 (image prop이 있으면 우선 사용)
   const getImageByType = (type) => {
+    if (image) {
+      return image;
+    }
     switch (type) {
       case "landmark":
         return sampleHistory;
@@ -60,21 +71,27 @@ const CourseCard = ({ title, description, type }) => {
       </div>
       {type === "mission" && (
         <div className={styles.missionInfoContainer}>
-          <div className={styles.missionInfoRow}>
-            <AiOutlineQuestionCircle className={styles.missionIcon} />
-            <div className={styles.missionLabel}>미션 추천 대상</div>
-            <div className={styles.missionContent}>친구끼리, 가족끼리, 커플</div>
-          </div>
-          <div className={styles.missionInfoRow}>
-            <CgSandClock className={styles.missionIcon} />
-            <div className={styles.missionLabel}>미션 소요 시간</div>
-            <div className={styles.missionContent}>평균 1~2시간</div>
-          </div>
-          <div className={styles.missionInfoRow}>
-            <AiOutlineDollar className={styles.missionIcon} />
-            <div className={styles.missionLabel}>미션 소요 비용</div>
-            <div className={styles.missionContent}>10,000~30,000원 (대여비)</div>
-          </div>
+          {recommend && (
+            <div className={styles.missionInfoRow}>
+              <AiOutlineQuestionCircle className={styles.missionIcon} />
+              <div className={styles.missionLabel}>미션 추천 대상</div>
+              <div className={styles.missionContent}>{recommend}</div>
+            </div>
+          )}
+          {runtime && (
+            <div className={styles.missionInfoRow}>
+              <CgSandClock className={styles.missionIcon} />
+              <div className={styles.missionLabel}>미션 소요 시간</div>
+              <div className={styles.missionContent}>{runtime}</div>
+            </div>
+          )}
+          {cost && (
+            <div className={styles.missionInfoRow}>
+              <AiOutlineDollar className={styles.missionIcon} />
+              <div className={styles.missionLabel}>미션 소요 비용</div>
+              <div className={styles.missionContent}>{cost}</div>
+            </div>
+          )}
         </div>
       )}
     </div>

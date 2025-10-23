@@ -1,15 +1,17 @@
 // src/components/HashTag/HashTag
 import React from "react";
 
-const HashTag = ({ text, color }) => {
+const HashTag = ({ text, color, width }) => {
   return (
     <>
       <span
         style={{
           display: "flex",
+          width: width || "auto",
           height: "30px",
-          padding: "0 20px",
+          padding: width ? "0" : "0 20px",
           alignItems: "center",
+          justifyContent: "center",
           borderRadius: "100px",
           backgroundColor: color,
           fontFamily: "Noto Sans KR",

@@ -177,3 +177,28 @@
   height: 30px;
   padding-top: 80px;
 }
+
+.errorText {
+  font-family: "Noto Sans KR";
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+  padding: 5px 10px;
+  transform: translateX(-70px);
+}
+
+.courseErrorText {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Noto Sans KR";
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}

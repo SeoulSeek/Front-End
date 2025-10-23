@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }) => {
       const response = await fetch(API_ENDPOINTS.AUTH_REFRESH, {
         method: 'POST',
         headers,
+        credentials: 'include',
         body: JSON.stringify({
           refreshToken: storedToken
         }),
@@ -185,6 +186,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json;charset=UTF-8',
           'Accept': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(loginData),
       });
 
@@ -338,6 +340,7 @@ export const AuthProvider = ({ children }) => {
           headers: {
             'Content-Type': 'application/json;charset=UTF-8',
           },
+          credentials: 'include',
           body: JSON.stringify({
             id: user.id
           }),
