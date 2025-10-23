@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import styles from "./HomePage.module.css";
 import CourseTag from "../../components/CourseTag/CourseTag";
 import HashTag from "../../components/global/HashTag/HashTag";
+import { Link } from "react-router-dom";
 
 import bannerMap from "../../assets/HomePage/bannerMap.png";
 import foldingMap from "../../assets/HomePage/foldingMap.png";
 import glass from "../../assets/HomePage/glass.png";
 import dummy1 from "../../assets/HomePage/dummy1.jpg";
 import dummy2 from "../../assets/HomePage/dummy2.jpg";
-import Loading from "../../components/Loading/Loading";
-import { Link } from "react-router";
 import { API_ENDPOINTS } from "../../config/api";
 
 const DISTRICT_MAP = {
@@ -64,7 +63,7 @@ const Home = () => {
         }
 
         const result = await response.json();
-        
+
         if (result.error || !result.data) {
           throw new Error("데이터 오류");
         }
@@ -93,7 +92,7 @@ const Home = () => {
         }
 
         const result = await response.json();
-        
+
         if (result.error || !result.data) {
           throw new Error("데이터 오류");
         }
@@ -110,88 +109,128 @@ const Home = () => {
   }, []);
 
   return (
-    <>
-      <div>
+    <div className={styles.homePage}>
+      {/* 메인 소개글 */}
+      <section className={styles.introSection}>
         <h1 className={styles.h1}>
           <span className={styles.bold}>서울</span>의 숨겨진 가치와 유산을{" "}
           <span className={styles.bold}>탐색하다</span>
         </h1>
-        <img src={bannerMap} className={styles.bannerMap} alt="Banner Map" />
-      </div>
-      <p className={styles.p}>
-        ‘서울식’이라는 표현은 단순히 서울만의 스타일이나
-        <br />
-        분위기를 의미하는 것을 넘어,
-        <br />이 도시가 지닌 특별한 정체성과 개성을 나타냅니다.
-      </p>
-      <img src={foldingMap} className={styles.foldingMap} />
-      <Link to="/map">
-        <img src={glass} className={styles.glass} />
-      </Link>
-      <div className={styles.recommContainer}>
-        <div className={styles.recommBox}>
-          <h2 className={styles.h2}>금주의 추천 관광코스</h2>
-          {courseError ? (
-            <div className={styles.recommInnerBox}>
-              <div className={styles.courseErrorText}>페이지를 새로고침해주세요.</div>
-            </div>
-          ) : (
-            <Link 
-              to={weeklyCourse?.id ? `/courses/${weeklyCourse.id}` : '#'} 
-              style={{ textDecoration: 'none', cursor: weeklyCourse?.id ? 'pointer' : 'default' }}
-            >
-              <div className={styles.recommInnerBox}>
-                <div className={styles.tag1}>
-                  <CourseTag type="all" count={weeklyCourse?.totalLocations || 7} />
-                </div>
-                <div className={styles.tag2}>
-                  <CourseTag type="special" count={weeklyCourse?.specialTourElements || 2} />
-                </div>
-                <div className={styles.tag3}>
-                  <CourseTag type="landmark" count={weeklyCourse?.landmarkTourElements || 4} />
-                </div>
-                <div className={styles.tag4}>
-                  <CourseTag type="mission" count={weeklyCourse?.missionTourElements || 1} />
-                </div>
-                <img
-                  alt="추천 관광코스 이미지"
-                  src={weeklyCourse?.imageUrl || dummy1}
-                  className={styles.recommImg}
-                />
-              </div>
-            </Link>
-          )}
+      </section>
+
+      {/* 맵 이미지 */}
+      <section className={styles.mapSection}>
+        <div className={styles.mapImageContainer}>
+          <img src={bannerMap} className={styles.bannerMap} alt="Banner Map" />
+          <img
+            src={foldingMap}
+            className={styles.foldingMap}
+            alt="Folding Map"
+          />
+          <Link to="/map">
+            <img src={glass} className={styles.glass} alt="Magnifying glass" />
+          </Link>
         </div>
-        <div className={styles.recommBox}>
-          <h2 className={styles.h2}>
-            지금 이 시간,{" "}
-            <span className={styles.special}>
-              {timePeriod}의 서울
-            </span>{" "}
-            명소
-          </h2>
-          <div className={styles.recommInnerBox}>
-            <div className={styles.hashTagContainer}>
-              {hasError ? (
-                <div className={styles.errorText}>페이지를 새로고침해주세요.</div>
-              ) : (
-                <HashTag 
-                  type="district" 
-                  text={DISTRICT_MAP[dailyLocation?.territory] || dailyLocation?.territory || "종로구"}
-                  color="#91C6FF"
-                  width="80px"
-                />
-              )}
+      </section>
+
+      {/* 부 소개글 */}
+      <section className={styles.subIntroSection}>
+        <p className={styles.p}>
+          ‘서울식’이라는 표현은 단순히 서울만의 스타일이나 <br />
+          분위기를 의미하는 것을 넘어, <br />이 도시가 지닌 특별한 정체성과
+          개성을 나타냅니다.
+        </p>
+      </section>
+
+      {/* 4. 추천 컨텐츠 */}
+      <section className={styles.recommSection}>
+        <div className={styles.recommContainer}>
+          {/* 금주의 추천 관광코스 */}
+          <div className={styles.recommBox}>
+            <h2 className={styles.h2}>금주의 추천 관광코스</h2>
+            {courseError ? (
+              <div className={styles.recommInnerBox}>
+                <div className={styles.courseErrorText}>
+                  페이지를 새로고침해주세요.
+                </div>
+              </div>
+            ) : (
+              <Link
+                to={weeklyCourse?.id ? `/courses/${weeklyCourse.id}` : "#"}
+                style={{
+                  textDecoration: "none",
+                  cursor: weeklyCourse?.id ? "pointer" : "default",
+                }}
+              >
+                <div className={styles.recommInnerBox}>
+                  <div className={styles.tag1}>
+                    <CourseTag
+                      type="all"
+                      count={weeklyCourse?.totalLocations || 7}
+                    />
+                  </div>
+                  <div className={styles.tag2}>
+                    <CourseTag
+                      type="special"
+                      count={weeklyCourse?.specialTourElements || 2}
+                    />
+                  </div>
+                  <div className={styles.tag3}>
+                    <CourseTag
+                      type="landmark"
+                      count={weeklyCourse?.landmarkTourElements || 4}
+                    />
+                  </div>
+                  <div className={styles.tag4}>
+                    <CourseTag
+                      type="mission"
+                      count={weeklyCourse?.missionTourElements || 1}
+                    />
+                  </div>
+                  <img
+                    alt="추천 관광코스 이미지"
+                    src={weeklyCourse?.imageUrl || dummy1}
+                    className={styles.recommImg}
+                  />
+                </div>
+              </Link>
+            )}
+          </div>
+          {/* 지금 이 시간 명소 */}
+          <div className={styles.recommBox}>
+            <h2 className={styles.h2}>
+              지금 이 시간,{" "}
+              <span className={styles.special}>{timePeriod}의 서울</span> 명소
+            </h2>
+            <div className={styles.recommInnerBox}>
+              <div className={styles.hashTagContainer}>
+                {hasError ? (
+                  <div className={styles.errorText}>
+                    페이지를 새로고침해주세요.
+                  </div>
+                ) : (
+                  <HashTag
+                    type="district"
+                    text={
+                      DISTRICT_MAP[dailyLocation?.territory] ||
+                      dailyLocation?.territory ||
+                      "종로구"
+                    }
+                    color="#91C6FF"
+                    width="80px"
+                  />
+                )}
+              </div>
+              <img
+                alt="서울 명소 이미지"
+                src={dailyLocation?.imageUrl || dummy2}
+                className={styles.recommImg}
+              />
             </div>
-            <img
-              alt="서울 명소 이미지"
-              src={dailyLocation?.imageUrl || dummy2}
-              className={styles.recommImg}
-            />
           </div>
         </div>
-      </div>
-    </>
+      </section>
+    </div>
   );
 };
 
