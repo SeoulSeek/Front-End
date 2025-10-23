@@ -1,8 +1,8 @@
 const getApiBaseUrl = () => {
   if (import.meta.env.PROD) {
-    return 'https://seoulseek.com';
+    return "https://seoulseek.com";
   } else {
-    return 'https://seoulseek.com';
+    return "https://seoulseek.com";
   }
 };
 
@@ -16,4 +16,6 @@ export const API_ENDPOINTS = {
   AUTH_REFRESH: `${API_BASE_URL}/auth/refresh`,
   AUTH_LOGOUT: `${API_BASE_URL}/auth/logout`,
   EMAIL_VALID: `${API_BASE_URL}/valid`,
+  REVIEW_CREATE: `${API_BASE_URL}/review`,
+  REVIEW_DELETE: `${API_BASE_URL}/review/delete`,
 };
