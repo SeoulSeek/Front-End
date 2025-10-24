@@ -1,9 +1,12 @@
-import React, { useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { BiLinkAlt } from "react-icons/bi";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { CgClose } from "react-icons/cg";
 import { FaRegComment } from "react-icons/fa";
+// useAuth 훅과 API 엔드포인트 import
+import { useAuth } from "../../contexts/AuthContext";
+import { API_ENDPOINTS } from "../../config/api";
 
 import $ from "./PlacesDetail2.module.css";
 import ScrollToTopBtn from "../../components/ScrollToTop/ScrollToTop";
@@ -21,11 +24,78 @@ const currentUser = {
 
 const PlaceDetail = () => {
   const { id } = useParams();
-  const post = dummyPosts.find((p) => p.id === parseInt(id));
+  const navigate = useNavigate();
+  const auth = useAuth();
 
-  if (!post) {
-    return <div>게시물을 찾을 수 없습니다.</div>;
-  }
+  // --- API 데이터를 위한 상태 관리 ---
+  const [post, setPost] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isAuthor, setIsAuthor] = useState(false);
+  // const post = dummyPosts.find((p) => p.id === parseInt(id));
+
+  // --- useEffect를 사용한 데이터 Fetching ---
+  useEffect(() => {
+    const fetchPostDetails = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`${API_ENDPOINTS.REVIEW_DETAIL}/${id}`);
+        if (!response.ok) {
+          throw new Error("게시물을 불러오는 데 실패했습니다.");
+        }
+        const result = await response.json();
+        setPost(result.data);
+
+        // 작성자 확인: 로그인된 사용자의 ID와 게시물 작성자의 userId를 비교
+        if (auth.user && auth.user.id === result.data.userId) {
+          setIsAuthor(true);
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPostDetails();
+  }, [id, auth.user]); // id나 로그인 상태가 변경되면 다시 데이터를 불러옴
+
+  // --- 이벤트 핸들러 ---
+  const handleEdit = () => {
+    navigate(`/places/edit/${id}`); // 수정 페이지로 이동
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("정말로 이 게시물을 삭제하시겠습니까?")) {
+      try {
+        const token = localStorage.getItem("refreshToken");
+        const response = await fetch(`${API_ENDPOINTS.REVIEW_DELETE}/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          alert("게시물이 삭제되었습니다.");
+          navigate("/places"); // 삭제 후 목록 페이지로 이동
+        } else {
+          throw new Error("삭제에 실패했습니다.");
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  };
+
+  // --- 로딩 및 에러 처리 ---
+  if (isLoading) return <div className={$.statusMessage}>로딩 중...</div>;
+  if (error) return <div className={$.statusMessage}>{error}</div>;
+  if (!post)
+    return <div className={$.statusMessage}>게시물을 찾을 수 없습니다.</div>;
+
+  // --- API 데이터와 컴포넌트 데이터 매핑 ---
+  //const allImages = post.fileURL ? [post.fileURL] : [];
+  const tags = post.tagList?.tagList?.map((tag) => tag.name) || [];
 
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(post.stats.likes);

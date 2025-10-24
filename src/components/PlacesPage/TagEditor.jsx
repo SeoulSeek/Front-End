@@ -26,7 +26,7 @@ const TagEditor = ({ onTagsChange }) => {
   };
 
   const addCustomTag = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.isComposing) {
       e.preventDefault();
       const newTag = customKeyword.trim();
       if (
@@ -34,7 +34,6 @@ const TagEditor = ({ onTagsChange }) => {
         !customHashtags.includes(newTag) &&
         customHashtags.length < 10
       ) {
-        // 최대 10개
         setCustomHashtags([...customHashtags, newTag]);
         setCustomKeyword("");
       }
