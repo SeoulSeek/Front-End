@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
 import styles from "./MapPage.module.css";
 import PlaceCard from "../../components/PlaceCard/PlaceCard";
@@ -15,6 +15,7 @@ import langChn from "../../assets/MapPage/lang_chn.png";
 import langJpn from "../../assets/MapPage/lang_jpn.png";
 import sampleImage from "../../assets/LoginPage/sample1.jpg";
 import pinIcon from "../../assets/MapPage/pin.svg";
+import pinSelectIcon from "../../assets/MapPage/pinSelect.svg";
 import { API_ENDPOINTS } from "../../config/api";
 
 // Era 매핑 객체
@@ -31,12 +32,14 @@ const ERA_MAP = {
 
 const MapPage = () => {
   const navigate = useNavigate();
+  const { locationId } = useParams();
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const currentLocationMarker = useRef(null);
   const locationMarkers = useRef([]);
   const [userLocation, setUserLocation] = useState(null);
   const [locations, setLocations] = useState([]);
+  const [selectedLocationId, setSelectedLocationId] = useState(null);
   const [activeWidget, setActiveWidget] = useState(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
@@ -45,6 +48,8 @@ const MapPage = () => {
   const [showPlacesPopup, setShowPlacesPopup] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [relatedPlaces, setRelatedPlaces] = useState([]);
+  const [locationText, setLocationText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [bottomSheetState, setBottomSheetState] = useState("peek");
@@ -84,21 +89,40 @@ const MapPage = () => {
   ];
 
   // 장소 상세 정보 조회 및 바텀시트 표시
-  const handleLocationMarkerClick = useCallback(async (locationId) => {
+  const handleLocationMarkerClick = useCallback(async (locationId, shouldMoveMap = false, sheetState = "half") => {
     try {
-      console.log("마커 클릭됨, locationId:", locationId);
+      // 선택된 장소 ID 업데이트
+      setSelectedLocationId(locationId);
+      
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(API_ENDPOINTS.LOCATION_DETAIL(locationId), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-        },
-      });
+      
+      // 장소 상세 정보, 연관 장소, 텍스트 설명을 병렬로 가져오기
+      const [detailResponse, relatedResponse, textResponse] = await Promise.all([
+        fetch(API_ENDPOINTS.LOCATION_DETAIL(locationId), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
+        }),
+        fetch(API_ENDPOINTS.LOCATION_RELATED_PLACES(locationId), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
+        }),
+        fetch(API_ENDPOINTS.LOCATION_TEXT(locationId), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
+        })
+      ]);
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("장소 상세 정보:", result);
+      if (detailResponse.ok) {
+        const result = await detailResponse.json();
         if (result.data) {
           const locationData = result.data;
           // era 값을 한글로 변환
@@ -114,15 +138,49 @@ const MapPage = () => {
             imageUrl: locationData.imageUrl || sampleImage,
             url: locationData.url,
           });
+          
+          // 지도 이동이 필요한 경우
+          if (shouldMoveMap && mapInstance.current) {
+            const moveLatLng = new window.kakao.maps.LatLng(
+              locationData.latitude,
+              locationData.longitude
+            );
+            mapInstance.current.setCenter(moveLatLng);
+          }
+          
           setIsBottomSheetOpen(true);
-          setBottomSheetState("half");
+          setBottomSheetState(sheetState);
           setIsSearchMode(false);
         }
       } else {
-        console.error("장소 상세 정보 응답 실패:", response.status);
+        console.error("장소 상세 정보 응답 실패:", detailResponse.status);
+      }
+      
+      // 연관 장소 처리
+      if (relatedResponse.ok) {
+        const relatedResult = await relatedResponse.json();
+        if (relatedResult.data) {
+          setRelatedPlaces(relatedResult.data);
+        }
+      } else {
+        console.error("연관 장소 응답 실패:", relatedResponse.status);
+        setRelatedPlaces([]);
+      }
+      
+      // 텍스트 설명 처리
+      if (textResponse.ok) {
+        const textResult = await textResponse.json();
+        if (textResult.data && textResult.data.content) {
+          setLocationText(textResult.data.content);
+        } else {
+          setLocationText("");
+        }
+      } else {
+        console.error("텍스트 설명 응답 실패:", textResponse.status);
+        setLocationText("");
       }
     } catch (error) {
-      console.error("장소 상세 정보를 가져오는데 실패했습니다:", error);
+      console.error("장소 정보를 가져오는데 실패했습니다:", error);
     }
   }, []);
 
@@ -130,10 +188,7 @@ const MapPage = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        console.log("장소 목록 API 호출 시작");
         const accessToken = localStorage.getItem("accessToken");
-        console.log("accessToken:", accessToken ? `존재함 (${accessToken.substring(0, 20)}...)` : "없음");
-        console.log("API URL:", API_ENDPOINTS.LOCATION);
         
         const response = await fetch(API_ENDPOINTS.LOCATION, {
           method: "GET",
@@ -142,30 +197,18 @@ const MapPage = () => {
             ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
           },
         });
-
-        console.log("응답 상태:", response.status);
-        console.log("응답 헤더:", response.headers.get("content-type"));
-        
-        // 응답 본문을 텍스트로 먼저 확인
-        const responseText = await response.text();
-        console.log("응답 본문 (첫 200자):", responseText.substring(0, 200));
         
         if (response.ok) {
           try {
-            const result = JSON.parse(responseText);
-            console.log("장소 목록 응답:", result);
+            const result = await response.json();
             if (result.data) {
-              console.log("장소 개수:", result.data.length);
               setLocations(result.data);
-            } else {
-              console.log("result.data가 없음");
             }
           } catch (parseError) {
             console.error("JSON 파싱 실패:", parseError);
-            console.error("받은 응답:", responseText);
           }
         } else {
-          console.error("장소 목록 API 응답 실패:", response.status, responseText);
+          console.error("장소 목록 API 응답 실패:", response.status);
         }
       } catch (error) {
         console.error("장소 목록을 가져오는데 실패했습니다:", error);
@@ -241,29 +284,29 @@ const MapPage = () => {
     );
   }, [userLocation]);
 
+  // URL 파라미터로 전달된 장소 자동 로드
+  useEffect(() => {
+    if (locationId && mapInstance.current && locations.length > 0) {
+      const numericLocationId = parseInt(locationId, 10);
+      handleLocationMarkerClick(numericLocationId, true, "full");
+    }
+  }, [locationId, mapInstance.current, locations, handleLocationMarkerClick]);
+
   // 장소 마커 표시
   useEffect(() => {
-    console.log("장소 마커 표시 useEffect 실행");
-    console.log("mapInstance.current:", mapInstance.current);
-    console.log("locations.length:", locations.length);
-    
     if (!mapInstance.current) {
-      console.log("지도가 아직 생성되지 않음");
       return;
     }
     
     if (locations.length === 0) {
-      console.log("장소 데이터가 없음");
       return;
     }
-
-    console.log("장소 마커 생성 시작");
 
     // 기존 마커 제거
     locationMarkers.current.forEach((marker) => marker.setMap(null));
     locationMarkers.current = [];
 
-    // SVG 핀 마커 이미지 생성
+    // SVG 핀 마커 이미지 생성 (일반)
     const imageSize = new window.kakao.maps.Size(32, 32);
     const imageOption = { offset: new window.kakao.maps.Point(16, 32) };
     const pinMarkerImage = new window.kakao.maps.MarkerImage(
@@ -272,38 +315,39 @@ const MapPage = () => {
       imageOption
     );
 
-    console.log("핀 마커 이미지 객체 생성됨:", pinMarkerImage);
+    // SVG 핀 마커 이미지 생성 (선택됨)
+    const pinSelectMarkerImage = new window.kakao.maps.MarkerImage(
+      pinSelectIcon,
+      imageSize,
+      imageOption
+    );
 
     // 장소 마커 생성
-    locations.forEach((location, index) => {
-      console.log(`마커 ${index + 1}/${locations.length} 생성 시작:`, location.name, location.latitude, location.longitude);
-      
+    locations.forEach((location) => {
       const position = new window.kakao.maps.LatLng(
         location.latitude,
         location.longitude
       );
 
+      // 선택된 장소인지 확인하여 다른 이미지 사용
+      const isSelected = location.tid === selectedLocationId;
+      const markerImage = isSelected ? pinSelectMarkerImage : pinMarkerImage;
+
       const marker = new window.kakao.maps.Marker({
         position: position,
         map: mapInstance.current,
-        image: pinMarkerImage,
+        image: markerImage,
         title: location.name,
       });
 
-      console.log(`마커 ${index + 1} 객체 생성됨:`, marker);
-
       // 마커 클릭 이벤트 추가
       window.kakao.maps.event.addListener(marker, "click", () => {
-        console.log("마커 클릭:", location.name);
         handleLocationMarkerClick(location.tid);
       });
 
       locationMarkers.current.push(marker);
     });
-
-    console.log(`총 ${locationMarkers.current.length}개의 마커 생성 완료`);
-    console.log("locationMarkers.current:", locationMarkers.current);
-  }, [locations, handleLocationMarkerClick]);
+  }, [locations, selectedLocationId, handleLocationMarkerClick]);
 
   // 두 팝업이 모두 닫혔을 때 오디오 위젯 비활성화
   useEffect(() => {
@@ -341,13 +385,11 @@ const MapPage = () => {
     { id: "jpn", icon: langJpn, alt: "일본어" },
   ];
 
-  const relatedPlaces = [
-    { id: 1, name: "창덕궁", distance: "1.2km" },
-    { id: 2, name: "북촌 한옥마을", distance: "0.8km" },
-    { id: 3, name: "인사동", distance: "1.5km" },
-    { id: 4, name: "청와대", distance: "1.0km" },
-    { id: 5, name: "종묘", distance: "1.8km" },
-  ];
+  // 연관 장소 클릭 핸들러
+  const handleRelatedPlaceClick = (placeId) => {
+    setShowPlacesPopup(false);
+    handleLocationMarkerClick(placeId, true);
+  };
 
   const handleWidgetClick = (widgetId) => {
     if (widgetId === "audio") {
@@ -616,14 +658,13 @@ const MapPage = () => {
             <h3 className={styles.textTitle}>텍스트 설명</h3>
 
             <div className={styles.textContent}>
-              경복궁은 조선 왕조의 법궁으로, 1395년 태조 이성계가 한양 도읍과
-              함께 건립한 궁궐이다. '경복'은 '큰 복을 누린다'는 뜻을 지니며,
-              조선 왕실의 정치·행정 중심지 역할을 했다. 근정전, 경회루, 강녕전,
-              교태전 등 주요 건물이 있으며, 정교한 건축미를 자랑한다.
-              임진왜란 때 소실되었으나, 고종 때 재건되었고 현재는 일부
-              복원되어 관광지로 활용된다. 경복궁 수문장 교대식, 한복 체험
-              등이 가능하며, 한국 전통문화와 역사를 직접 경험할 수 있는
-              대표적인 명소이다.
+              {locationText ? (
+                locationText
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#666', fontSize: '15px', fontWeight: 700 }}>
+                  텍스트 설명이 없습니다.
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -644,13 +685,25 @@ const MapPage = () => {
             <h3 className={styles.placesTitle}>연관 장소 목록</h3>
 
             <div className={styles.placesContent}>
-              {relatedPlaces.map((place) => (
-                <PlaceCard
-                  key={place.id}
-                  placeName={place.name}
-                  distance={place.distance}
-                />
-              ))}
+              {relatedPlaces.length > 0 ? (
+                relatedPlaces.map((place) => (
+                  <div 
+                    key={place.tid} 
+                    onClick={() => handleRelatedPlaceClick(place.tid)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <PlaceCard
+                      placeName={place.name}
+                      distance=""
+                      imageUrl={place.imageUrl}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#666', fontSize: '15px', fontWeight: 700 }}>
+                  연관 장소가 없습니다.
+                </div>
+              )}
             </div>
           </div>
         )}
