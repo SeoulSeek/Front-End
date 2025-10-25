@@ -36,7 +36,7 @@ const PlaceDetail = () => {
     const fetchPostDetails = async () => {
       setIsLoading(true);
       setError(null);
-      console.log("PlaceDetail: 게시물 상세 정보 요청 시작, ID:", id);
+      console.log("[방명록 단일페이지]: 게시물 상세 정보 요청 시작, ID:", id);
 
       try {
         const token = localStorage.getItem("refreshToken");
@@ -47,6 +47,9 @@ const PlaceDetail = () => {
           headers["Authorization"] = `Bearer ${token}`;
         }
 
+        console.log(
+          `[방명록 단일페이지] 요청 URL: ${API_ENDPOINTS.REVIEW_LIST}/${id}`
+        );
         const response = await fetch(`${API_ENDPOINTS.REVIEW_DETAIL}/${id}`, {
           headers: headers,
           credentials: "include",
@@ -59,7 +62,7 @@ const PlaceDetail = () => {
         }
 
         const result = await response.json();
-        console.log("PlaceDetail: 데이터 조회 성공:", result.data);
+        console.log("[방명록 단일페이지] 데이터 조회 성공:", result.data);
         setPost(result.data);
         // API 응답에 현재 유저의 좋아요 여부(ex: isLiked)가 포함되있어야함.
         // 일단은 false로 초기화
@@ -67,7 +70,11 @@ const PlaceDetail = () => {
         setIsLiked(result.data.isLiked || false);
         // 작성자 확인: 로그인된 사용자의 ID와 게시물 작성자의 userId를 비교
       } catch (err) {
-        console.error("PlaceDetail: 게시물 상세 정보 조회 중 에러:", err);
+        console.error(
+          "[방명록 단일페이지]: 게시물 상세 정보 조회 중 에러:",
+          err
+        );
+        setError(err.message);
       } finally {
         setIsLoading(false);
       }

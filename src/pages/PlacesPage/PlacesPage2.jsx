@@ -68,7 +68,7 @@ const Places = () => {
         });
 
         console.log(
-          `[PlacesPage] Request URL: ${
+          `[방명록페이지] 요청 URL: ${
             API_ENDPOINTS.REVIEW_LIST
           }?${params.toString()}`
         );
@@ -104,6 +104,7 @@ const Places = () => {
         }
       } catch (err) {
         console.error("PlacePage: 게시물 상세 정보 조회 중 에러:", err);
+        setError(err.message);
       } finally {
         setIsLoading(false);
       }
