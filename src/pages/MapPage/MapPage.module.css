@@ -381,6 +381,7 @@
 }
 
 .textContent {
+  margin-top: 10px;
   width: 340px;
   height: 270px;
   color: #ffffff;
