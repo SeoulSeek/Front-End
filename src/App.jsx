@@ -34,6 +34,7 @@ function App() {
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:id" element={<CoursesDetail />} />
             <Route path="/map" element={<MapPage />} />
+            <Route path="/map/:locationId" element={<MapPage />} />
             <Route path="/view" element={<MapHistoryView />} />
             <Route path="/mypage" element={<MyPage />} />
           </Route>

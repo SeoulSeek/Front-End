@@ -22,7 +22,6 @@
   font-size: 20px;
   font-weight: 700;
   margin: 0;
-  padding-left: 10px;
   flex-shrink: 0;
   max-width: 160px;
   overflow: hidden;
@@ -40,9 +39,9 @@
 
 .saveButton {
   position: absolute;
-  right: 15px;
-  width: 30px;
-  height: 30px;
+  right: 0px;
+  width: 25px;
+  height: 25px;
   background: none;
   border: none;
   cursor: pointer;
@@ -55,6 +54,7 @@
 .placeImageWrapper {
   width: 100%;
   height: 160px;
+  margin-top: 10px;
   border: 1px solid #ffffff;
   overflow: hidden;
   box-sizing: border-box;

@@ -23,4 +23,8 @@ export const API_ENDPOINTS = {
   COURSES: `${API_BASE_URL}/courses`,
   COURSE_DETAIL: (id) => `${API_BASE_URL}/courses/${id}`,
   COURSE_SCRAP: (id) => `${API_BASE_URL}/auth/courses/${id}/scrap`,
+  LOCATION: `${API_BASE_URL}/location`,
+  LOCATION_DETAIL: (id) => `${API_BASE_URL}/location/${id}`,
+  LOCATION_RELATED_PLACES: (id) => `${API_BASE_URL}/location/${id}/places`,
+  LOCATION_TEXT: (id) => `${API_BASE_URL}/location/${id}/text`,
 };

@@ -42,7 +42,7 @@
 
 .bottomSheet.half {
   bottom: 0;
-  height: 400px;
+  height: 370px;
 }
 
 .bottomSheet.full {
@@ -98,7 +98,7 @@
 
 .placeName {
   color: #000000;
-  font-size: 40px;
+  font-size: 35px;
   font-weight: 400;
   margin: 0;
   text-align: center;
