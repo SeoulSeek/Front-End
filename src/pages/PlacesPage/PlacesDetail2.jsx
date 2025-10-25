@@ -1,3 +1,5 @@
+// 방명록 단일 조회 페이지
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { BiLinkAlt } from "react-icons/bi";
@@ -12,15 +14,7 @@ import $ from "./PlacesDetail2.module.css";
 import ScrollToTopBtn from "../../components/ScrollToTop/ScrollToTop";
 import sampleImg from "../../assets/PlacePage/sample.jpg";
 import defaultProfileImg from "../../assets/PlacePage/profile_a.jpg"; // 기본 프로필 이미지
-import dummyPosts from "../../data/dummyPosts";
 import HashTag from "../../components/global/HashTag/HashTag";
-
-// 현재 로그인한 사용자를 가정하는 데이터 (실제 앱에서는 Redux, Context API 등으로 관리)
-const currentUser = {
-  userId: "user456",
-  username: "산책러버",
-  profileImage: "/images/profiles/user456.jpg",
-};
 
 const PlaceDetail = () => {
   const { id } = useParams();
@@ -31,41 +25,80 @@ const PlaceDetail = () => {
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAuthor, setIsAuthor] = useState(false);
-  // const post = dummyPosts.find((p) => p.id === parseInt(id));
+
+  const [isLiked, setIsLiked] = useState(false); // 현재 유저의 좋아요 여부
+  const [likeCount, setLikeCount] = useState(0); // 좋아요 개수
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // 현재 보이는 이미지 인덱스
+
+  const [toastMessage, setToastMessage] = useState("");
 
   // --- useEffect를 사용한 데이터 Fetching ---
   useEffect(() => {
     const fetchPostDetails = async () => {
       setIsLoading(true);
       setError(null);
-      try {
-        const response = await fetch(`${API_ENDPOINTS.REVIEW_DETAIL}/${id}`);
-        if (!response.ok) {
-          throw new Error("게시물을 불러오는 데 실패했습니다.");
-        }
-        const result = await response.json();
-        setPost(result.data);
+      console.log("PlaceDetail: 게시물 상세 정보 요청 시작, ID:", id);
 
-        // 작성자 확인: 로그인된 사용자의 ID와 게시물 작성자의 userId를 비교
-        if (auth.user && auth.user.id === result.data.userId) {
-          setIsAuthor(true);
+      try {
+        const token = localStorage.getItem("refreshToken");
+        const headers = {
+          "Content-Type": "application/json;charset=UTF-8",
+        };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
         }
+
+        const response = await fetch(`${API_ENDPOINTS.REVIEW_DETAIL}/${id}`, {
+          headers: headers,
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `게시물을 불러오는 데 실패했습니다 (${response.status})`
+          );
+        }
+
+        const result = await response.json();
+        console.log("PlaceDetail: 데이터 조회 성공:", result.data);
+        setPost(result.data);
+        // API 응답에 현재 유저의 좋아요 여부(ex: isLiked)가 포함되있어야함.
+        // 일단은 false로 초기화
+        setLikeCount(result.data.like);
+        setIsLiked(result.data.isLiked || false);
+        // 작성자 확인: 로그인된 사용자의 ID와 게시물 작성자의 userId를 비교
       } catch (err) {
-        setError(err.message);
+        console.error("PlaceDetail: 게시물 상세 정보 조회 중 에러:", err);
       } finally {
         setIsLoading(false);
       }
     };
     fetchPostDetails();
-  }, [id, auth.user]); // id나 로그인 상태가 변경되면 다시 데이터를 불러옴
+  }, [id, auth]); // id나 로그인 상태가 변경되면 다시 데이터를 불러옴
 
   // --- 이벤트 핸들러 ---
+  const handleLikeClick = async () => {
+    // 좋아요 클릭 핸들러(추후 api연동 필요)
+    if (!auth.user) {
+      alert("로그인이 필요한 기능입니다.");
+      navigate("/login");
+      return;
+    }
+
+    // 좋아요 ui를 먼저 변경 후
+    const originalLiked = isLiked;
+    const originalLikeCount = likeCount;
+    setIsLiked(!isLiked);
+    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+    // try {} api 요청 -> 실패시 ui 원복
+  };
+
   const handleEdit = () => {
     navigate(`/places/edit/${id}`); // 수정 페이지로 이동
   };
 
   const handleDelete = async () => {
+    // 방명록 삭제 핸들러(추후 api연동 필요)
     if (window.confirm("정말로 이 게시물을 삭제하시겠습니까?")) {
       try {
         const token = localStorage.getItem("refreshToken");
@@ -87,56 +120,13 @@ const PlaceDetail = () => {
     }
   };
 
-  // --- 로딩 및 에러 처리 ---
-  if (isLoading) return <div className={$.statusMessage}>로딩 중...</div>;
-  if (error) return <div className={$.statusMessage}>{error}</div>;
-  if (!post)
-    return <div className={$.statusMessage}>게시물을 찾을 수 없습니다.</div>;
-
-  // --- API 데이터와 컴포넌트 데이터 매핑 ---
-  //const allImages = post.fileURL ? [post.fileURL] : [];
-  const tags = post.tagList?.tagList?.map((tag) => tag.name) || [];
-
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(post.stats.likes);
-  const handleLikeClick = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const newLiked = !liked;
-    setLiked(newLiked);
-    setLikes(newLiked ? likes + 1 : likes - 1);
-  };
-
-  const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState(post.comments);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-
-    setComments((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        author: {
-          userId: "user456",
-          username: "산책러버",
-          profileImage: "/images/profiles/user456.jpg",
-        },
-        content: newComment,
-        createdAt: new Date().toLocaleDateString(),
-      },
-    ]);
-    setNewComment("");
-  };
-
   const handleKeyDown = (e) => {
+    // 댓글 작성 핸들러
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
   };
-
-  const [toastMessage, setToastMessage] = useState("");
 
   // 클립보드 복사 핸들러 함수
   const handleCopyClipBoard = async () => {
@@ -158,18 +148,10 @@ const PlaceDetail = () => {
   const handleProfileClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate(`/profile/${author.userId}`);
+    navigate(`/profile/${post.userId}`);
   };
-  // --- 이미지 슬라이드 기능 추가 ---
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // post.content.images와 sampleImg를 합쳐서 하나의 배열로
-  // useMemo를 사용해 post가 변경될 때만 배열을 다시 생성.
-  const allImages = useMemo(() => {
-    const images = post.content.images || [];
-    return [...images, sampleImg];
-  }, [post]);
-
+  // --- 이미지 슬라이드 기능 ---
   const goToPrevious = () => {
     const isFirstImage = currentImageIndex === 0;
     const newIndex = isFirstImage
@@ -184,78 +166,112 @@ const PlaceDetail = () => {
     setCurrentImageIndex(newIndex);
   };
 
+  // --- 로딩 및 에러 처리 ---
+  if (isLoading) return <div className={$.statusMessage}>로딩 중...</div>;
+  if (error) return <div className={$.statusMessage}>{error}</div>;
+  if (!post)
+    return <div className={$.statusMessage}>게시물을 찾을 수 없습니다.</div>;
+
+  const isAuthor = auth.user && auth.user.id === post.userId;
+  // fileURL이 배열이 아니면 배열로 감싸서 처리
+  const allImages = Array.isArray(post.fileURL)
+    ? post.fileURL
+    : post.fileURL
+    ? [post.fileURL]
+    : [];
+  const tags = post.tagList?.tagList?.map((tag) => tag.name) || [];
+
   return (
     <>
-      {/* 전체 페이지를 감싸는 컨테이너 */}
       <div className={$.placeDetailPage}>
-        {/* 1. 이미지 갤러리 */}
+        {/* 이미지 갤러리 */}
         <div className={$.imageGallery}>
           {/* 이미지가 1개 초과일 때만 화살표 표시 */}
-          {allImages.length > 1 && (
+          {allImages.length > 0 ? (
             <>
-              <button
-                onClick={goToPrevious}
-                className={`${$.arrow} ${$.leftArrow}`}
-              >
-                &lt;
-              </button>
-              <button
-                onClick={goToNext}
-                className={`${$.arrow} ${$.rightArrow}`}
-              >
-                &gt;
-              </button>
+              {allImages.length > 1 && (
+                <>
+                  <button
+                    onClick={goToPrevious}
+                    className={`${$.arrow} ${$.leftArrow}`}
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    onClick={goToNext}
+                    className={`${$.arrow} ${$.rightArrow}`}
+                  >
+                    &gt;
+                  </button>
+                </>
+              )}
+              <img
+                src={allImages[currentImageIndex]}
+                alt={`${post.title} 이미지 ${currentImageIndex + 1}`}
+              />
             </>
+          ) : (
+            <></>
           )}
-          <img
-            src={allImages[currentImageIndex]}
-            alt={`이미지 ${currentImageIndex + 1}`}
-          />
         </div>
 
-        {/* 2. 게시물 콘텐츠 (댓글 영역 제외) */}
+        {/* 게시물 콘텐츠 (댓글 영역 제외) */}
         <div className={$.postContent}>
           <h1 className={$.postTitle}>{post.title}</h1>
           <div className={$.postUserWrap}>
             <div className={$.miniProfile} onClick={handleProfileClick}>
               <img
-                src={post.author.profileImage || defaultProfileImg}
-                alt={`${post.author.username} profile`}
+                src={defaultProfileImg}
+                alt={`${post.username} profile`}
                 className={$.profileImage}
               />
-              <span className={$.username}>{post.author.username}</span>
+              <span className={$.username}>{post.username}</span>
             </div>
 
-            {/* 2. 정보 (좋아요 + 댓글) */}
+            {/* 정보 (좋아요 + 댓글) */}
             <div className={$.postInfo}>
-              <span className={$.postedDate}>{post.metadata.createdAt}</span>
+              <span className={$.postedDate}>
+                {new Date(post.createdAt).toLocaleDateString()}
+              </span>
               <div className={$.postCounts}>
                 <button className={$.infoButton} onClick={handleLikeClick}>
-                  {liked ? <AiFillHeart color="#ff4d4d" /> : <AiOutlineHeart />}
-                  <span>{likes}</span>
+                  {isLiked ? (
+                    <AiFillHeart color="#ff4d4d" />
+                  ) : (
+                    <AiOutlineHeart />
+                  )}
+                  <span>{likeCount}</span>
                 </button>
                 <div className={$.infoItem}>
                   <FaRegComment />
-                  <span>{post.comments.length}</span>
+                  <span>{post.comments}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className={$.text}>{post.content.text}</div>
+          <div className={$.text}>{post.content}</div>
+
+          {isAuthor && (
+            <div className={$.authorActions}>
+              <button onClick={handleEdit} className={$.editBtn}>
+                수정
+              </button>
+              <button onClick={handleDelete} className={$.deleteBtn}>
+                삭제
+              </button>
+            </div>
+          )}
 
           <div className={$.hashtagContainer}>
-            {post.metadata.tags.map((tag, index) => {
-              let tagColor;
-              if (index === 0) {
-                tagColor = "#91C6FF"; // 첫 번째 태그 색상
-              } else if (index === 1) {
-                tagColor = "#968C6E"; // 두 번째 태그 색상
-              } else {
-                tagColor = "#D3D9DF";
-              }
-              // 세 번째 태그부터는 tagColor가 undefined이므로 기본색이 적용됨
-              return <HashTag key={index} text={tag} color={tagColor} />;
+            {post.tagList?.territory && (
+              <HashTag text={post.tagList.territory} color="#91C6FF" />
+            )}
+            {post.tagList?.locationName && (
+              <HashTag text={post.tagList.locationName} color="#968C6E" />
+            )}
+            {tags.map((tag, index) => {
+              return <HashTag key={index} text={tag} color="#D3D9DF" />;
             })}
           </div>
 
@@ -265,8 +281,8 @@ const PlaceDetail = () => {
           </div>
         </div>
 
-        {/* 3. 댓글 영역 (postContent 밖으로 이동)*/}
-        <div className={$.comments}>
+        {/* 댓글 영역 (postContent 밖으로 이동)*/}
+        {/*<div className={$.comments}>
           <div className={$.commentFormWrap}>
             <form onSubmit={handleSubmit} className={$.commentForm}>
               <textarea
@@ -293,7 +309,7 @@ const PlaceDetail = () => {
             ))}
           </ul>
           <div className={$.commentEnd}>댓글 목록이 끝났어요.</div>
-        </div>
+        </div>*/}
       </div>
       {toastMessage && <div className={$.toast}>{toastMessage}</div>}
       <ScrollToTopBtn />

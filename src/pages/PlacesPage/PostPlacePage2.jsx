@@ -1,3 +1,5 @@
+// 방명록 작성 페이지
+
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";

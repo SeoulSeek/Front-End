@@ -1,3 +1,5 @@
+// 방명록 기본 메인 페이지
+
 import React, {
   useState,
   useEffect,

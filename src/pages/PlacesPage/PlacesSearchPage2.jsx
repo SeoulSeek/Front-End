@@ -1,3 +1,5 @@
+// 방명록 검색 조회 페이지
+
 import React, { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
