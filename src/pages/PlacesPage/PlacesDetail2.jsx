@@ -11,6 +11,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { API_ENDPOINTS } from "../../config/api";
 
 import $ from "./PlacesDetail2.module.css";
+import Loading from "../../components/Loading/Loading";
 import ScrollToTopBtn from "../../components/ScrollToTop/ScrollToTop";
 import defaultProfileImg from "../../assets/PlacePage/profile_a.jpg"; // 기본 프로필 이미지
 import HashTag from "../../components/global/HashTag/HashTag";
@@ -173,7 +174,7 @@ const PlaceDetail = () => {
   };
 
   // --- 로딩 및 에러 처리 ---
-  if (isLoading) return <div className={$.statusMessage}>로딩 중...</div>;
+  if (isLoading) return <Loading />;
   if (error) return <div className={$.statusMessage}>{error}</div>;
   if (!post)
     return <div className={$.statusMessage}>게시물을 찾을 수 없습니다.</div>;

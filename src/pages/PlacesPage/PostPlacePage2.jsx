@@ -25,7 +25,7 @@ const PostPlacePage = () => {
 
   const handleDataChange = useCallback((key, value) => {
     setPostData((prev) => ({ ...prev, [key]: value }));
-  }, []); // 의존성 배열이 비어있으므로 이 함수는 최초 1회만 생성됨
+  }, []);
 
   const handleTagsChange = useCallback(
     (tags) => {
@@ -63,8 +63,6 @@ const PostPlacePage = () => {
     }
 
     setIsSubmitting(true);
-
-    // --- API 요청 데이터 생성 ---
     const formData = new FormData();
 
     // 텍스트 데이터 (JSON 형식으로 변환하여 Blob으로 추가)
@@ -96,6 +94,7 @@ const PostPlacePage = () => {
           Authorization: `Bearer ${token}`,
         },
         body: formData,
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -103,7 +102,7 @@ const PostPlacePage = () => {
         alert("방명록이 성공적으로 작성되었습니다!");
         navigate(`/places/${result.data.reviewId}`);
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || "작성에 실패했습니다.");
       }
     } catch (error) {
