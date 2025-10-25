@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
   EMAIL_VALID: `${API_BASE_URL}/valid`,
   REVIEW_CREATE: `${API_BASE_URL}/auth/review`,
   REVIEW_DETAIL: `${API_BASE_URL}/auth/review`,
+  REVIEW_LIST: `${API_BASE_URL}/auth/review`,
   REVIEW_DELETE: `${API_BASE_URL}/review/delete`,
   DAILY_LOCATION: `${API_BASE_URL}/location/daily`,
   WEEKLY_COURSE: `${API_BASE_URL}/courses/weekly`,

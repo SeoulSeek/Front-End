@@ -12,7 +12,6 @@ import { API_ENDPOINTS } from "../../config/api";
 
 import $ from "./PlacesDetail2.module.css";
 import ScrollToTopBtn from "../../components/ScrollToTop/ScrollToTop";
-import sampleImg from "../../assets/PlacePage/sample.jpg";
 import defaultProfileImg from "../../assets/PlacePage/profile_a.jpg"; // 기본 프로필 이미지
 import HashTag from "../../components/global/HashTag/HashTag";
 
