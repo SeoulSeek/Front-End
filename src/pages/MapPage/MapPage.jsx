@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
 import styles from "./MapPage.module.css";
@@ -14,28 +14,37 @@ import langEng from "../../assets/MapPage/lang_eng.png";
 import langChn from "../../assets/MapPage/lang_chn.png";
 import langJpn from "../../assets/MapPage/lang_jpn.png";
 import sampleImage from "../../assets/LoginPage/sample1.jpg";
+import pinIcon from "../../assets/MapPage/pin.svg";
+import { API_ENDPOINTS } from "../../config/api";
+
+// Era 매핑 객체
+const ERA_MAP = {
+  TEMP: "temp",
+  PREHISTORIC: "선사시대",
+  THREE_KINGDOMS: "삼국시대",
+  GORYEO: "고려시대",
+  JOSEON: "조선시대",
+  KOREAN_EMPIRE: "대한제국",
+  JAPANESE_OCCUPATION: "일제강점기",
+  REPUBLIC_OF_KOREA: "대한민국",
+};
 
 const MapPage = () => {
   const navigate = useNavigate();
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const currentLocationMarker = useRef(null);
+  const locationMarkers = useRef([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [locations, setLocations] = useState([]);
   const [activeWidget, setActiveWidget] = useState(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
   const [showAudioSummary, setShowAudioSummary] = useState(false);
   const [showTextPopup, setShowTextPopup] = useState(false);
   const [showPlacesPopup, setShowPlacesPopup] = useState(false);
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(true);
-  const [selectedPlace, setSelectedPlace] = useState({
-    name: "경복궁",
-    address: "서울특별시 종로구 사직로 161",
-    period: "조선시대",
-    hours: "09:00 - 18:00 (월요일 휴무)",
-    phone: "02-3700-3900",
-    imageUrl: sampleImage,
-  });
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [bottomSheetState, setBottomSheetState] = useState("peek");
@@ -74,6 +83,98 @@ const MapPage = () => {
     },
   ];
 
+  // 장소 상세 정보 조회 및 바텀시트 표시
+  const handleLocationMarkerClick = useCallback(async (locationId) => {
+    try {
+      console.log("마커 클릭됨, locationId:", locationId);
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await fetch(API_ENDPOINTS.LOCATION_DETAIL(locationId), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("장소 상세 정보:", result);
+        if (result.data) {
+          const locationData = result.data;
+          // era 값을 한글로 변환
+          const eraText = locationData.era ? (ERA_MAP[locationData.era] || locationData.era) : "정보 없음";
+          
+          // 바텀 시트에 표시할 형식으로 변환
+          setSelectedPlace({
+            name: locationData.name,
+            address: locationData.address,
+            period: eraText,
+            hours: locationData.time || "정보 없음",
+            phone: "",
+            imageUrl: locationData.imageUrl || sampleImage,
+            url: locationData.url,
+          });
+          setIsBottomSheetOpen(true);
+          setBottomSheetState("half");
+          setIsSearchMode(false);
+        }
+      } else {
+        console.error("장소 상세 정보 응답 실패:", response.status);
+      }
+    } catch (error) {
+      console.error("장소 상세 정보를 가져오는데 실패했습니다:", error);
+    }
+  }, []);
+
+  // 장소 목록 가져오기
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        console.log("장소 목록 API 호출 시작");
+        const accessToken = localStorage.getItem("accessToken");
+        console.log("accessToken:", accessToken ? `존재함 (${accessToken.substring(0, 20)}...)` : "없음");
+        console.log("API URL:", API_ENDPOINTS.LOCATION);
+        
+        const response = await fetch(API_ENDPOINTS.LOCATION, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
+        });
+
+        console.log("응답 상태:", response.status);
+        console.log("응답 헤더:", response.headers.get("content-type"));
+        
+        // 응답 본문을 텍스트로 먼저 확인
+        const responseText = await response.text();
+        console.log("응답 본문 (첫 200자):", responseText.substring(0, 200));
+        
+        if (response.ok) {
+          try {
+            const result = JSON.parse(responseText);
+            console.log("장소 목록 응답:", result);
+            if (result.data) {
+              console.log("장소 개수:", result.data.length);
+              setLocations(result.data);
+            } else {
+              console.log("result.data가 없음");
+            }
+          } catch (parseError) {
+            console.error("JSON 파싱 실패:", parseError);
+            console.error("받은 응답:", responseText);
+          }
+        } else {
+          console.error("장소 목록 API 응답 실패:", response.status, responseText);
+        }
+      } catch (error) {
+        console.error("장소 목록을 가져오는데 실패했습니다:", error);
+      }
+    };
+
+    fetchLocations();
+  }, []);
+
   // 현재 위치 가져오기
   useEffect(() => {
     if (navigator.geolocation) {
@@ -106,7 +207,7 @@ const MapPage = () => {
     // 지도 생성
     mapInstance.current = new window.kakao.maps.Map(mapRef.current, options);
 
-    // 현재 위치 마커 생성
+    // 현재 위치 마커 생성 (카카오 기본 마커 사용)
     const markerPosition = new window.kakao.maps.LatLng(
       userLocation.lat,
       userLocation.lng
@@ -117,7 +218,7 @@ const MapPage = () => {
       map: mapInstance.current,
     });
 
-    // 마커에 인포윈도우 추가 (선택사항)
+    // 마커에 인포윈도우 추가
     const infowindow = new window.kakao.maps.InfoWindow({
       content: '<div style="padding:5px;font-size:12px;">현재 위치</div>',
     });
@@ -139,6 +240,70 @@ const MapPage = () => {
       }
     );
   }, [userLocation]);
+
+  // 장소 마커 표시
+  useEffect(() => {
+    console.log("장소 마커 표시 useEffect 실행");
+    console.log("mapInstance.current:", mapInstance.current);
+    console.log("locations.length:", locations.length);
+    
+    if (!mapInstance.current) {
+      console.log("지도가 아직 생성되지 않음");
+      return;
+    }
+    
+    if (locations.length === 0) {
+      console.log("장소 데이터가 없음");
+      return;
+    }
+
+    console.log("장소 마커 생성 시작");
+
+    // 기존 마커 제거
+    locationMarkers.current.forEach((marker) => marker.setMap(null));
+    locationMarkers.current = [];
+
+    // SVG 핀 마커 이미지 생성
+    const imageSize = new window.kakao.maps.Size(32, 32);
+    const imageOption = { offset: new window.kakao.maps.Point(16, 32) };
+    const pinMarkerImage = new window.kakao.maps.MarkerImage(
+      pinIcon,
+      imageSize,
+      imageOption
+    );
+
+    console.log("핀 마커 이미지 객체 생성됨:", pinMarkerImage);
+
+    // 장소 마커 생성
+    locations.forEach((location, index) => {
+      console.log(`마커 ${index + 1}/${locations.length} 생성 시작:`, location.name, location.latitude, location.longitude);
+      
+      const position = new window.kakao.maps.LatLng(
+        location.latitude,
+        location.longitude
+      );
+
+      const marker = new window.kakao.maps.Marker({
+        position: position,
+        map: mapInstance.current,
+        image: pinMarkerImage,
+        title: location.name,
+      });
+
+      console.log(`마커 ${index + 1} 객체 생성됨:`, marker);
+
+      // 마커 클릭 이벤트 추가
+      window.kakao.maps.event.addListener(marker, "click", () => {
+        console.log("마커 클릭:", location.name);
+        handleLocationMarkerClick(location.tid);
+      });
+
+      locationMarkers.current.push(marker);
+    });
+
+    console.log(`총 ${locationMarkers.current.length}개의 마커 생성 완료`);
+    console.log("locationMarkers.current:", locationMarkers.current);
+  }, [locations, handleLocationMarkerClick]);
 
   // 두 팝업이 모두 닫혔을 때 오디오 위젯 비활성화
   useEffect(() => {
