@@ -1,3 +1,4 @@
+/* 모바일 헤더 */
 .header {
   display: flex;
   width: 100%;
@@ -17,6 +18,7 @@
   width: 220px;
   height: 40px;
   cursor: pointer;
+  display: block;
 }
 
 .menu {
@@ -24,4 +26,84 @@
   height: 40px;
   flex-shrink: 0;
   aspect-ratio: 1/1;
+  cursor: pointer;
+}
+
+/* 데스크탑 헤더 */
+.headerDesktop {
+  display: flex;
+  width: 100%;
+  height: 80px;
+  align-items: center;
+  padding: 0 4rem 0 0;
+  background-color: #ffffff;
+  border-bottom: 1px solid #000000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3000;
+}
+
+.logoDesktop {
+  height: 80px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: block;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  margin-left: 80px;
+  font-family: "Noto Sans KR";
+}
+
+.navItem {
+  color: #968C6E;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.navItem:hover {
+  color: #7a7258;
+}
+
+.profileItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.profileItem:hover {
+  color: #666;
+}
+
+.profileItem:hover .profileIcon {
+  color: #666;
+}
+
+.profileIcon {
+  width: 30px;
+  height: 30px;
+  color: #000000;
+  transition: color 0.2s ease;
+}
+
+.profileText {
+  color: #000000;
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.bold {
+  font-weight: 700;
 }
