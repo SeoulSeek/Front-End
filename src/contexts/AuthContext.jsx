@@ -291,27 +291,77 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
+      // FormData 생성
+      const formData = new FormData();
+      
+      // name 추가
+      if (profileData.name) {
+        formData.append('name', profileData.name);
+      }
+      
+      // languages 추가 (배열을 각각 추가)
+      if (profileData.languages && Array.isArray(profileData.languages)) {
+        profileData.languages.forEach(lang => {
+          formData.append('languages', lang);
+        });
+      }
+      
+      // file 추가 (File 객체만 추가, 기존 URL은 제외)
+      if (profileData.file && profileData.file instanceof File) {
+        // 새로 선택한 파일인 경우에만 추가
+        formData.append('file', profileData.file);
+      }
+      
       const headers = {
-        'Content-Type': 'application/json;charset=UTF-8',
+        // multipart/form-data는 브라우저가 자동으로 Content-Type 설정
+        // 'Content-Type': 'multipart/form-data' 를 직접 설정하지 않음
       };
       
       // Authorization 헤더에 토큰 추가
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
-        console.log('프로필 업데이트 요청에 Authorization 헤더 추가');
       }
 
       const response = await fetch(API_ENDPOINTS.AUTH_USER_PROFILE, {
-        method: 'PATCH',
+        method: 'POST',
         headers,
         credentials: 'include',
-        body: JSON.stringify(profileData),
+        body: formData,
       });
 
+      const responseText = await response.text();
+      
+      // 디버깅용 임시 로그
+      if (!response.ok) {
+        console.log('프로필 업데이트 실패:', response.status);
+        console.log('에러 응답:', responseText);
+      }
+
       if (response.ok) {
-        // 프로필 업데이트 성공 시 사용자 정보 다시 가져오기
-        await fetchUser();
-        return { success: true };
+        // 응답 파싱
+        if (responseText.trim()) {
+          try {
+            const responseData = JSON.parse(responseText);
+            
+            // error 필드가 false이면 성공
+            if (responseData.error === false) {
+              // 프로필 업데이트 성공 시 사용자 정보 다시 가져오기
+              await fetchUser();
+              return { success: true, message: responseData.message };
+            } else {
+              return { success: false, message: responseData.message || '프로필 업데이트에 실패했습니다.' };
+            }
+          } catch (jsonError) {
+            console.error('프로필 업데이트 응답 JSON 파싱 에러:', jsonError);
+            // JSON 파싱 실패해도 200 응답이면 성공으로 간주
+            await fetchUser();
+            return { success: true };
+          }
+        } else {
+          // 응답이 비어있어도 200 응답이면 성공
+          await fetchUser();
+          return { success: true };
+        }
       } else if (response.status === 401) {
         // 토큰이 만료되었을 가능성이 있으므로 재발급 시도
         const newToken = await refreshAuthToken();
@@ -322,8 +372,17 @@ export const AuthProvider = ({ children }) => {
           return { success: false, message: '인증이 만료되었습니다. 다시 로그인해주세요.' };
         }
       } else {
-        const errorData = await response.json();
-        return { success: false, message: errorData.message || '프로필 업데이트에 실패했습니다.' };
+        // 에러 응답 처리
+        let errorMessage = '프로필 업데이트에 실패했습니다.';
+        if (responseText.trim()) {
+          try {
+            const errorData = JSON.parse(responseText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (jsonError) {
+            console.error('에러 응답 JSON 파싱 실패:', jsonError);
+          }
+        }
+        return { success: false, message: errorMessage };
       }
     } catch (error) {
       console.error('프로필 업데이트 실패:', error);
