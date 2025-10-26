@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CoursesBox.module.css";
 import dummy1 from "../../assets/HomePage/dummy1.jpg";
@@ -12,16 +12,22 @@ const CoursesBox = ({
   id, 
   title = "고궁 스토리텔링", 
   image = dummy1,
+  scrapped = false,
   totalLocations = 0,
   landmarkTourElements = 0,
   specialTourElements = 0,
   missionTourElements = 0
 }) => {
-  const [isStarFilled, setIsStarFilled] = useState(false);
+  const [isStarFilled, setIsStarFilled] = useState(scrapped);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshAuthToken } = useAuth();
 
-  const toggleStarIcon = async () => {
+  // scrapped prop이 변경될 때 상태 업데이트
+  useEffect(() => {
+    setIsStarFilled(scrapped);
+  }, [scrapped]);
+
+  const toggleStarIcon = async (retryCount = 0) => {
     // 로그인 체크
     if (!user) {
       alert("로그인이 필요합니다.");
@@ -40,7 +46,7 @@ const CoursesBox = ({
       
       if (!token) {
         alert("로그인이 필요합니다.");
-        setIsStarFilled(previousState); // 원래 상태로 복구
+        setIsStarFilled(previousState);
         return;
       }
 
@@ -50,7 +56,23 @@ const CoursesBox = ({
           'Content-Type': 'application/json;charset=UTF-8',
           'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include',
       });
+
+      if (response.status === 401 && retryCount === 0) {
+        // 401 에러 발생 시 토큰 재발급 시도
+        const newToken = await refreshAuthToken();
+        
+        if (newToken) {
+          // 토큰 재발급 성공 시 다시 시도
+          return toggleStarIcon(1);
+        } else {
+          // 토큰 재발급 실패
+          alert("로그인이 필요합니다.");
+          setIsStarFilled(previousState);
+          return;
+        }
+      }
 
       if (!response.ok) {
         // API 호출 실패 시 조용히 실패하고 원래 상태로 복구

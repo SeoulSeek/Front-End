@@ -51,7 +51,6 @@ export const AuthProvider = ({ children }) => {
       // Authorization 헤더에도 토큰 추가
       if (storedToken) {
         headers['Authorization'] = `Bearer ${storedToken}`;
-        console.log('토큰 재발급 요청에 Authorization 헤더 추가');
       }
 
       const response = await fetch(API_ENDPOINTS.AUTH_REFRESH, {
@@ -64,10 +63,21 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        if (data.refreshToken) {
-          storeToken(data.refreshToken);
-          return data.refreshToken;
+        const responseText = await response.text();
+        
+        if (responseText.trim()) {
+          const result = JSON.parse(responseText);
+          
+          // 응답 구조 확인: { error: false, data: { refreshToken: "..." } } 형식
+          if (result.error === false && result.data && result.data.refreshToken) {
+            storeToken(result.data.refreshToken);
+            return result.data.refreshToken;
+          } 
+          // 또는 { refreshToken: "..." } 형식
+          else if (result.refreshToken) {
+            storeToken(result.refreshToken);
+            return result.refreshToken;
+          }
         }
       } else {
         // 토큰이 유효하지 않음

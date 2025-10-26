@@ -8,13 +8,14 @@ const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [sortType, setSortType] = useState("recent");
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
         setError(false);
-        const response = await fetch(API_ENDPOINTS.COURSES);
+        const response = await fetch(`${API_ENDPOINTS.COURSES}?sort=${sortType}`);
         
         if (!response.ok) {
           throw new Error("Failed to fetch courses");
@@ -36,13 +37,17 @@ const CoursesPage = () => {
     };
 
     fetchCourses();
-  }, []);
+  }, [sortType]);
+
+  const handleSortChange = (newSortType) => {
+    setSortType(newSortType);
+  };
 
   return (
     <>
       <h1 className={styles.h1}>서울식 관광코스</h1>
       <div className={styles.sortWrapper}>
-        <SortMenu />
+        <SortMenu onSortChange={handleSortChange} />
       </div>
       <div className={styles.boxes}>
         {courses.map((course) => (
@@ -52,6 +57,7 @@ const CoursesPage = () => {
             title={course.title}
             content={course.content}
             image={course.imageUrl}
+            scrapped={course.scrapped}
             totalLocations={course.totalLocations}
             landmarkTourElements={course.landmarkTourElements}
             specialTourElements={course.specialTourElements}
