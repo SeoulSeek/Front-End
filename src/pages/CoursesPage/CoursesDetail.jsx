@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./CoursesDetail.module.css";
 import { 
@@ -21,6 +21,7 @@ const CoursesDetail = () => {
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isScrapped, setIsScrapped] = useState(false);
+  const hasInitialized = useRef(false);
   const [expanded, setExpanded] = useState({
     landmark: false,
     special: false,
@@ -41,7 +42,28 @@ const CoursesDetail = () => {
     const fetchCourseDetail = async () => {
       try {
         setLoading(true);
-        const response = await fetch(API_ENDPOINTS.COURSE_DETAIL(id));
+        
+        // 인증 헤더 준비
+        const headers = {
+          'Content-Type': 'application/json;charset=UTF-8',
+        };
+        
+        const token = localStorage.getItem('refreshToken');
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(API_ENDPOINTS.COURSE_DETAIL(id), {
+          method: 'GET',
+          headers,
+          credentials: 'include',
+        });
+        
+        console.log('CoursesDetail API 호출:', {
+          url: API_ENDPOINTS.COURSE_DETAIL(id),
+          status: response.status,
+          hasToken: !!token
+        });
         
         if (!response.ok) {
           throw new Error("Failed to fetch course detail");
@@ -49,12 +71,19 @@ const CoursesDetail = () => {
         
         const result = await response.json();
         
+        console.log('CoursesDetail API 응답:', result);
+        
         if (result.error) {
           throw new Error("API returned an error");
         }
         
         setCourseData(result.data);
-        setIsScrapped(result.data.scrapped || false);
+        if (!hasInitialized.current) {
+          const scrappedValue = result.data.scrapped || false;
+          console.log('초기 스크랩 상태:', scrappedValue);
+          setIsScrapped(scrappedValue);
+          hasInitialized.current = true;
+        }
       } catch (err) {
         console.error("Error fetching course detail:", err);
         alert("다시 시도해 주시기 바랍니다.");
@@ -74,8 +103,13 @@ const CoursesDetail = () => {
   };
 
   const toggleScrap = async (retryCount = 0) => {
+    console.log('=== CoursesDetail toggleScrap 시작 ===');
+    console.log('현재 상태:', isScrapped);
+    console.log('코스 ID:', id);
+    
     // 로그인 체크
     if (!user) {
+      console.log('로그인 필요');
       alert("로그인이 필요합니다.");
       return;
     }
@@ -85,10 +119,12 @@ const CoursesDetail = () => {
     
     // 낙관적 업데이트 (UI 먼저 변경)
     setIsScrapped((prev) => !prev);
+    console.log('낙관적 업데이트 후:', !previousState);
 
     try {
       // refreshToken 가져오기
       const token = localStorage.getItem('refreshToken');
+      console.log('토큰 존재:', !!token);
       
       if (!token) {
         alert("로그인이 필요합니다.");
@@ -96,7 +132,10 @@ const CoursesDetail = () => {
         return;
       }
 
-      const response = await fetch(API_ENDPOINTS.COURSE_SCRAP(id), {
+      const url = API_ENDPOINTS.COURSE_SCRAP(id);
+      console.log('스크랩 API URL:', url);
+
+      const response = await fetch(url, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
@@ -104,6 +143,8 @@ const CoursesDetail = () => {
         },
         credentials: 'include',
       });
+
+      console.log('API 응답 상태:', response.status);
 
       if (response.status === 401 && retryCount === 0) {
         // 401 에러 발생 시 토큰 재발급 시도
@@ -126,17 +167,22 @@ const CoursesDetail = () => {
       }
 
       const result = await response.json();
+      console.log('API 응답 데이터:', result);
       
       // API 응답의 scrapped 값으로 상태 동기화
       if (result.error === false && result.data) {
-        setIsScrapped(result.data.scrapped);
+        const newScrappedState = result.data.scrapped;
+        console.log('새 스크랩 상태:', newScrappedState);
+        setIsScrapped(newScrappedState);
       } else {
+        console.log('에러 응답, 원래 상태로 복구');
         setIsScrapped(previousState);
       }
     } catch (error) {
       console.error('Course scrap error:', error);
       setIsScrapped(previousState);
     }
+    console.log('=== CoursesDetail toggleScrap 종료 ===');
   };
 
   // 로딩 중에는 빈 화면

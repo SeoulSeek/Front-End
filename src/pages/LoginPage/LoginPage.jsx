@@ -37,7 +37,6 @@ const Login = () => {
         alert(result.message || "로그인에 실패했습니다.");
       }
     } catch (err) {
-      console.error("로그인 에러:", err);
       alert("로그인 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);

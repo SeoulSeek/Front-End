@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CoursesBox.module.css";
 import dummy1 from "../../assets/HomePage/dummy1.jpg";
@@ -16,20 +16,30 @@ const CoursesBox = ({
   totalLocations = 0,
   landmarkTourElements = 0,
   specialTourElements = 0,
-  missionTourElements = 0
+  missionTourElements = 0,
+  onScrapChange
 }) => {
   const [isStarFilled, setIsStarFilled] = useState(scrapped);
+  const hasInitialized = useRef(false);
   const navigate = useNavigate();
   const { user, refreshAuthToken } = useAuth();
 
-  // scrapped prop이 변경될 때 상태 업데이트
+  // 첫 마운트 시에만 초기 상태 설정
   useEffect(() => {
-    setIsStarFilled(scrapped);
+    if (!hasInitialized.current) {
+      setIsStarFilled(scrapped);
+      hasInitialized.current = true;
+    }
   }, [scrapped]);
 
   const toggleStarIcon = async (retryCount = 0) => {
+    console.log('=== CoursesBox toggleStarIcon 시작 ===');
+    console.log('현재 상태:', isStarFilled);
+    console.log('코스 ID:', id);
+    
     // 로그인 체크
     if (!user) {
+      console.log('로그인 필요');
       alert("로그인이 필요합니다.");
       return;
     }
@@ -39,10 +49,12 @@ const CoursesBox = ({
     
     // 낙관적 업데이트 (UI 먼저 변경)
     setIsStarFilled((prev) => !prev);
+    console.log('낙관적 업데이트 후:', !previousState);
 
     try {
       // refreshToken 가져오기
       const token = localStorage.getItem('refreshToken');
+      console.log('토큰 존재:', !!token);
       
       if (!token) {
         alert("로그인이 필요합니다.");
@@ -50,7 +62,10 @@ const CoursesBox = ({
         return;
       }
 
-      const response = await fetch(API_ENDPOINTS.COURSE_SCRAP(id), {
+      const url = API_ENDPOINTS.COURSE_SCRAP(id);
+      console.log('스크랩 API URL:', url);
+
+      const response = await fetch(url, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
@@ -58,6 +73,8 @@ const CoursesBox = ({
         },
         credentials: 'include',
       });
+
+      console.log('API 응답 상태:', response.status);
 
       if (response.status === 401 && retryCount === 0) {
         // 401 에러 발생 시 토큰 재발급 시도
@@ -81,11 +98,20 @@ const CoursesBox = ({
       }
 
       const result = await response.json();
+      console.log('API 응답 데이터:', result);
       
       // API 응답의 scrapped 값으로 상태 동기화
       if (result.error === false && result.data) {
-        setIsStarFilled(result.data.scrapped);
+        const newScrappedState = result.data.scrapped;
+        console.log('새 스크랩 상태:', newScrappedState);
+        setIsStarFilled(newScrappedState);
+        // 부모 컴포넌트에 변경사항 알림
+        if (onScrapChange) {
+          console.log('부모 컴포넌트에 알림');
+          onScrapChange();
+        }
       } else {
+        console.log('에러 응답, 원래 상태로 복구');
         // 에러 응답 시 원래 상태로 복구
         setIsStarFilled(previousState);
       }
@@ -94,6 +120,7 @@ const CoursesBox = ({
       console.error('Course scrap error:', error);
       setIsStarFilled(previousState);
     }
+    console.log('=== CoursesBox toggleStarIcon 종료 ===');
   };
 
   const handleBoxClick = () => {

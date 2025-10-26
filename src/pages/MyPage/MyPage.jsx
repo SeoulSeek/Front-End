@@ -10,6 +10,8 @@ import {
 } from "react-icons/ai";
 import { useAuth } from "../../contexts/AuthContext";
 import { mapLanguageToUI } from "../../hooks/auth";
+import CoursesBox from "../../components/CoursesBox/CoursesBox";
+import { API_ENDPOINTS } from "../../config/api";
 
 const LANGUAGES = ["한국어", "English", "中國語", "日本語"];
 
@@ -31,7 +33,7 @@ const mapUILanguagesToAPI = (uiLanguages) => {
 };
 
 const MyPage = () => {
-  const { user, isLoading, updateProfile } = useAuth();
+  const { user, isLoading, updateProfile, refreshAuthToken } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("places");
   const [isPublic, setIsPublic] = useState(false);
@@ -46,6 +48,9 @@ const MyPage = () => {
   const fileInputRef = useRef(null);
 
   const [selectedLangs, setSelectedLangs] = useState([]);
+  
+  const [scrapCourses, setScrapCourses] = useState([]);
+  const [isLoadingScrap, setIsLoadingScrap] = useState(false);
 
   // 사용자 정보가 변경될 때 로컬 상태 업데이트
   useEffect(() => {
@@ -68,6 +73,69 @@ const MyPage = () => {
       setSelectedLangs(uiLanguages);
     }
   }, [user]);
+
+  // 스크랩한 코스 목록 가져오기
+  useEffect(() => {
+    const fetchScrapCourses = async () => {
+      if (!user) {
+        return;
+      }
+
+      try {
+        setIsLoadingScrap(true);
+        const token = localStorage.getItem('refreshToken');
+        
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch(API_ENDPOINTS.COURSE_SCRAP_LIST, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': `Bearer ${token}`,
+          },
+          credentials: 'include',
+        });
+
+        if (response.status === 401) {
+          // 토큰 재발급 시도
+          const newToken = await refreshAuthToken();
+          if (newToken) {
+            const retryResponse = await fetch(API_ENDPOINTS.COURSE_SCRAP_LIST, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${newToken}`,
+              },
+              credentials: 'include',
+            });
+            
+            if (retryResponse.ok) {
+              const result = await retryResponse.json();
+              if (result.error === false && result.data) {
+                setScrapCourses(result.data);
+              }
+            }
+          }
+          return;
+        }
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.error === false && result.data) {
+            setScrapCourses(result.data);
+          }
+        }
+      } catch (error) {
+        console.error('스크랩 코스 목록 가져오기 실패:', error);
+      } finally {
+        setIsLoadingScrap(false);
+      }
+    };
+
+    fetchScrapCourses();
+  }, [user, refreshAuthToken]);
 
   const handleEditClick = async () => {
     if (isEditing) {
@@ -339,9 +407,28 @@ const MyPage = () => {
 
         <span className={styles.listTitle}>스크랩한 관광코스</span>
         <div className={styles.scrapList}>
-          <span className={styles.emptyText}>
-            스크랩한 관광코스가 없습니다.
-          </span>
+          {isLoadingScrap ? (
+            <span className={styles.emptyText}>로딩 중...</span>
+          ) : scrapCourses.length > 0 ? (
+            scrapCourses.map((course) => (
+              <CoursesBox
+                key={course.id}
+                id={course.id}
+                title={course.title}
+                content={course.content}
+                image={course.imageUrl}
+                scrapped={course.scrapped}
+                totalLocations={course.totalLocations}
+                landmarkTourElements={course.landmarkTourElements}
+                specialTourElements={course.specialTourElements}
+                missionTourElements={course.missionTourElements}
+              />
+            ))
+          ) : (
+            <span className={styles.emptyText}>
+              스크랩한 관광코스가 없습니다.
+            </span>
+          )}
         </div>
 
         <span className={styles.listTitle}>좋아요를 누른 방명록</span>
