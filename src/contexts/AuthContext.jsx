@@ -202,6 +202,7 @@ export const AuthProvider = ({ children }) => {
 
       console.log('로그인 응답 상태:', response.status, response.statusText);
       console.log('로그인 응답 헤더:', Object.fromEntries(response.headers.entries()));
+      console.log('Set-Cookie 헤더:', response.headers.get('Set-Cookie'));
 
       // 응답 본문을 텍스트로 먼저 읽어서 확인
       const responseText = await response.text();
@@ -301,16 +302,23 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
+      console.log('=== 프로필 업데이트 요청 시작 ===');
+      console.log('받은 profileData:', profileData);
+      console.log('현재 user 객체:', user);
+      console.log('user.id:', user?.id);
+      
       // FormData 생성
       const formData = new FormData();
       
       // name 추가
       if (profileData.name) {
         formData.append('name', profileData.name);
+        console.log('FormData에 name 추가:', profileData.name);
       }
       
       // languages 추가 (배열을 각각 추가)
       if (profileData.languages && Array.isArray(profileData.languages)) {
+        console.log('FormData에 languages 추가:', profileData.languages);
         profileData.languages.forEach(lang => {
           formData.append('languages', lang);
         });
@@ -320,17 +328,38 @@ export const AuthProvider = ({ children }) => {
       if (profileData.file && profileData.file instanceof File) {
         // 새로 선택한 파일인 경우에만 추가
         formData.append('file', profileData.file);
+        console.log('FormData에 file 추가:', profileData.file.name, profileData.file.type);
+      } else {
+        console.log('file 필드 정보:', {
+          file: profileData.file,
+          isFile: profileData.file instanceof File,
+          type: typeof profileData.file
+        });
       }
       
-      const headers = {
-        // multipart/form-data는 브라우저가 자동으로 Content-Type 설정
-        // 'Content-Type': 'multipart/form-data' 를 직접 설정하지 않음
-      };
+      // FormData 내용 확인
+      console.log('FormData 전체 내용:');
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}:`, `[File] ${value.name} (${value.type}, ${value.size} bytes)`);
+        } else {
+          console.log(`  ${key}:`, value);
+        }
+      }
+      
+      // FormData를 사용하면 브라우저가 자동으로 boundary를 포함한 Content-Type을 설정합니다.
+      // Authorization 헤더를 사용하여 인증합니다.
+      const headers = {};
       
       // Authorization 헤더에 토큰 추가
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
+        console.log('Authorization 헤더 추가됨');
       }
+      
+      console.log('요청 URL:', API_ENDPOINTS.AUTH_USER_PROFILE);
+      console.log('요청 메서드: POST');
+      console.log('요청 헤더:', headers);
 
       const response = await fetch(API_ENDPOINTS.AUTH_USER_PROFILE, {
         method: 'POST',
@@ -339,12 +368,24 @@ export const AuthProvider = ({ children }) => {
         body: formData,
       });
 
+      console.log('응답 상태:', response.status, response.statusText);
       const responseText = await response.text();
       
-      // 디버깅용 임시 로그
+      // 디버깅용 상세 로그
       if (!response.ok) {
-        console.log('프로필 업데이트 실패:', response.status);
-        console.log('에러 응답:', responseText);
+        console.error('=== 프로필 업데이트 실패 ===');
+        console.error('HTTP 상태 코드:', response.status);
+        console.error('상태 텍스트:', response.statusText);
+        console.error('에러 응답 본문:', responseText);
+        
+        try {
+          const errorData = JSON.parse(responseText);
+          console.error('에러 상세 정보:', errorData);
+        } catch (e) {
+          console.error('응답이 JSON 형식이 아님');
+        }
+      } else {
+        console.log('요청 성공! 응답 본문:', responseText);
       }
 
       if (response.ok) {

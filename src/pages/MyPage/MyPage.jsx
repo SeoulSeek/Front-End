@@ -72,13 +72,25 @@ const MyPage = () => {
   const handleEditClick = async () => {
     if (isEditing) {
       try {
+        console.log('=== MyPage handleEditClick 시작 ===');
+        console.log('현재 사용자:', user);
+        console.log('선택된 언어(UI):', selectedLangs);
+        
         // API에 전송할 데이터 준비
         const apiLanguages = mapUILanguagesToAPI(selectedLangs);
+        console.log('변환된 언어(API):', apiLanguages);
+        
         const profileData = {
           name: tempName.trim() || name,
           file: tempProfileFile || savedProfile, // 새 파일 객체 또는 기존 URL
           languages: apiLanguages
         };
+        
+        console.log('전송할 profileData:', {
+          name: profileData.name,
+          file: profileData.file instanceof File ? `[File] ${profileData.file.name}` : profileData.file,
+          languages: profileData.languages
+        });
 
         // API 호출
         const result = await updateProfile(profileData);
