@@ -10,6 +10,7 @@ import Signin from "./pages/SigninPage/SigninPage";
 import Places from "./pages/PlacesPage/PlacesPage2";
 import Search from "./pages/PlacesPage/PlacesSearchPage2";
 import Posting from "./pages/PlacesPage/PostPlacePage2";
+import Modify from "./pages/PlacesPage/PlacesModifyPage";
 import PlaceDetail from "./pages/PlacesPage/PlacesDetail2";
 import Courses from "./pages/CoursesPage/CoursesPage";
 import CoursesDetail from "./pages/CoursesPage/CoursesDetail";
@@ -31,6 +32,7 @@ function App() {
             <Route path="/places/result" element={<Search />} />
             <Route path="/places/:id" element={<PlaceDetail />} />
             <Route path="/places/edit/" element={<Posting />} />
+            <Route path="/places/edit/:id" element={<Modify />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:id" element={<CoursesDetail />} />
             <Route path="/map" element={<MapPage />} />
