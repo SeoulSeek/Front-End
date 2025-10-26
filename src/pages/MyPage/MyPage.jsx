@@ -42,6 +42,7 @@ const MyPage = () => {
 
   const [savedProfile, setSavedProfile] = useState(user?.file || defaultProfile);
   const [tempProfile, setTempProfile] = useState(savedProfile);
+  const [tempProfileFile, setTempProfileFile] = useState(null); // 새로 선택된 파일 객체
   const fileInputRef = useRef(null);
 
   const [selectedLangs, setSelectedLangs] = useState([]);
@@ -51,12 +52,19 @@ const MyPage = () => {
     if (user) {
       setName(user.name || "");
       setTempName(user.name || "");
-      setSavedProfile(user.file || defaultProfile);
-      setTempProfile(user.file || defaultProfile);
+      
+      // user.file이 유효한 URL인지 확인
+      const profileImage = (user.file && (
+        user.file.startsWith('http') || 
+        user.file.startsWith('/') ||
+        user.file.startsWith('blob:')
+      )) ? user.file : defaultProfile;
+      
+      setSavedProfile(profileImage);
+      setTempProfile(profileImage);
+      
       // API에서 받은 영어 언어 코드를 UI 언어로 변환
       const uiLanguages = mapApiLanguagesToUI(user.language || []);
-      console.log('API languages:', user.language);
-      console.log('UI languages:', uiLanguages);
       setSelectedLangs(uiLanguages);
     }
   }, [user]);
@@ -64,15 +72,25 @@ const MyPage = () => {
   const handleEditClick = async () => {
     if (isEditing) {
       try {
+        console.log('=== MyPage handleEditClick 시작 ===');
+        console.log('현재 사용자:', user);
+        console.log('선택된 언어(UI):', selectedLangs);
+        
         // API에 전송할 데이터 준비
         const apiLanguages = mapUILanguagesToAPI(selectedLangs);
+        console.log('변환된 언어(API):', apiLanguages);
+        
         const profileData = {
           name: tempName.trim() || name,
-          file: tempProfile,
-          languages: apiLanguages // API 명세서에 따르면 'languages' (복수형)
+          file: tempProfileFile || savedProfile, // 새 파일 객체 또는 기존 URL
+          languages: apiLanguages
         };
-
-        console.log('프로필 업데이트 데이터:', profileData);
+        
+        console.log('전송할 profileData:', {
+          name: profileData.name,
+          file: profileData.file instanceof File ? `[File] ${profileData.file.name}` : profileData.file,
+          languages: profileData.languages
+        });
 
         // API 호출
         const result = await updateProfile(profileData);
@@ -81,6 +99,7 @@ const MyPage = () => {
           // 성공 시 로컬 상태 업데이트
           setName(tempName.trim() || name);
           setSavedProfile(tempProfile);
+          setTempProfileFile(null); // 파일 객체 초기화
           setIsEditing(false);
           alert('프로필이 성공적으로 업데이트되었습니다.');
         } else {
@@ -93,6 +112,7 @@ const MyPage = () => {
     } else {
       setTempName(name);
       setTempProfile(savedProfile);
+      setTempProfileFile(null);
       setIsEditing(true);
     }
   };
@@ -111,11 +131,8 @@ const MyPage = () => {
       // 미리보기용 URL 생성
       const previewUrl = URL.createObjectURL(file);
       setTempProfile(previewUrl);
-      
-      // TODO: 실제 파일 업로드 API 구현 필요
-      // 현재는 미리보기만 지원하며, 실제 파일 업로드를 위해서는
-      // 별도의 파일 업로드 API가 필요할 수 있습니다.
-      console.log('선택된 파일:', file);
+      // 실제 파일 객체 저장
+      setTempProfileFile(file);
     }
   };
 
@@ -139,6 +156,7 @@ const MyPage = () => {
               src={defaultProfile}
               className={styles.profilePic}
               alt="기본 프로필 이미지"
+              onError={(e) => { e.target.src = defaultProfile; }}
             />
           </div>
           <div className={styles.myInfo}>
@@ -161,6 +179,7 @@ const MyPage = () => {
               src={defaultProfile}
               className={styles.profilePic}
               alt="기본 프로필 이미지"
+              onError={(e) => { e.target.src = defaultProfile; }}
             />
           </div>
           <div className={styles.myInfo}>
@@ -182,6 +201,7 @@ const MyPage = () => {
             src={isEditing ? tempProfile : savedProfile}
             className={styles.profilePic}
             alt="프로필 이미지"
+            onError={(e) => { e.target.src = defaultProfile; }}
           />
           {isEditing && tempProfile === savedProfile && (
             <div
