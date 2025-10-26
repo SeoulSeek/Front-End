@@ -106,12 +106,10 @@ const PlacesSearchPage = () => {
         });
 
         console.log(
-          `[검색페이지] 요청 URL: ${
-            API_ENDPOINTS.REVIEW_LIST
-          }?${params.toString()}`
+          `[검색페이지] 요청 URL: ${API_ENDPOINTS.REVIEWS}?${params.toString()}`
         );
         const response = await fetch(
-          `${API_ENDPOINTS.REVIEW_LIST}?${params.toString()}`,
+          `${API_ENDPOINTS.REVIEWS}?${params.toString()}`,
           { headers: headers, credentials: "include" }
         );
 

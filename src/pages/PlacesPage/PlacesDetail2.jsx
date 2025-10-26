@@ -49,9 +49,9 @@ const PlaceDetail = () => {
         }
 
         console.log(
-          `[방명록 단일페이지] 요청 URL: ${API_ENDPOINTS.REVIEW_LIST}/${id}`
+          `[방명록 단일페이지] 요청 URL: ${API_ENDPOINTS.REVIEWS}/${id}`
         );
-        const response = await fetch(`${API_ENDPOINTS.REVIEW_DETAIL}/${id}`, {
+        const response = await fetch(`${API_ENDPOINTS.REVIEWS}/${id}`, {
           headers: headers,
           credentials: "include",
         });
@@ -105,7 +105,6 @@ const PlaceDetail = () => {
   };
 
   const handleDelete = async () => {
-    // 방명록 삭제 핸들러(추후 api연동 필요)
     if (window.confirm("정말로 이 게시물을 삭제하시겠습니까?")) {
       try {
         const token = localStorage.getItem("refreshToken");
@@ -118,7 +117,7 @@ const PlaceDetail = () => {
 
         console.log(`[상세페이지] 삭제 방명록 ID: ${id}`);
 
-        const response = await fetch(`${API_ENDPOINTS.REVIEW_DELETE}/${id}`, {
+        const response = await fetch(`${API_ENDPOINTS.REVIEWS}/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,

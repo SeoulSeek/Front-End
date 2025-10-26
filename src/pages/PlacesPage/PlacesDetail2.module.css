@@ -132,6 +132,26 @@
   cursor: pointer;
   color: inherit;
 }
+.authorActions {
+  margin-top: 40px;
+  padding: 0 20px;
+}
+.editBtn,
+.deleteBtn {
+  color: #6d8196;
+  border: none;
+  background-color: inherit;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 300;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
 .text {
   line-height: 1.6;
   font-family: "Noto Sans KR";
@@ -143,7 +163,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 40px;
 }
 
 .mapLink {

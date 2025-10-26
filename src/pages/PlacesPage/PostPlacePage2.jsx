@@ -97,7 +97,7 @@ const PostPlacePage = () => {
     try {
       const token = localStorage.getItem("refreshToken");
 
-      const response = await fetch(API_ENDPOINTS.REVIEW_CREATE, {
+      const response = await fetch(`${API_ENDPOINTS.REVIEWS}/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
