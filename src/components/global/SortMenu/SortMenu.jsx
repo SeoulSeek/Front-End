@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import styles from "./SortMenu.module.css";
 
-const SortMenu = () => {
+const SortMenu = ({ onSortChange }) => {
   const [selected, setSelected] = useState("최신순");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const options = ["최신순", "조회순", "추천순"];
+  const options = ["최신순", "추천순", "가나다순"];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -23,9 +23,24 @@ const SortMenu = () => {
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
+  const getSortValue = (option) => {
+    switch (option) {
+      case "가나다순":
+        return "alphabet";
+      case "추천순":
+        return "recommend";
+      case "최신순":
+      default:
+        return "recent";
+    }
+  };
+
   const handleSelect = (option) => {
     setSelected(option);
     setIsOpen(false);
+    if (onSortChange) {
+      onSortChange(getSortValue(option));
+    }
   };
 
   const filteredOptions = options.filter((opt) => opt !== selected);
