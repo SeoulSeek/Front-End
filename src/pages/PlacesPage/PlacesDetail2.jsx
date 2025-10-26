@@ -29,7 +29,9 @@ const PlaceDetail = () => {
   const [isLiked, setIsLiked] = useState(false); // 현재 유저의 좋아요 여부
   const [likeCount, setLikeCount] = useState(0); // 좋아요 개수
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // 현재 보이는 이미지 인덱스
-
+  const [comments, setComments] = useState([]); // 댓글 목록 상태
+  const [newComment, setNewComment] = useState(""); // 새 댓글 입력 상태
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
   // --- useEffect를 사용한 데이터 Fetching ---
@@ -69,7 +71,7 @@ const PlaceDetail = () => {
         // 일단은 false로 초기화
         setLikeCount(result.data.like);
         setIsLiked(result.data.isLiked || false);
-        // 작성자 확인: 로그인된 사용자의 ID와 게시물 작성자의 userId를 비교
+        setComments(result.data.commentList || []); // 댓글 상태 설정
       } catch (err) {
         console.error(
           "[방명록 단일페이지]: 게시물 상세 정보 조회 중 에러:",
@@ -141,11 +143,100 @@ const PlaceDetail = () => {
     }
   };
 
+  const handleSubmitComment = async (e, retryToken = null) => {
+    e.preventDefault();
+    if (!newComment.trim() || isSubmittingComment) return;
+    if (!auth.user) {
+      alert("댓글을 작성하려면 로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
+    setIsSubmittingComment(true);
+    const commentContent = newComment;
+
+    // 댓글 작성 api
+    try {
+      const token = retryToken || localStorage.getItem("refreshToken");
+      if (!token) throw new Error("로그인이 필요합니다.");
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Beare ${token}`,
+      };
+
+      const response = await fetch(`${API_ENDPOINTS.REVIEWS}/${id}/comment`, {
+        method: "POST",
+        headers: headers,
+        credentials: "include",
+        body: JSON.stringify({ content: commentContent }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setComments((prev) => [...prev, result.data]);
+        setNewComment("");
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `댓글 작성 실패 (${response.status})`
+        );
+      }
+    } catch (err) {
+      console.error("[CommentSubmit] Error:", err);
+      alert(err.message);
+      setNewComment(commentContent);
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
   const handleKeyDown = (e) => {
     // 댓글 작성 핸들러
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      handleSubmitComment(e);
+    }
+  };
+
+  const handleDeleteComment = async (commentIdToDelete, retryToken = null) => {
+    if (!auth.user) return;
+    const commentToDelete = comments.find(
+      (c) => c.commentId === commentIdToDelete
+    );
+    if (auth.user.name !== commentToDelete?.userName) return;
+
+    if (window.confirm("댓글을 삭제하시겠습니까?")) {
+      try {
+        const token = retryToken || localStorage.getItem("refreshToken");
+        if (!token) throw new Error("로그인이 필요합니다.");
+
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const response = await fetch(
+          `${API_ENDPOINTS.COMMENTS}/${commentIdToDelete}`,
+          {
+            method: "DELETE",
+            headers: headers,
+            credentials: "include",
+          }
+        );
+
+        if (response.ok) {
+          setComments((prev) =>
+            prev.filter((comment) => comment.commentId !== commentIdToDelete)
+          );
+          alert("댓글이 삭제되었습니다.");
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.message || `댓글 삭제 실패 (${response.status})`
+          );
+        }
+      } catch (err) {
+        console.error("[댓글삭제] 에러:", err);
+        alert(err.message);
+      }
     }
   };
 
@@ -303,34 +394,50 @@ const PlaceDetail = () => {
         </div>
 
         {/* 댓글 영역 (postContent 밖으로 이동)*/}
-        {/*<div className={$.comments}>
+        <div className={$.comments}>
           <div className={$.commentFormWrap}>
-            <form onSubmit={handleSubmit} className={$.commentForm}>
+            <form onSubmit={handleSubmitComment} className={$.commentForm}>
               <textarea
                 value={newComment}
                 rows="1"
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="댓글을 입력해 주세요."
+                disabled={!auth.user || isSubmittingComment}
               ></textarea>
-              <button type="submit">등록</button>
+              <button
+                type="submit"
+                disabled={
+                  !auth.user || !newComment.trim() || isSubmittingComment
+                }
+              >
+                등록
+              </button>
             </form>
           </div>
-          <ul className={$.commentList}>
-            {comments.map((comment) => (
-              <li key={comment.id} className={$.commentItem}>
-                <span className={$.commentAuthor}>
-                  {comment.author.username}
-                </span>
-                <span className={$.commentText}>{comment.content}</span>
-                {comment.author.userId === currentUser.userId && (
-                  <CgClose className={$.commentDelete} size={15} />
-                )}
-              </li>
-            ))}
-          </ul>
-          <div className={$.commentEnd}>댓글 목록이 끝났어요.</div>
-        </div>*/}
+          {comments.length > 0 ? (
+            <ul className={$.commentList}>
+              {comments.map((comment) => (
+                <li key={comment.commentId} className={$.commentItem}>
+                  <span className={$.commentAuthor}>{comment.userName}</span>
+                  <span className={$.commentText}>{comment.content}</span>
+                  {auth.user && auth.user.name === comment.userName && (
+                    <CgClose
+                      className={$.commentDelete}
+                      size={15}
+                      onClick={() => handleDeleteComment(comment.commentId)}
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className={$.commentEnd}>아직 댓글이 없습니다.</div>
+          )}
+          {comments.length > 0 && (
+            <div className={$.commentEnd}>댓글 목록이 끝났어요.</div>
+          )}
+        </div>
       </div>
       {toastMessage && <div className={$.toast}>{toastMessage}</div>}
       <ScrollToTopBtn />

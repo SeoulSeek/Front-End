@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
   AUTH_LOGOUT: `${API_BASE_URL}/auth/logout`,
   EMAIL_VALID: `${API_BASE_URL}/valid`,
   REVIEWS: `${API_BASE_URL}/auth/review`,
+  COMMENTS: `${API_BASE_URL}/auth/review/comment`,
   LOCATION_LIST: `${API_BASE_URL}/location`,
   DAILY_LOCATION: `${API_BASE_URL}/location/daily`,
   WEEKLY_COURSE: `${API_BASE_URL}/courses/weekly`,
