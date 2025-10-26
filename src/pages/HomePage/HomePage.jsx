@@ -202,31 +202,41 @@ const Home = () => {
               지금 이 시간,{" "}
               <span className={styles.special}>{timePeriod}의 서울</span> 명소
             </h2>
-            <div className={styles.recommInnerBox}>
-              <div className={styles.hashTagContainer}>
-                {hasError ? (
-                  <div className={styles.errorText}>
-                    페이지를 새로고침해주세요.
-                  </div>
-                ) : (
-                  <HashTag
-                    type="district"
-                    text={
-                      DISTRICT_MAP[dailyLocation?.territory] ||
-                      dailyLocation?.territory ||
-                      "종로구"
-                    }
-                    color="#91C6FF"
-                    width="80px"
-                  />
-                )}
+            {hasError ? (
+              <div className={styles.recommInnerBox}>
+                <div className={styles.errorText}>
+                  페이지를 새로고침해주세요.
+                </div>
               </div>
-              <img
-                alt="서울 명소 이미지"
-                src={dailyLocation?.imageUrl || dummy2}
-                className={styles.recommImg}
-              />
-            </div>
+            ) : (
+              <Link
+                to={dailyLocation?.tid ? `/map/${dailyLocation.tid}` : "#"}
+                style={{
+                  textDecoration: "none",
+                  cursor: dailyLocation?.tid ? "pointer" : "default",
+                }}
+              >
+                <div className={styles.recommInnerBox}>
+                  <div className={styles.hashTagContainer}>
+                    <HashTag
+                      type="district"
+                      text={
+                        DISTRICT_MAP[dailyLocation?.territory] ||
+                        dailyLocation?.territory ||
+                        "종로구"
+                      }
+                      color="#91C6FF"
+                      width="80px"
+                    />
+                  </div>
+                  <img
+                    alt="서울 명소 이미지"
+                    src={dailyLocation?.imageUrl || dummy2}
+                    className={styles.recommImg}
+                  />
+                </div>
+              </Link>
+            )}
           </div>
         </div>
       </section>

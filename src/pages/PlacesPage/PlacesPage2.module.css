@@ -1,5 +1,6 @@
 /* 기본 (모바일) 스타일 */
 .placesPage {
+  position: relative;
   max-width: 1800px;
   margin: 0 auto;
   padding: 20px;
@@ -36,10 +37,18 @@
   font-weight: 600;
 }
 
+.sortMenuContainer {
+  position: absolute;
+  right: 20px;
+  top: 225px;
+  z-index: 1000;
+}
+
 .contentsWrap {
   display: flex;
   flex-direction: column;
   gap: 30px;
+  margin-top: 20px;
 }
 
 .mapWrap {
@@ -150,6 +159,10 @@
 
   .filterContainer {
     justify-content: center;
+  }
+
+  .sortMenuContainer {
+    top: 160px;
   }
 
   .contentsWrap {

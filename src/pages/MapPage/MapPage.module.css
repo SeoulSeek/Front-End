@@ -456,12 +456,16 @@
 }
 
 .placesContent {
+  margin-top: 10px;
   width: 320px;
   height: 270px;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 /* 스크롤바 스타일링 */

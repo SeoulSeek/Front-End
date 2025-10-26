@@ -4,6 +4,7 @@ import { AiOutlineEdit } from "react-icons/ai";
 
 import $ from "./PlacesLayout.module.css";
 import { useIsDesktop } from "../hooks/useIsDesktop";
+import { useAuth } from "../contexts/AuthContext";
 import SearchBar from "../components/Input/SearchBar";
 import Checkbox from "../components/Checkbox/Checkbox";
 import KakaoMiniMap from "../components/KakaoMiniMap/KakaoMiniMap";
@@ -11,11 +12,13 @@ import KakaoMiniMap from "../components/KakaoMiniMap/KakaoMiniMap";
 const PlacesLayout = ({ children, filters, onFilterChange }) => {
   const isDesktop = useIsDesktop();
   const navigate = useNavigate();
+  const auth = useAuth();
 
   const handleSearch = (query) => {
     navigate(`/places/result?q=${encodeURIComponent(query)}`);
   };
   const handleCreatePost = () => navigate("/places/edit");
+
   return (
     <div className={$.placesPage}>
       <div className={$.pageHeader}>
@@ -56,11 +59,13 @@ const PlacesLayout = ({ children, filters, onFilterChange }) => {
         <section className={$.mainContent}>{children}</section>
       </main>
 
-      <div className={$.postCreateBtnWrap}>
-        <button onClick={handleCreatePost} className={$.postCreateBtn}>
-          작성 <AiOutlineEdit />
-        </button>
-      </div>
+      {auth.user && (
+        <div className={$.postCreateBtnWrap}>
+          <button onClick={handleCreatePost} className={$.postCreateBtn}>
+            <AiOutlineEdit /> 작성
+          </button>
+        </div>
+      )}
     </div>
   );
 };

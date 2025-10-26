@@ -247,7 +247,12 @@ const BottomSheet = ({
 
             {/* 제목 칸 */}
             <div className={styles.titleSection}>
-              <h2 className={styles.placeName}>{placeData.name}</h2>
+              <h2 
+                className={styles.placeName}
+                style={{ fontSize: placeData.name.length > 10 ? '22px' : '35px' }}
+              >
+                {placeData.name}
+              </h2>
               <button className={styles.saveButton} onClick={handleSaveClick}>
                 {isSaved ? (
                   <FaBookmark size={24} color="#000000" />
