@@ -181,9 +181,11 @@ const Places = () => {
       </div>
 
       {auth.user && (
-        <button onClick={handleCreatePost} className={$.postCreateBtn}>
-          <AiOutlineEdit /> 작성
-        </button>
+        <div className={$.postCreateBtnWrap}>
+          <button onClick={handleCreatePost} className={$.postCreateBtn}>
+            <AiOutlineEdit /> 작성
+          </button>
+        </div>
       )}
 
       {!isDesktop && (

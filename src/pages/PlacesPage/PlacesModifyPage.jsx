@@ -1,7 +1,7 @@
 // 방명록 수정 페이지
 
 import React, { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { API_ENDPOINTS } from "../../config/api";
 
@@ -21,9 +21,11 @@ const ModifyPlacePage = () => {
   const [postData, setPostData] = useState({
     title: "",
     content: "",
+    locationId: null,
     tags: [],
     files: [],
   });
+  const [initialImageRemoved, setInitialImageRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 데이터 로딩 상태
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -33,6 +35,7 @@ const ModifyPlacePage = () => {
     const fetchPostData = async () => {
       setIsLoading(true);
       setError(null);
+      console.log(`[수정페이지] 방명록 ID: ${id}`);
       try {
         const token = localStorage.getItem("refreshToken");
         const headers = { Authorization: `Bearer ${token}` };
@@ -41,29 +44,28 @@ const ModifyPlacePage = () => {
           headers: headers,
           credentials: "include",
         });
+        console.log(`[수정페이지] 응답 상태: ${response.status}`);
 
         if (!response.ok) {
           throw new Error("게시물 정보를 불러오는데 실패했습니다.");
         }
         const result = await response.json();
+        console.log(`[수정페이지] 데이터 수신:`, result.data);
 
         // 불러온 데이터로 상태 초기화
         const fetchedData = result.data;
         setInitialData(fetchedData);
 
-        const initialTags = [
-          fetchedData.tagList?.territory,
-          fetchedData.tagList?.locationName,
-          ...(fetchedData.tagList?.tagList?.map((tag) => tag.name) || []),
-        ].filter(Boolean);
-
         setPostData({
           title: fetchedData.title || "",
           content: fetchedData.content || "",
-          tags: initialTags,
-          files: [],
+          locationId:
+            fetchedData.locationId || fetchedData.tagList?.locationId || null, // 방법찾기전까지 null
+          tags: fetchedData.tagList?.tagList?.map((tag) => tag.name) || [], // 키워드 설정
+          files: [], // 파일은 ImageUploader가 initialFiles로 처리
         });
       } catch (err) {
+        console.error("[상세페이지] Error data:", err);
         setError(err.message);
       } finally {
         setIsLoading(false);
@@ -74,14 +76,15 @@ const ModifyPlacePage = () => {
 
   const handleDataChange = useCallback((key, value) => {
     setPostData((prev) => ({ ...prev, [key]: value }));
-  }, []); // 의존성 배열이 비어있으므로 이 함수는 최초 1회만 생성됨
+  }, []);
 
-  const handleTagsChange = useCallback(
-    (tags) => {
-      handleDataChange("tags", tags);
-    },
-    [handleDataChange]
-  );
+  const handleTagsChange = useCallback((tagData) => {
+    setPostData((prev) => ({
+      ...prev,
+      locationId: tagData.locationId,
+      tags: tagData.keywords,
+    }));
+  }, []);
 
   const handleFormChange = useCallback(
     (fieldid, value) => {
@@ -97,16 +100,25 @@ const ModifyPlacePage = () => {
     [handleDataChange]
   );
 
+  const handleInitialImageDelete = useCallback(() => {
+    setInitialImageRemoved(true);
+    console.log("[ModifyPage] 초기 이미지가 삭제됨으로 표시됨.");
+  }, []);
+
   // 수정 api 호출
   const handleSubmit = async (e) => {
     e.preventDefault();
     // 유효성 검사
+    if (!id) {
+      alert("잘못된 접근입니다. 게시물 ID가 없습니다.");
+      return;
+    }
     if (!auth.user) {
       alert("로그인이 필요한 기능입니다.");
       navigate("/login");
       return;
     }
-    if (postData.tags.length < 2) {
+    if (!postData.locationId) {
       alert("장소 태그를 선택해주세요.");
       return;
     }
@@ -116,31 +128,46 @@ const ModifyPlacePage = () => {
     // --- API 요청 데이터 생성 ---
     const formData = new FormData();
 
-    // 텍스트 데이터 (JSON 형식으로 변환하여 Blob으로 추가)
-    const reviewRequest = {
-      title: postData.title,
-      content: postData.content,
-      location: postData.tags[1], // 장소명
-      tagList: {
-        locationName: postData.tags[1], // 장소명
-        territory: postData.tags[0], // 자치구
-        tagList: postData.tags.slice(2).map((tag) => ({ name: tag })), // 키워드 태그
-      },
-    };
-    formData.append(
-      "reviewRequest",
-      new Blob([JSON.stringify(reviewRequest)], { type: "application/json" })
-    );
+    // 데이터 추가
+    formData.append("title", postData.title);
+    formData.append("content", postData.content);
+    formData.append("locationId", String(postData.locationId));
+    if (postData.tags && postData.tags.length > 0) {
+      postData.tags.forEach((tag) => formData.append("tags", tag));
+    } else {
+      formData.append("tags", "");
+    }
 
-    // 새 이미지가 업로드된 경우 ----- 임시
+    let fileRemovedValue = "false";
+    if (initialImageRemoved && postData.files.length === 0) {
+      fileRemovedValue = "true";
+    }
+    formData.append("fileRemoved", fileRemovedValue);
+    console.log(`[ModifyPage] fileRemoved 값 추가: ${fileRemovedValue}`);
     if (postData.files.length > 0) {
       formData.append("file", postData.files[0]);
+      console.log(`[ModifyPage] 새 파일 추가: ${postData.files[0].name}`);
+    } else {
+      console.log(`[ModifyPage] 새 파일 없음.`);
+    }
+
+    console.log("--- FormData 내용 (Modify) ---");
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(
+          `${key}:`,
+          `[File Object - name: ${value.name}, type: ${value.type}]`
+        );
+      } else {
+        console.log(`${key}:`, value);
+      }
     }
 
     // API 호출
     try {
       const token = localStorage.getItem("refreshToken");
 
+      console.log(`[ModifyPage] API Endpoint: ${API_ENDPOINTS.REVIEW_UPDATE}`);
       const response = await fetch(`${API_ENDPOINTS.REVIEW_UPDATE}/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
@@ -177,13 +204,23 @@ const ModifyPlacePage = () => {
             <p className={$.subTitle}>방명록 수정</p>
           </header>
           <ImageUploader
-            initialFiles={initialData.fileURL ? [initialData.fileURL] : []}
+            initialFiles={
+              initialData?.fileURL
+                ? Array.isArray(initialData.fileURL)
+                  ? initialData.fileURL
+                  : [initialData.fileURL]
+                : []
+            }
             onFilesChange={handleFilesChange}
+            onInitialImageDelete={handleInitialImageDelete} // 콜백 전달
           />
         </div>
 
         <div className={$.rightColumn}>
           <TagEditor
+            initialLocationId={
+              initialData.locationId || initialData.tagList?.locationId
+            } // API 응답 확인 필요
             initialTerritory={initialData.tagList?.territory}
             initialLocationName={initialData.tagList?.locationName}
             initialKeywords={

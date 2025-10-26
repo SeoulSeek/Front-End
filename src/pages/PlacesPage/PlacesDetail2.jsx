@@ -109,20 +109,35 @@ const PlaceDetail = () => {
     if (window.confirm("정말로 이 게시물을 삭제하시겠습니까?")) {
       try {
         const token = localStorage.getItem("refreshToken");
+        if (!token) {
+          alert("삭제 권한이 없습니다. 다시 로그인해주세요.");
+          auth.logout(); // 로그아웃 처리
+          navigate("/login");
+          return;
+        }
+
+        console.log(`[상세페이지] 삭제 방명록 ID: ${id}`);
+
         const response = await fetch(`${API_ENDPOINTS.REVIEW_DELETE}/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
         });
+
+        console.log(`[상세페이지] 삭제 응답 상태: ${response.status}`);
+
         if (response.ok) {
           alert("게시물이 삭제되었습니다.");
           navigate("/places"); // 삭제 후 목록 페이지로 이동
         } else {
-          throw new Error("삭제에 실패했습니다.");
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "작성에 실패했습니다.");
         }
       } catch (err) {
-        alert(err.message);
+        console.error("[상세페이지] Error handleDelete:", err);
+        alert(err.message || "삭제 중 오류가 발생했습니다.");
       }
     }
   };
@@ -179,7 +194,7 @@ const PlaceDetail = () => {
   if (!post)
     return <div className={$.statusMessage}>게시물을 찾을 수 없습니다.</div>;
 
-  const isAuthor = auth.user && auth.user.id === post.userId;
+  const isAuthor = auth.user.name === post.username;
   // fileURL이 배열이 아니면 배열로 감싸서 처리
   const allImages = Array.isArray(post.fileURL)
     ? post.fileURL

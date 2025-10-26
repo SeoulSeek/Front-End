@@ -14,6 +14,7 @@ const PostPlacePage = () => {
   const [postData, setPostData] = useState({
     title: "",
     content: "",
+    locationId: null,
     tags: [],
     files: [],
   });
@@ -27,12 +28,14 @@ const PostPlacePage = () => {
     setPostData((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const handleTagsChange = useCallback(
-    (tags) => {
-      handleDataChange("tags", tags);
-    },
-    [handleDataChange]
-  );
+  const handleTagsChange = useCallback((tagData) => {
+    // tagData = { locationId: ..., keywords: [...] }
+    setPostData((prev) => ({
+      ...prev,
+      locationId: tagData.locationId,
+      tags: tagData.keywords,
+    }));
+  }, []);
 
   const handleFormChange = useCallback(
     (id, value) => {
@@ -57,7 +60,7 @@ const PostPlacePage = () => {
       navigate("/login");
       return;
     }
-    if (postData.tags.length < 2) {
+    if (!postData.locationId) {
       alert("장소 태그를 선택해주세요.");
       return;
     }
@@ -66,23 +69,29 @@ const PostPlacePage = () => {
     const formData = new FormData();
 
     // 텍스트 데이터 (JSON 형식으로 변환하여 Blob으로 추가)
-    const reviewRequest = {
-      title: postData.title,
-      content: postData.content,
-      location: postData.tags[1], // 장소명
-      tagList: {
-        locationName: postData.tags[1], // 장소명
-        territory: postData.tags[0], // 자치구
-        tagList: postData.tags.slice(2).map((tag) => ({ name: tag })), // 키워드 태그
-      },
-    };
-    formData.append(
-      "reviewRequest",
-      new Blob([JSON.stringify(reviewRequest)], { type: "application/json" })
-    );
-
+    formData.append("title", postData.title);
+    formData.append("content", postData.content);
+    formData.append("locationId", postData.locationId);
+    if (postData.tags && postData.tags.length > 0) {
+      postData.tags.forEach((tag) => formData.append("tags", tag));
+    } else {
+      formData.append("tags", ""); // 빈 문자열
+    }
     // 이미지 파일 추가 (첫 번째 이미지만 전송) ----- 임시
     formData.append("file", postData.files[0]);
+
+    console.log("--- FormData 내용 ---");
+    for (let [key, value] of formData.entries()) {
+      // 파일 객체는 직접 보기 어려우므로 파일 이름만 출력
+      if (value instanceof File) {
+        console.log(
+          `${key}:`,
+          `[File Object - name: ${value.name}, type: ${value.type}]`
+        );
+      } else {
+        console.log(`${key}:`, value);
+      }
+    }
 
     // API 호출
     try {
@@ -111,8 +120,6 @@ const PostPlacePage = () => {
     } finally {
       setIsSubmitting(false);
     }
-
-    console.log("최종 제출 데이터:", postData);
   };
 
   return (
