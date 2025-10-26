@@ -10,30 +10,26 @@ const PostList = ({ posts, lastPostRef }) => {
         const postProps = {
           id: post.id,
           title: post.title,
-          hashtags: post.metadata.tags,
+          hashtags: post.tags || [],
           author: {
-            userId: post.author.userId,
-            username: post.author.username,
-            profileImage: post.author.profileImage,
+            userId: null,
+            username: post.username,
+            profileImage: post.fileURL,
           },
-          likes: post.stats.likes,
-          comments: post.comments.length,
+          likes: post.like,
+          comments: post.comments,
         };
 
         // 마지막 게시물에 ref 연결
-        if (posts.length === index + 1) {
-          return (
-            <li ref={lastPostRef} key={post.id}>
-              <PostBox {...postProps} />
-            </li>
-          );
-        } else {
-          return (
-            <li key={post.id}>
-              <PostBox {...postProps} />
-            </li>
-          );
-        }
+        const isLastElement = posts.length === index + 1;
+        return (
+          <li
+            ref={isLastElement ? lastPostRef : null}
+            key={`${post.id}-${index}`}
+          >
+            <PostBox {...postProps} />
+          </li>
+        );
       })}
     </ul>
   );

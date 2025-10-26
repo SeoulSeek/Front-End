@@ -6,12 +6,21 @@ import dummyPlaces from "../../data/dummyPlaces";
 import PlaceSearchBar from "../../components/Input/PlaceSearchBar";
 import HashTag from "../../components/global/HashTag/HashTag";
 
-const TagEditor = ({ onTagsChange }) => {
+const TagEditor = ({
+  onTagsChange,
+  initialTerritory = null,
+  initialLocationName = null,
+  initialKeywords = [],
+}) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showPlaceList, setShowPlaceList] = useState(false);
-  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(
+    initialTerritory && initialLocationName
+      ? { district: initialTerritory, title: initialLocationName } // 초기 장소 객체 생성
+      : null
+  );
   const [customKeyword, setCustomKeyword] = useState("");
-  const [customHashtags, setCustomHashtags] = useState([]);
+  const [customHashtags, setCustomHashtags] = useState(initialKeywords);
 
   useEffect(() => {
     const placeTags = selectedPlace
