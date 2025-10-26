@@ -4,6 +4,7 @@ import { BiLinkAlt } from "react-icons/bi";
 import styles from "./BottomSheet.module.css";
 import PlaceCard from "../PlaceCard/PlaceCard";
 import sampleImage from "../../assets/LoginPage/sample1.jpg";
+import { useAuth } from "../../contexts/AuthContext";
 
 const BottomSheet = ({ 
   placeData, 
@@ -15,6 +16,7 @@ const BottomSheet = ({
   bottomSheetState,
   setBottomSheetState
 }) => {
+  const { user } = useAuth();
   const [sheetState, setSheetState] = useState("peek"); // 'peek', 'half', 'full'
   const [isSaved, setIsSaved] = useState(false);
   const [startY, setStartY] = useState(0);
@@ -168,6 +170,13 @@ const BottomSheet = ({
 
   const handleSaveClick = (e) => {
     e.stopPropagation();
+    
+    // 로그인 체크
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    
     setIsSaved(!isSaved);
   };
 

@@ -94,7 +94,7 @@ const MapPage = () => {
       // 선택된 장소 ID 업데이트
       setSelectedLocationId(locationId);
       
-      const accessToken = localStorage.getItem("accessToken");
+      const token = localStorage.getItem("refreshToken");
       
       // 장소 상세 정보, 연관 장소, 텍스트 설명을 병렬로 가져오기
       const [detailResponse, relatedResponse, textResponse] = await Promise.all([
@@ -102,21 +102,21 @@ const MapPage = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+            ...(token && { Authorization: `Bearer ${token}` }),
           },
         }),
         fetch(API_ENDPOINTS.LOCATION_RELATED_PLACES(locationId), {
           method: "GET",
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+            ...(token && { Authorization: `Bearer ${token}` }),
           },
         }),
         fetch(API_ENDPOINTS.LOCATION_TEXT(locationId), {
           method: "GET",
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+            ...(token && { Authorization: `Bearer ${token}` }),
           },
         })
       ]);
@@ -188,13 +188,13 @@ const MapPage = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const accessToken = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("refreshToken");
         
         const response = await fetch(API_ENDPOINTS.LOCATION, {
           method: "GET",
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+            ...(token && { Authorization: `Bearer ${token}` }),
           },
         });
         

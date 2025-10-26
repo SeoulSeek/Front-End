@@ -27,7 +27,7 @@ export const API_ENDPOINTS = {
   COURSE_SCRAP: (id) => `${API_BASE_URL}/auth/courses/${id}/scrap`,
   COURSE_SCRAP_LIST: `${API_BASE_URL}/auth/user/scrap`,
   LOCATION: `${API_BASE_URL}/location`,
-  LOCATION_DETAIL: (id) => `${API_BASE_URL}/location/${id}`,
-  LOCATION_RELATED_PLACES: (id) => `${API_BASE_URL}/location/${id}/places`,
+  LOCATION_DETAIL: (id) => `${API_BASE_URL}/optional/location/${id}`,
+  LOCATION_RELATED_PLACES: (id) => `${API_BASE_URL}/optional/location/${id}/places`,
   LOCATION_TEXT: (id) => `${API_BASE_URL}/location/${id}/text`,
 };

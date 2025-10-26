@@ -33,27 +33,17 @@ const CoursesPage = () => {
         credentials: 'include',
       });
       
-      console.log('CoursesPage API 호출:', {
-        url: `${API_ENDPOINTS.COURSES}?sort=${sortType}`,
-        status: response.status,
-        hasToken: !!token
-      });
-      
       if (!response.ok) {
         throw new Error("Failed to fetch courses");
       }
       
       const result = await response.json();
       
-      console.log('CoursesPage API 응답:', result);
-      
       if (result.error) {
         throw new Error("API returned an error");
       }
       
       const coursesData = result.data || [];
-      console.log('받은 코스 데이터 (첫 번째):', coursesData[0]);
-      
       setCourses(coursesData);
     } catch (err) {
       console.error("Error fetching courses:", err);

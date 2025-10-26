@@ -2,12 +2,21 @@ import React, { useState } from "react";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa6";
 import styles from "./PlaceCard.module.css";
 import sampleImage from "../../assets/LoginPage/sample1.jpg";
+import { useAuth } from "../../contexts/AuthContext";
 
 const PlaceCard = ({ placeName, distance, imageUrl, variant = "dark" }) => {
+  const { user } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSaveClick = (e) => {
     e.stopPropagation();
+    
+    // 로그인 체크
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    
     setIsSaved(!isSaved);
   };
 

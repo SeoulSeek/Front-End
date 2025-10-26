@@ -80,12 +80,12 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } else {
-        // 토큰이 유효하지 않음
+        // 토큰이 유효하지 않음 (로그인하지 않았거나 만료됨)
         removeToken();
         setUser(null);
       }
     } catch (error) {
-      console.error('토큰 재발급 실패:', error);
+      // 로그인하지 않은 사용자의 경우 조용히 처리
       removeToken();
       setUser(null);
     }
@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }) => {
               return null;
             }
           } catch (jsonError) {
-            console.error('사용자 정보 JSON 파싱 에러:', jsonError);
+            // 로그인하지 않은 사용자의 경우 조용히 처리
             setUser(null);
             return null;
           }
@@ -147,7 +147,7 @@ export const AuthProvider = ({ children }) => {
           return null;
         }
       } else if (response.status === 401) {
-        // 토큰이 만료되었을 가능성이 있으므로 재발급 시도
+        // 토큰이 만료되었거나 로그인하지 않은 경우 조용히 처리
         const newToken = await refreshAuthToken();
         if (newToken) {
           // 재발급 성공 시 다시 사용자 정보 요청
@@ -161,7 +161,7 @@ export const AuthProvider = ({ children }) => {
         return null;
       }
     } catch (error) {
-      console.error('사용자 정보 가져오기 실패:', error);
+      // 로그인하지 않은 사용자의 경우 조용히 처리
       setUser(null);
       return null;
     }
@@ -318,7 +318,6 @@ export const AuthProvider = ({ children }) => {
               return { success: false, message: responseData.message || '프로필 업데이트에 실패했습니다.' };
             }
           } catch (jsonError) {
-            console.error('프로필 업데이트 응답 JSON 파싱 에러:', jsonError);
             // JSON 파싱 실패해도 200 응답이면 성공으로 간주
             await fetchUser();
             return { success: true };
