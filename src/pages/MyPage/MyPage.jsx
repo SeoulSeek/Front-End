@@ -597,6 +597,12 @@ const MyPage = () => {
                 landmarkTourElements={course.landmarkTourElements}
                 specialTourElements={course.specialTourElements}
                 missionTourElements={course.missionTourElements}
+                onScrapChange={(courseId, isScrapped) => {
+                  if (!isScrapped) {
+                    // 스크랩 해제 시 리스트에서 제거
+                    setScrapCourses(prev => prev.filter(c => c.id !== courseId));
+                  }
+                }}
               />
             ))
           ) : (

@@ -93,9 +93,9 @@ const CoursesBox = ({
       if (result.error === false && result.data) {
         const newScrappedState = result.data.scrapped;
         setIsStarFilled(newScrappedState);
-        // 부모 컴포넌트에 변경사항 알림
+        // 부모 컴포넌트에 변경사항 알림 (북마크 해제된 경우에만)
         if (onScrapChange) {
-          onScrapChange();
+          onScrapChange(id, newScrappedState);
         }
       } else {
         // 에러 응답 시 원래 상태로 복구

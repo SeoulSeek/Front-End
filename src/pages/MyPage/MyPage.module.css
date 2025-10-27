@@ -233,7 +233,7 @@
 .logList {
   width: 390px;
   display: flex;
-  min-height: 446px;
+  min-height: 250px;
   justify-content: center;
   align-items: center;
   flex-direction: column;
