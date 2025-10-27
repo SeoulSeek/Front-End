@@ -32,4 +32,5 @@ export const API_ENDPOINTS = {
   LOCATION_RELATED_PLACES: (id) => `${API_BASE_URL}/optional/location/${id}/places`,
   LOCATION_TEXT: (id) => `${API_BASE_URL}/location/${id}/text`,
   LOCATION_AUDIO: (id) => `${API_BASE_URL}/location/${id}/repaudio`,
+  USER_BOOKMARK: `${API_BASE_URL}/auth/user/book-mark`,
 };

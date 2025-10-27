@@ -228,11 +228,21 @@
 .logList {
   width: 390px;
   display: flex;
-  height: 446px;
+  min-height: 446px;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   background: #FFF;
+  padding: 20px 0;
+}
+
+.bookmarkedPlacesContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0 20px;
 }
 
 .scrapList,

@@ -12,6 +12,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { mapLanguageToUI } from "../../hooks/auth";
 import CoursesBox from "../../components/CoursesBox/CoursesBox";
 import { API_ENDPOINTS } from "../../config/api";
+import PlaceCard from "../../components/PlaceCard/PlaceCard";
+import Pagination from "../../components/PlacesPage/Pagination";
 
 const LANGUAGES = ["한국어", "English", "中國語", "日本語"];
 
@@ -51,6 +53,11 @@ const MyPage = () => {
   
   const [scrapCourses, setScrapCourses] = useState([]);
   const [isLoadingScrap, setIsLoadingScrap] = useState(false);
+  
+  const [bookmarkedPlaces, setBookmarkedPlaces] = useState([]);
+  const [isLoadingBookmarks, setIsLoadingBookmarks] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   // 사용자 정보가 변경될 때 로컬 상태 업데이트
   useEffect(() => {
@@ -136,6 +143,121 @@ const MyPage = () => {
 
     fetchScrapCourses();
   }, [user, refreshAuthToken]);
+
+  // 북마크한 장소 목록 가져오기
+  useEffect(() => {
+    const fetchBookmarkedPlaces = async () => {
+      if (!user || activeTab !== "places") {
+        return;
+      }
+
+      try {
+        setIsLoadingBookmarks(true);
+        const token = localStorage.getItem('refreshToken');
+        
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch(
+          `${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=${currentPage}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8',
+              'Authorization': `Bearer ${token}`,
+            },
+            credentials: 'include',
+          }
+        );
+
+        if (response.status === 401) {
+          // 토큰 재발급 시도
+          const newToken = await refreshAuthToken();
+          if (newToken) {
+            const retryResponse = await fetch(
+              `${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=${currentPage}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8',
+                  'Authorization': `Bearer ${newToken}`,
+                },
+                credentials: 'include',
+              }
+            );
+            
+            if (retryResponse.ok) {
+              const result = await retryResponse.json();
+              if (result.error === false && result.data) {
+                setBookmarkedPlaces(result.data);
+                // 페이지네이션: 첫 페이지일 때만 다음 페이지 확인
+                if (currentPage === 0 && result.data.length === 3) {
+                  // 다음 페이지 확인
+                  fetch(`${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=1`, {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json;charset=UTF-8',
+                      'Authorization': `Bearer ${newToken}`,
+                    },
+                    credentials: 'include',
+                  }).then(nextResponse => nextResponse.json())
+                    .then(nextResult => {
+                      if (nextResult.error === false && nextResult.data) {
+                        if (nextResult.data.length > 0) {
+                          setTotalPages(2);
+                        } else {
+                          setTotalPages(1);
+                        }
+                      }
+                    });
+                } else if (result.data.length < 3) {
+                  setTotalPages(currentPage + 1);
+                }
+              }
+            }
+          }
+          return;
+        }
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.error === false && result.data) {
+            setBookmarkedPlaces(result.data);
+            // 페이지네이션: 첫 페이지일 때만 다음 페이지 확인
+            if (currentPage === 0 && result.data.length === 3) {
+              // 다음 페이지 확인
+              fetch(`${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=1`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8',
+                  'Authorization': `Bearer ${token}`,
+                },
+                credentials: 'include',
+              }).then(nextResponse => nextResponse.json())
+                .then(nextResult => {
+                  if (nextResult.error === false && nextResult.data) {
+                    if (nextResult.data.length > 0) {
+                      setTotalPages(2);
+                    } else {
+                      setTotalPages(1);
+                    }
+                  }
+                });
+            } else if (result.data.length < 3) {
+              setTotalPages(currentPage + 1);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('북마크 장소 목록 가져오기 실패:', error);
+      } finally {
+        setIsLoadingBookmarks(false);
+      }
+    };
+
+    fetchBookmarkedPlaces();
+  }, [user, activeTab, currentPage, refreshAuthToken]);
 
   const handleEditClick = async () => {
     if (isEditing) {
@@ -391,9 +513,49 @@ const MyPage = () => {
       <div className={styles.listContainer}>
         {activeTab === "places" && (
           <div className={styles.placesList}>
-            <span className={styles.emptyText}>
-              지도에서 다양한 서울을 경험해 보세요!
-            </span>
+            {isLoadingBookmarks ? (
+              <span className={styles.emptyText}>로딩 중...</span>
+            ) : (
+              <>
+                {bookmarkedPlaces.length > 0 ? (
+                  <div className={styles.bookmarkedPlacesContainer}>
+                    {bookmarkedPlaces.map((place) => (
+                      <PlaceCard
+                        key={place.id}
+                        id={place.id}
+                        placeName={place.name}
+                        imageUrl={place.file}
+                        hideDistance={true}
+                        variant="light"
+                        initialBookmarked={true}
+                        onBookmarkChange={(placeId, isBookmarked) => {
+                          if (!isBookmarked) {
+                            // 북마크 해제 시 리스트에서 제거
+                            setBookmarkedPlaces(prev => prev.filter(p => p.id !== placeId));
+                            // 현재 페이지에 데이터가 없으면 이전 페이지로 이동
+                            const filtered = bookmarkedPlaces.filter(p => p.id !== placeId);
+                            if (filtered.length === 0 && currentPage > 0) {
+                              setCurrentPage(currentPage - 1);
+                            }
+                          }
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : currentPage === 0 ? (
+                  <span className={styles.emptyText}>
+                    지도에서 다양한 서울을 경험해 보세요!
+                  </span>
+                ) : null}
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage + 1}
+                    totalPages={totalPages}
+                    onPageClick={(page) => setCurrentPage(page - 1)}
+                  />
+                )}
+              </>
+            )}
           </div>
         )}
 

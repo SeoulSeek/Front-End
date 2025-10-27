@@ -4,6 +4,10 @@
   margin-bottom: 40px;
 }
 
+.verticalSpacing {
+  margin-bottom: 40px;
+}
+
 .placeCard:last-child {
   margin-bottom: 0;
 }
