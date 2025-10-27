@@ -14,11 +14,13 @@ const BottomSheet = ({
   searchQuery = "",
   searchResults = [],
   bottomSheetState,
-  setBottomSheetState
+  setBottomSheetState,
+  placeId,
+  onBookmarkToggle
 }) => {
   const { user } = useAuth();
   const [sheetState, setSheetState] = useState("peek"); // 'peek', 'half', 'full'
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(placeData?.bookmarked || false);
   const [startY, setStartY] = useState(0);
   const [currentY, setCurrentY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -168,6 +170,13 @@ const BottomSheet = ({
     };
   }, [isDragging, currentY]);
 
+  // placeData가 변경될 때 북마크 상태도 업데이트
+  useEffect(() => {
+    if (placeData?.bookmarked !== undefined) {
+      setIsSaved(placeData.bookmarked);
+    }
+  }, [placeData?.bookmarked]);
+
   const handleSaveClick = (e) => {
     e.stopPropagation();
     
@@ -177,7 +186,10 @@ const BottomSheet = ({
       return;
     }
     
-    setIsSaved(!isSaved);
+    // 북마크 토글 함수 호출
+    if (onBookmarkToggle) {
+      onBookmarkToggle();
+    }
   };
 
   const handleCopyAddress = async () => {

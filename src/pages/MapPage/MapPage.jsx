@@ -17,6 +17,7 @@ import sampleImage from "../../assets/LoginPage/sample1.jpg";
 import pinIcon from "../../assets/MapPage/pin.svg";
 import pinSelectIcon from "../../assets/MapPage/pinSelect.svg";
 import { API_ENDPOINTS } from "../../config/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Era 매핑 객체
 const ERA_MAP = {
@@ -50,9 +51,14 @@ const MapPage = () => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [relatedPlaces, setRelatedPlaces] = useState([]);
   const [locationText, setLocationText] = useState("");
+  const [locationAudio, setLocationAudio] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [bottomSheetState, setBottomSheetState] = useState("peek");
+  
+  const authContext = useAuth();
+  const { user, refreshAuthToken } = authContext;
+  
   
   // 검색 결과 더미 데이터
   const searchResults = [
@@ -96,35 +102,63 @@ const MapPage = () => {
       
       const token = localStorage.getItem("refreshToken");
       
-      // 장소 상세 정보, 연관 장소, 텍스트 설명을 병렬로 가져오기
-      const [detailResponse, relatedResponse, textResponse] = await Promise.all([
-        fetch(API_ENDPOINTS.LOCATION_DETAIL(locationId), {
+      // 장소 상세 정보를 먼저 가져오기
+      const detailResponse = await fetch(API_ENDPOINTS.LOCATION_DETAIL(locationId), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        credentials: 'include',
+      });
+
+      // 연관 장소, 텍스트 설명, 오디오를 병렬로 가져오기 (에러가 발생해도 조용히 처리)
+      const silentFetch = async (url, options) => {
+        try {
+          const response = await fetch(url, options);
+          // 404 에러를 조용히 처리
+          if (!response.ok && response.status === 404) {
+            return { ok: false, status: 404 };
+          }
+          return response;
+        } catch {
+          return { ok: false };
+        }
+      };
+
+      const [relatedResponse, textResponse, audioResponse] = await Promise.allSettled([
+        silentFetch(API_ENDPOINTS.LOCATION_RELATED_PLACES(locationId), {
           method: "GET",
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
             ...(token && { Authorization: `Bearer ${token}` }),
           },
+          credentials: 'include',
         }),
-        fetch(API_ENDPOINTS.LOCATION_RELATED_PLACES(locationId), {
+        silentFetch(API_ENDPOINTS.LOCATION_TEXT(locationId), {
           method: "GET",
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
             ...(token && { Authorization: `Bearer ${token}` }),
           },
+          credentials: 'include',
         }),
-        fetch(API_ENDPOINTS.LOCATION_TEXT(locationId), {
+        silentFetch(API_ENDPOINTS.LOCATION_AUDIO(locationId), {
           method: "GET",
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
             ...(token && { Authorization: `Bearer ${token}` }),
           },
+          credentials: 'include',
         })
       ]);
 
+      // detailResponse는 반드시 성공해야 함
       if (detailResponse.ok) {
         const result = await detailResponse.json();
         if (result.data) {
           const locationData = result.data;
+          
           // era 값을 한글로 변환
           const eraText = locationData.era ? (ERA_MAP[locationData.era] || locationData.era) : "정보 없음";
           
@@ -137,6 +171,7 @@ const MapPage = () => {
             phone: "",
             imageUrl: locationData.imageUrl || sampleImage,
             url: locationData.url,
+            bookmarked: locationData.bookmarked || false,
           });
           
           // 지도 이동이 필요한 경우
@@ -153,36 +188,60 @@ const MapPage = () => {
           setIsSearchMode(false);
         }
       } else {
-        console.error("장소 상세 정보 응답 실패:", detailResponse.status);
+        console.error("장소 상세 정보 응답 실패");
       }
       
-      // 연관 장소 처리
-      if (relatedResponse.ok) {
-        const relatedResult = await relatedResponse.json();
-        if (relatedResult.data) {
-          setRelatedPlaces(relatedResult.data);
+      // 연관 장소 처리 (정보가 없어도 에러로 처리하지 않음)
+      if (relatedResponse.status === 'fulfilled' && relatedResponse.value && relatedResponse.value.ok) {
+        try {
+          const relatedResult = await relatedResponse.value.json();
+          if (relatedResult.data) {
+            setRelatedPlaces(relatedResult.data);
+          } else {
+            setRelatedPlaces([]);
+          }
+        } catch {
+          setRelatedPlaces([]);
         }
       } else {
-        console.error("연관 장소 응답 실패:", relatedResponse.status);
         setRelatedPlaces([]);
       }
       
-      // 텍스트 설명 처리
-      if (textResponse.ok) {
-        const textResult = await textResponse.json();
-        if (textResult.data && textResult.data.content) {
-          setLocationText(textResult.data.content);
-        } else {
+      // 텍스트 설명 처리 (정보가 없어도 에러로 처리하지 않음)
+      if (textResponse.status === 'fulfilled' && textResponse.value && textResponse.value.ok) {
+        try {
+          const textResult = await textResponse.value.json();
+          if (textResult.data && textResult.data.content) {
+            setLocationText(textResult.data.content);
+          } else {
+            setLocationText("");
+          }
+        } catch {
           setLocationText("");
         }
       } else {
-        console.error("텍스트 설명 응답 실패:", textResponse.status);
         setLocationText("");
+      }
+      
+      // 오디오 처리 (정보가 없어도 에러로 처리하지 않음)
+      if (audioResponse.status === 'fulfilled' && audioResponse.value && audioResponse.value.ok) {
+        try {
+          const audioResult = await audioResponse.value.json();
+          if (audioResult.data) {
+            setLocationAudio(audioResult.data);
+          } else {
+            setLocationAudio(null);
+          }
+        } catch {
+          setLocationAudio(null);
+        }
+      } else {
+        setLocationAudio(null);
       }
     } catch (error) {
       console.error("장소 정보를 가져오는데 실패했습니다:", error);
     }
-  }, []);
+  }, [user]);
 
   // 장소 목록 가져오기
   useEffect(() => {
@@ -196,6 +255,7 @@ const MapPage = () => {
             "Content-Type": "application/json;charset=UTF-8",
             ...(token && { Authorization: `Bearer ${token}` }),
           },
+          credentials: 'include',
         });
         
         if (response.ok) {
@@ -491,6 +551,107 @@ const MapPage = () => {
     }
   };
 
+  // 북마크 토글 함수
+  const toggleBookmark = async (retryCount = 0) => {
+    // 로그인 체크
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    if (!selectedLocationId) {
+      return;
+    }
+
+    // 현재 상태 저장 (실패 시 복구용)
+    const previousState = selectedPlace?.bookmarked || false;
+    
+    // 낙관적 업데이트 (UI 먼저 변경)
+    setSelectedPlace(prev => ({
+      ...prev,
+      bookmarked: !prev?.bookmarked
+    }));
+
+    try {
+      // refreshToken 가져오기
+      const token = localStorage.getItem('refreshToken');
+      
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        setSelectedPlace(prev => ({
+          ...prev,
+          bookmarked: previousState
+        }));
+        return;
+      }
+
+      const url = API_ENDPOINTS.LOCATION_BOOKMARK(selectedLocationId);
+
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${token}`,
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API 오류 응답:', errorText);
+      }
+
+      if (response.status === 401 && retryCount === 0) {
+        // 401 에러 발생 시 토큰 재발급 시도
+        const newToken = await refreshAuthToken();
+        
+        if (newToken) {
+          // 토큰 재발급 성공 시 다시 시도
+          return toggleBookmark(1);
+        } else {
+          // 토큰 재발급 실패
+          alert("로그인이 필요합니다.");
+          setSelectedPlace(prev => ({
+            ...prev,
+            bookmarked: previousState
+          }));
+          return;
+        }
+      }
+
+      if (!response.ok) {
+        setSelectedPlace(prev => ({
+          ...prev,
+          bookmarked: previousState
+        }));
+        return;
+      }
+
+      const result = await response.json();
+      
+      // API 응답의 bookmarked 값으로 상태 동기화
+      if (result.error === false && result.data) {
+        const newBookmarkedState = result.data.bookmarked;
+        
+        setSelectedPlace(prev => ({
+          ...prev,
+          bookmarked: newBookmarkedState
+        }));
+      } else {
+        setSelectedPlace(prev => ({
+          ...prev,
+          bookmarked: previousState
+        }));
+      }
+    } catch (error) {
+      console.error('Location bookmark error:', error);
+      setSelectedPlace(prev => ({
+        ...prev,
+        bookmarked: previousState
+      }));
+    }
+  };
+
   return (
     <>
       <div className={styles.container} onClick={handleContainerClick}>
@@ -635,9 +796,13 @@ const MapPage = () => {
             <h3 className={styles.audioSummaryTitle}>오디오 요약</h3>
 
             <div className={styles.audioSummaryContent}>
-              경복궁은 조선 시대의 법궁으로, 1395년 태조 이성계가 창건한
-              서울의 대표적인 궁궐이다. 근정전, 경회루 등 아름다운 건축물이
-              있으며, 한국 전통문화와 역사를 체험할 수 있는 관광 명소다.
+              {locationAudio && locationAudio.script ? (
+                locationAudio.script
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#666', fontSize: '15px', fontWeight: 700 }}>
+                  오디오 요약이 없습니다.
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -721,9 +886,12 @@ const MapPage = () => {
         searchResults={searchResults}
         bottomSheetState={bottomSheetState}
         setBottomSheetState={setBottomSheetState}
+        placeId={selectedLocationId}
+        onBookmarkToggle={toggleBookmark}
       />
     </>
   );
 };
 
 export default MapPage;
+
