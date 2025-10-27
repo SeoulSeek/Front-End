@@ -59,6 +59,9 @@ const MyPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  // 닉네임 길이 체크 (10자 이상이면 작은 크기 적용)
+  const isVeryLongNickname = name && name.length >= 10;
+
   // 사용자 정보가 변경될 때 로컬 상태 업데이트
   useEffect(() => {
     if (user) {
@@ -261,6 +264,16 @@ const MyPage = () => {
 
   const handleEditClick = async () => {
     if (isEditing) {
+      // 닉네임 길이 체크
+      const trimmedName = tempName.trim();
+      const nameToUse = trimmedName || name;
+      
+      // 닉네임이 20자를 초과하면 alert 표시하고 API 호출 중단
+      if (nameToUse.length > 20) {
+        alert('닉네임은 20자 이내로 작성해 주세요.');
+        return;
+      }
+      
       try {
         console.log('=== MyPage handleEditClick 시작 ===');
         console.log('현재 사용자:', user);
@@ -271,7 +284,7 @@ const MyPage = () => {
         console.log('변환된 언어(API):', apiLanguages);
         
         const profileData = {
-          name: tempName.trim() || name,
+          name: nameToUse,
           file: tempProfileFile || savedProfile, // 새 파일 객체 또는 기존 URL
           languages: apiLanguages
         };
@@ -287,7 +300,7 @@ const MyPage = () => {
         
         if (result.success) {
           // 성공 시 로컬 상태 업데이트
-          setName(tempName.trim() || name);
+          setName(nameToUse);
           setSavedProfile(tempProfile);
           setTempProfileFile(null); // 파일 객체 초기화
           setIsEditing(false);
@@ -420,7 +433,7 @@ const MyPage = () => {
                 placeholder="닉네임을 입력해 주세요"
               />
             ) : (
-              <span>
+              <span className={isVeryLongNickname ? styles.myNameSmall : ''}>
                 <span className={styles.blue}>{name || "사용자"}</span>님의 역사 탐험록
               </span>
             )}

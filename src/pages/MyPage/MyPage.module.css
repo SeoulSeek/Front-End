@@ -76,6 +76,11 @@
   align-self: stretch;
 }
 
+/* 아주 긴 닉네임(10자 이상)일 때 작은 크기 */
+.myNameSmall {
+  font-size: 16px;
+}
+
 .myLang {
   display: flex;
   height: 30px;
