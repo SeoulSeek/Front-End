@@ -69,12 +69,12 @@ const Places = () => {
 
         console.log(
           `[방명록페이지] 요청 URL: ${
-            API_ENDPOINTS.REVIEW_LIST
+            API_ENDPOINTS.REVIEWS
           }?${params.toString()}`
         );
 
         const response = await fetch(
-          `${API_ENDPOINTS.REVIEW_LIST}?${params.toString()}`,
+          `${API_ENDPOINTS.REVIEWS}?${params.toString()}`,
           {
             headers: headers,
             credentials: "include",
@@ -181,9 +181,11 @@ const Places = () => {
       </div>
 
       {auth.user && (
-        <button onClick={handleCreatePost} className={$.postCreateBtn}>
-          <AiOutlineEdit /> 작성
-        </button>
+        <div className={$.postCreateBtnWrap}>
+          <button onClick={handleCreatePost} className={$.postCreateBtn}>
+            <AiOutlineEdit /> 작성
+          </button>
+        </div>
       )}
 
       {!isDesktop && (

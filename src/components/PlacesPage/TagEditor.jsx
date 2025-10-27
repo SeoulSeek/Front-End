@@ -1,32 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 
 import $ from "./../../pages/PlacesPage/PostPlacePage2.module.css";
-import dummyPlaces from "../../data/dummyPlaces";
 import PlaceSearchBar from "../../components/Input/PlaceSearchBar";
 import HashTag from "../../components/global/HashTag/HashTag";
+import { API_ENDPOINTS } from "../../config/api";
 
 const TagEditor = ({
   onTagsChange,
   initialTerritory = null,
   initialLocationName = null,
+  initialLocationId = null,
   initialKeywords = [],
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showPlaceList, setShowPlaceList] = useState(false);
+  const [allLocations, setAllLocations] = useState([]);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(
-    initialTerritory && initialLocationName
-      ? { district: initialTerritory, title: initialLocationName } // 초기 장소 객체 생성
+    initialLocationId && initialLocationName && initialTerritory
+      ? {
+          tid: initialLocationId,
+          name: initialLocationName,
+          territory: initialTerritory,
+        }
       : null
   );
   const [customKeyword, setCustomKeyword] = useState("");
   const [customHashtags, setCustomHashtags] = useState(initialKeywords);
 
   useEffect(() => {
-    const placeTags = selectedPlace
-      ? [selectedPlace.district, selectedPlace.title]
-      : [];
-    onTagsChange([...placeTags, ...customHashtags]);
+    const fetchLocations = async () => {
+      setIsLoadingLocations(true);
+      try {
+        const response = await fetch(API_ENDPOINTS.LOCATION_LIST); // LOCATION_LIST 엔드포인트 사용
+        if (!response.ok) throw new Error("장소 목록 로딩 실패");
+        const result = await response.json();
+        setAllLocations(result.data || []);
+      } catch (error) {
+        console.error("장소 목록 로딩 중 에러:", error);
+      } finally {
+        setIsLoadingLocations(false);
+      }
+    };
+    fetchLocations();
+  }, []);
+
+  useEffect(() => {
+    // 선택된 장소의 ID와 키워드 태그 목록을 객체로 전달
+    onTagsChange({
+      locationId: selectedPlace?.tid || null, // 장소 ID 전달
+      keywords: customHashtags,
+    });
   }, [selectedPlace, customHashtags, onTagsChange]);
 
   const handlePlaceSelect = (place) => {
@@ -43,15 +68,33 @@ const TagEditor = ({
         !customHashtags.includes(newTag) &&
         customHashtags.length < 10
       ) {
-        setCustomHashtags([...customHashtags, newTag]);
+        const updatedKeywords = [...customHashtags, newTag];
+        setCustomHashtags(updatedKeywords);
         setCustomKeyword("");
+        // 키워드 추가 시 부모에게 알림
+        const placeTags = selectedPlace
+          ? [selectedPlace.district, selectedPlace.title]
+          : [];
+        onTagsChange([...placeTags, ...updatedKeywords]);
       }
     }
   };
 
   const removeCustomTag = (indexToRemove) => {
-    setCustomHashtags((prev) => prev.filter((_, i) => i !== indexToRemove));
+    const updatedKeywords = customHashtags.filter(
+      (_, i) => i !== indexToRemove
+    );
+    setCustomHashtags(updatedKeywords);
   };
+
+  const filteredLocations = useMemo(() => {
+    if (!searchQuery) return allLocations;
+    return allLocations.filter(
+      (loc) =>
+        loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        loc.territory.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, allLocations]);
 
   return (
     <section>
@@ -61,8 +104,8 @@ const TagEditor = ({
         <div className={$.placeSelector}>
           {selectedPlace ? (
             <>
-              <HashTag text={selectedPlace.district} color="#91C6FF" />
-              <HashTag text={selectedPlace.title} color="#968C6E" />
+              <HashTag text={selectedPlace.territory} color="#91C6FF" />
+              <HashTag text={selectedPlace.name} color="#968C6E" />
             </>
           ) : (
             ""
@@ -82,7 +125,7 @@ const TagEditor = ({
         <div className={$.keywordAdd}>
           {customHashtags.map((tag, index) => (
             <div
-              key={index}
+              key={tag}
               className={$.customTagWrap}
               onClick={() => removeCustomTag(index)}
             >
@@ -114,29 +157,27 @@ const TagEditor = ({
               />{" "}
             </div>
             <div className={$.resultInfo}>
-              {searchQuery ? `‘${searchQuery}’ 검색결과` : "장소 목록"}
+              {isLoadingLocations
+                ? "불러오는 중..."
+                : searchQuery
+                ? `‘${searchQuery}’ 검색결과`
+                : "장소 목록"}
             </div>
             <ul className={$.placeList}>
-              {dummyPlaces
-                .filter(
-                  (p) =>
-                    p.title.includes(searchQuery) ||
-                    p.district.includes(searchQuery)
-                )
-                .map((place) => (
-                  <li
-                    key={place.id}
-                    className={$.placeItem}
-                    onClick={() => handlePlaceSelect(place)}
-                  >
-                    <p className={$.placeItemTitle}>{place.title}</p>
-                    <div className={$.placeItemTags}>
-                      {" "}
-                      <HashTag text={place.district} color="#91C6FF" />{" "}
-                      <HashTag text={place.title} color="#968C6E" />{" "}
-                    </div>
-                  </li>
-                ))}
+              {filteredLocations.map((location) => (
+                <li
+                  key={location.tid}
+                  className={$.placeItem}
+                  onClick={() => handlePlaceSelect(location)}
+                >
+                  <p className={$.placeItemTitle}>{location.name}</p>
+                  <div className={$.placeItemTags}>
+                    {" "}
+                    <HashTag text={location.territory} color="#91C6FF" />{" "}
+                    <HashTag text={location.name} color="#968C6E" />{" "}
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
