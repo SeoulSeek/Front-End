@@ -10,6 +10,10 @@ import {
 } from "react-icons/ai";
 import { useAuth } from "../../contexts/AuthContext";
 import { mapLanguageToUI } from "../../hooks/auth";
+import CoursesBox from "../../components/CoursesBox/CoursesBox";
+import { API_ENDPOINTS } from "../../config/api";
+import PlaceCard from "../../components/PlaceCard/PlaceCard";
+import Pagination from "../../components/PlacesPage/Pagination";
 
 const LANGUAGES = ["한국어", "English", "中國語", "日本語"];
 
@@ -31,7 +35,7 @@ const mapUILanguagesToAPI = (uiLanguages) => {
 };
 
 const MyPage = () => {
-  const { user, isLoading, updateProfile } = useAuth();
+  const { user, isLoading, updateProfile, refreshAuthToken } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("places");
   const [isPublic, setIsPublic] = useState(false);
@@ -46,6 +50,17 @@ const MyPage = () => {
   const fileInputRef = useRef(null);
 
   const [selectedLangs, setSelectedLangs] = useState([]);
+  
+  const [scrapCourses, setScrapCourses] = useState([]);
+  const [isLoadingScrap, setIsLoadingScrap] = useState(false);
+  
+  const [bookmarkedPlaces, setBookmarkedPlaces] = useState([]);
+  const [isLoadingBookmarks, setIsLoadingBookmarks] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // 닉네임 길이 체크 (10자 이상이면 작은 크기 적용)
+  const isVeryLongNickname = name && name.length >= 10;
 
   // 사용자 정보가 변경될 때 로컬 상태 업데이트
   useEffect(() => {
@@ -69,8 +84,196 @@ const MyPage = () => {
     }
   }, [user]);
 
+  // 스크랩한 코스 목록 가져오기
+  useEffect(() => {
+    const fetchScrapCourses = async () => {
+      if (!user) {
+        return;
+      }
+
+      try {
+        setIsLoadingScrap(true);
+        const token = localStorage.getItem('refreshToken');
+        
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch(API_ENDPOINTS.COURSE_SCRAP_LIST, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': `Bearer ${token}`,
+          },
+          credentials: 'include',
+        });
+
+        if (response.status === 401) {
+          // 토큰 재발급 시도
+          const newToken = await refreshAuthToken();
+          if (newToken) {
+            const retryResponse = await fetch(API_ENDPOINTS.COURSE_SCRAP_LIST, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${newToken}`,
+              },
+              credentials: 'include',
+            });
+            
+            if (retryResponse.ok) {
+              const result = await retryResponse.json();
+              if (result.error === false && result.data) {
+                setScrapCourses(result.data);
+              }
+            }
+          }
+          return;
+        }
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.error === false && result.data) {
+            setScrapCourses(result.data);
+          }
+        }
+      } catch (error) {
+        console.error('스크랩 코스 목록 가져오기 실패:', error);
+      } finally {
+        setIsLoadingScrap(false);
+      }
+    };
+
+    fetchScrapCourses();
+  }, [user, refreshAuthToken]);
+
+  // 북마크한 장소 목록 가져오기
+  useEffect(() => {
+    const fetchBookmarkedPlaces = async () => {
+      if (!user || activeTab !== "places") {
+        return;
+      }
+
+      try {
+        setIsLoadingBookmarks(true);
+        const token = localStorage.getItem('refreshToken');
+        
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch(
+          `${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=${currentPage}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8',
+              'Authorization': `Bearer ${token}`,
+            },
+            credentials: 'include',
+          }
+        );
+
+        if (response.status === 401) {
+          // 토큰 재발급 시도
+          const newToken = await refreshAuthToken();
+          if (newToken) {
+            const retryResponse = await fetch(
+              `${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=${currentPage}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8',
+                  'Authorization': `Bearer ${newToken}`,
+                },
+                credentials: 'include',
+              }
+            );
+            
+            if (retryResponse.ok) {
+              const result = await retryResponse.json();
+              if (result.error === false && result.data) {
+                setBookmarkedPlaces(result.data);
+                // 페이지네이션: 첫 페이지일 때만 다음 페이지 확인
+                if (currentPage === 0 && result.data.length === 3) {
+                  // 다음 페이지 확인
+                  fetch(`${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=1`, {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json;charset=UTF-8',
+                      'Authorization': `Bearer ${newToken}`,
+                    },
+                    credentials: 'include',
+                  }).then(nextResponse => nextResponse.json())
+                    .then(nextResult => {
+                      if (nextResult.error === false && nextResult.data) {
+                        if (nextResult.data.length > 0) {
+                          setTotalPages(2);
+                        } else {
+                          setTotalPages(1);
+                        }
+                      }
+                    });
+                } else if (result.data.length < 3) {
+                  setTotalPages(currentPage + 1);
+                }
+              }
+            }
+          }
+          return;
+        }
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.error === false && result.data) {
+            setBookmarkedPlaces(result.data);
+            // 페이지네이션: 첫 페이지일 때만 다음 페이지 확인
+            if (currentPage === 0 && result.data.length === 3) {
+              // 다음 페이지 확인
+              fetch(`${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=1`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8',
+                  'Authorization': `Bearer ${token}`,
+                },
+                credentials: 'include',
+              }).then(nextResponse => nextResponse.json())
+                .then(nextResult => {
+                  if (nextResult.error === false && nextResult.data) {
+                    if (nextResult.data.length > 0) {
+                      setTotalPages(2);
+                    } else {
+                      setTotalPages(1);
+                    }
+                  }
+                });
+            } else if (result.data.length < 3) {
+              setTotalPages(currentPage + 1);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('북마크 장소 목록 가져오기 실패:', error);
+      } finally {
+        setIsLoadingBookmarks(false);
+      }
+    };
+
+    fetchBookmarkedPlaces();
+  }, [user, activeTab, currentPage, refreshAuthToken]);
+
   const handleEditClick = async () => {
     if (isEditing) {
+      // 닉네임 길이 체크
+      const trimmedName = tempName.trim();
+      const nameToUse = trimmedName || name;
+      
+      // 닉네임이 20자를 초과하면 alert 표시하고 API 호출 중단
+      if (nameToUse.length > 20) {
+        alert('닉네임은 20자 이내로 작성해 주세요.');
+        return;
+      }
+      
       try {
         console.log('=== MyPage handleEditClick 시작 ===');
         console.log('현재 사용자:', user);
@@ -81,7 +284,7 @@ const MyPage = () => {
         console.log('변환된 언어(API):', apiLanguages);
         
         const profileData = {
-          name: tempName.trim() || name,
+          name: nameToUse,
           file: tempProfileFile || savedProfile, // 새 파일 객체 또는 기존 URL
           languages: apiLanguages
         };
@@ -97,7 +300,7 @@ const MyPage = () => {
         
         if (result.success) {
           // 성공 시 로컬 상태 업데이트
-          setName(tempName.trim() || name);
+          setName(nameToUse);
           setSavedProfile(tempProfile);
           setTempProfileFile(null); // 파일 객체 초기화
           setIsEditing(false);
@@ -230,7 +433,7 @@ const MyPage = () => {
                 placeholder="닉네임을 입력해 주세요"
               />
             ) : (
-              <span>
+              <span className={isVeryLongNickname ? styles.myNameSmall : ''}>
                 <span className={styles.blue}>{name || "사용자"}</span>님의 역사 탐험록
               </span>
             )}
@@ -323,9 +526,49 @@ const MyPage = () => {
       <div className={styles.listContainer}>
         {activeTab === "places" && (
           <div className={styles.placesList}>
-            <span className={styles.emptyText}>
-              지도에서 다양한 서울을 경험해 보세요!
-            </span>
+            {isLoadingBookmarks ? (
+              <span className={styles.emptyText}>로딩 중...</span>
+            ) : (
+              <>
+                {bookmarkedPlaces.length > 0 ? (
+                  <div className={styles.bookmarkedPlacesContainer}>
+                    {bookmarkedPlaces.map((place) => (
+                      <PlaceCard
+                        key={place.id}
+                        id={place.id}
+                        placeName={place.name}
+                        imageUrl={place.file}
+                        hideDistance={true}
+                        variant="light"
+                        initialBookmarked={true}
+                        onBookmarkChange={(placeId, isBookmarked) => {
+                          if (!isBookmarked) {
+                            // 북마크 해제 시 리스트에서 제거
+                            setBookmarkedPlaces(prev => prev.filter(p => p.id !== placeId));
+                            // 현재 페이지에 데이터가 없으면 이전 페이지로 이동
+                            const filtered = bookmarkedPlaces.filter(p => p.id !== placeId);
+                            if (filtered.length === 0 && currentPage > 0) {
+                              setCurrentPage(currentPage - 1);
+                            }
+                          }
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : currentPage === 0 ? (
+                  <span className={styles.emptyText}>
+                    지도에서 다양한 서울을 경험해 보세요!
+                  </span>
+                ) : null}
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage + 1}
+                    totalPages={totalPages}
+                    onPageClick={(page) => setCurrentPage(page - 1)}
+                  />
+                )}
+              </>
+            )}
           </div>
         )}
 
@@ -339,9 +582,34 @@ const MyPage = () => {
 
         <span className={styles.listTitle}>스크랩한 관광코스</span>
         <div className={styles.scrapList}>
-          <span className={styles.emptyText}>
-            스크랩한 관광코스가 없습니다.
-          </span>
+          {isLoadingScrap ? (
+            <span className={styles.emptyText}>로딩 중...</span>
+          ) : scrapCourses.length > 0 ? (
+            scrapCourses.map((course) => (
+              <CoursesBox
+                key={course.id}
+                id={course.id}
+                title={course.title}
+                content={course.content}
+                image={course.imageUrl}
+                scrapped={course.scrapped}
+                totalLocations={course.totalLocations}
+                landmarkTourElements={course.landmarkTourElements}
+                specialTourElements={course.specialTourElements}
+                missionTourElements={course.missionTourElements}
+                onScrapChange={(courseId, isScrapped) => {
+                  if (!isScrapped) {
+                    // 스크랩 해제 시 리스트에서 제거
+                    setScrapCourses(prev => prev.filter(c => c.id !== courseId));
+                  }
+                }}
+              />
+            ))
+          ) : (
+            <span className={styles.emptyText}>
+              스크랩한 관광코스가 없습니다.
+            </span>
+          )}
         </div>
 
         <span className={styles.listTitle}>좋아요를 누른 방명록</span>

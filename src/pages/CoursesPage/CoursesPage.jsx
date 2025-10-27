@@ -3,41 +3,66 @@ import styles from "./CoursesPage.module.css";
 import CoursesBox from "../../components/CoursesBox/CoursesBox";
 import SortMenu from "../../components/global/SortMenu/SortMenu";
 import { API_ENDPOINTS } from "../../config/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [sortType, setSortType] = useState("recent");
+  const { user } = useAuth();
+
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      
+      // 인증 헤더 준비
+      const headers = {
+        'Content-Type': 'application/json;charset=UTF-8',
+      };
+      
+      const token = localStorage.getItem('refreshToken');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch(`${API_ENDPOINTS.COURSES}?sort=${sortType}`, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch courses");
+      }
+      
+      const result = await response.json();
+      
+      if (result.error) {
+        throw new Error("API returned an error");
+      }
+      
+      const coursesData = result.data || [];
+      setCourses(coursesData);
+    } catch (err) {
+      console.error("Error fetching courses:", err);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setLoading(true);
-        setError(false);
-        const response = await fetch(`${API_ENDPOINTS.COURSES}?sort=${sortType}`);
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch courses");
-        }
-        
-        const result = await response.json();
-        
-        if (result.error) {
-          throw new Error("API returned an error");
-        }
-        
-        setCourses(result.data || []);
-      } catch (err) {
-        console.error("Error fetching courses:", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCourses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortType]);
+
+  const handleScrapChange = () => {
+    // 스크랩 상태가 변경되면 다시 데이터를 가져옴
+    fetchCourses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  };
 
   const handleSortChange = (newSortType) => {
     setSortType(newSortType);
@@ -62,6 +87,7 @@ const CoursesPage = () => {
             landmarkTourElements={course.landmarkTourElements}
             specialTourElements={course.specialTourElements}
             missionTourElements={course.missionTourElements}
+            onScrapChange={handleScrapChange}
           />
         ))}
       </div>

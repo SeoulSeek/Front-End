@@ -4,6 +4,7 @@ import { BiLinkAlt } from "react-icons/bi";
 import styles from "./BottomSheet.module.css";
 import PlaceCard from "../PlaceCard/PlaceCard";
 import sampleImage from "../../assets/LoginPage/sample1.jpg";
+import { useAuth } from "../../contexts/AuthContext";
 
 const BottomSheet = ({ 
   placeData, 
@@ -13,10 +14,13 @@ const BottomSheet = ({
   searchQuery = "",
   searchResults = [],
   bottomSheetState,
-  setBottomSheetState
+  setBottomSheetState,
+  placeId,
+  onBookmarkToggle
 }) => {
+  const { user } = useAuth();
   const [sheetState, setSheetState] = useState("peek"); // 'peek', 'half', 'full'
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(placeData?.bookmarked || false);
   const [startY, setStartY] = useState(0);
   const [currentY, setCurrentY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -166,9 +170,26 @@ const BottomSheet = ({
     };
   }, [isDragging, currentY]);
 
+  // placeData가 변경될 때 북마크 상태도 업데이트
+  useEffect(() => {
+    if (placeData?.bookmarked !== undefined) {
+      setIsSaved(placeData.bookmarked);
+    }
+  }, [placeData?.bookmarked]);
+
   const handleSaveClick = (e) => {
     e.stopPropagation();
-    setIsSaved(!isSaved);
+    
+    // 로그인 체크
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    
+    // 북마크 토글 함수 호출
+    if (onBookmarkToggle) {
+      onBookmarkToggle();
+    }
   };
 
   const handleCopyAddress = async () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CoursesBox.module.css";
 import dummy1 from "../../assets/HomePage/dummy1.jpg";
@@ -16,15 +16,20 @@ const CoursesBox = ({
   totalLocations = 0,
   landmarkTourElements = 0,
   specialTourElements = 0,
-  missionTourElements = 0
+  missionTourElements = 0,
+  onScrapChange
 }) => {
   const [isStarFilled, setIsStarFilled] = useState(scrapped);
+  const hasInitialized = useRef(false);
   const navigate = useNavigate();
   const { user, refreshAuthToken } = useAuth();
 
-  // scrapped prop이 변경될 때 상태 업데이트
+  // 첫 마운트 시에만 초기 상태 설정
   useEffect(() => {
-    setIsStarFilled(scrapped);
+    if (!hasInitialized.current) {
+      setIsStarFilled(scrapped);
+      hasInitialized.current = true;
+    }
   }, [scrapped]);
 
   const toggleStarIcon = async (retryCount = 0) => {
@@ -50,7 +55,9 @@ const CoursesBox = ({
         return;
       }
 
-      const response = await fetch(API_ENDPOINTS.COURSE_SCRAP(id), {
+      const url = API_ENDPOINTS.COURSE_SCRAP(id);
+
+      const response = await fetch(url, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
@@ -84,7 +91,12 @@ const CoursesBox = ({
       
       // API 응답의 scrapped 값으로 상태 동기화
       if (result.error === false && result.data) {
-        setIsStarFilled(result.data.scrapped);
+        const newScrappedState = result.data.scrapped;
+        setIsStarFilled(newScrappedState);
+        // 부모 컴포넌트에 변경사항 알림 (북마크 해제된 경우에만)
+        if (onScrapChange) {
+          onScrapChange(id, newScrappedState);
+        }
       } else {
         // 에러 응답 시 원래 상태로 복구
         setIsStarFilled(previousState);
