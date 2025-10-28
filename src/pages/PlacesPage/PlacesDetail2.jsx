@@ -69,7 +69,7 @@ const PlaceDetail = () => {
         setPost(result.data);
         // API 응답에 현재 유저의 좋아요 여부(ex: isLiked)가 포함되있어야함.
         // 일단은 false로 초기화
-        setLikeCount(result.data.like);
+        setLikeCount(result.data.like || 0);
         setIsLiked(result.data.isLiked || false);
         setComments(result.data.commentList || []); // 댓글 상태 설정
       } catch (err) {
@@ -99,7 +99,30 @@ const PlaceDetail = () => {
     const originalLikeCount = likeCount;
     setIsLiked(!isLiked);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
-    // try {} api 요청 -> 실패시 ui 원복
+
+    try {
+      const token = localStorage.getItem("refreshToken");
+      if (!token) throw new Error("로그인이 필요합니다.");
+      const headers = { Authorization: `Bearer ${token}` };
+      const response = await fetch(`${API_ENDPOINTS.REVIEWS_AUTH}/${id}/like`, {
+        method: "PATCH",
+        headers: headers,
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error(`좋아요 처리 실패: (${response.status})`);
+      }
+
+      const result = await response.json();
+      console.log("[좋아요] API 응답:", result);
+      // 흠
+    } catch (error) {
+      console.error("[좋아요] 에러:", error);
+      alert(error.message);
+      setIsLiked(originalLiked);
+      setLikeCount(originalLikeCount);
+    }
   };
 
   const handleEdit = () => {
@@ -119,7 +142,7 @@ const PlaceDetail = () => {
 
         console.log(`[상세페이지] 삭제 방명록 ID: ${id}`);
 
-        const response = await fetch(`${API_ENDPOINTS.REVIEWS}/${id}`, {
+        const response = await fetch(`${API_ENDPOINTS.REVIEWS_AUTH}/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -165,12 +188,15 @@ const PlaceDetail = () => {
         Authorization: `Beare ${token}`,
       };
 
-      const response = await fetch(`${API_ENDPOINTS.REVIEWS}/${id}/comment`, {
-        method: "POST",
-        headers: headers,
-        credentials: "include",
-        body: JSON.stringify({ content: commentContent }),
-      });
+      const response = await fetch(
+        `${API_ENDPOINTS.REVIEWS_AUTH}/${id}/comment`,
+        {
+          method: "POST",
+          headers: headers,
+          credentials: "include",
+          body: JSON.stringify({ content: commentContent }),
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -333,7 +359,7 @@ const PlaceDetail = () => {
           <div className={$.postUserWrap}>
             <div className={$.miniProfile} onClick={handleProfileClick}>
               <img
-                src={defaultProfileImg}
+                src={post.userFileURL || defaultProfileImg}
                 alt={`${post.username} profile`}
                 className={$.profileImage}
               />
