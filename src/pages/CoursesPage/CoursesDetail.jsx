@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./CoursesDetail.module.css";
 import { 
@@ -21,6 +21,7 @@ const CoursesDetail = () => {
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isScrapped, setIsScrapped] = useState(false);
+  const hasInitialized = useRef(false);
   const [expanded, setExpanded] = useState({
     landmark: false,
     special: false,
@@ -41,7 +42,22 @@ const CoursesDetail = () => {
     const fetchCourseDetail = async () => {
       try {
         setLoading(true);
-        const response = await fetch(API_ENDPOINTS.COURSE_DETAIL(id));
+        
+        // 인증 헤더 준비
+        const headers = {
+          'Content-Type': 'application/json;charset=UTF-8',
+        };
+        
+        const token = localStorage.getItem('refreshToken');
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(API_ENDPOINTS.COURSE_DETAIL(id), {
+          method: 'GET',
+          headers,
+          credentials: 'include',
+        });
         
         if (!response.ok) {
           throw new Error("Failed to fetch course detail");
@@ -54,7 +70,11 @@ const CoursesDetail = () => {
         }
         
         setCourseData(result.data);
-        setIsScrapped(result.data.scrapped || false);
+        if (!hasInitialized.current) {
+          const scrappedValue = result.data.scrapped || false;
+          setIsScrapped(scrappedValue);
+          hasInitialized.current = true;
+        }
       } catch (err) {
         console.error("Error fetching course detail:", err);
         alert("다시 시도해 주시기 바랍니다.");
@@ -96,7 +116,9 @@ const CoursesDetail = () => {
         return;
       }
 
-      const response = await fetch(API_ENDPOINTS.COURSE_SCRAP(id), {
+      const url = API_ENDPOINTS.COURSE_SCRAP(id);
+
+      const response = await fetch(url, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
@@ -129,7 +151,8 @@ const CoursesDetail = () => {
       
       // API 응답의 scrapped 값으로 상태 동기화
       if (result.error === false && result.data) {
-        setIsScrapped(result.data.scrapped);
+        const newScrappedState = result.data.scrapped;
+        setIsScrapped(newScrappedState);
       } else {
         setIsScrapped(previousState);
       }

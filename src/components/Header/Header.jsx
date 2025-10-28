@@ -33,6 +33,11 @@ const Header = ({ onMenuClick, onLogoClick }) => {
     setShowLogoutModal(false);
   };
 
+  // 닉네임 길이 체크
+  const nicknameLength = user?.name ? user.name.length : 0;
+  const isLongNickname = nicknameLength >= 6;
+  const isVeryLongNickname = nicknameLength >= 10;
+
   // 모바일 버전
   if (!isDesktop) {
     return (
@@ -66,11 +71,11 @@ const Header = ({ onMenuClick, onLogoClick }) => {
             마이페이지
           </Link>
           <div 
-            className={styles.profileItem} 
+            className={`${styles.profileItem} ${isLongNickname ? styles.profileItemSmall : ''} ${isVeryLongNickname ? styles.profileItemVerySmall : ''}`} 
             onClick={handleProfileClick}
           >
-            <FaRegUserCircle className={styles.profileIcon} />
-            <span className={styles.profileText}>
+            <FaRegUserCircle className={`${styles.profileIcon} ${isLongNickname ? styles.profileIconSmall : ''} ${isVeryLongNickname ? styles.profileIconVerySmall : ''}`} />
+            <span className={`${styles.profileText} ${isLongNickname ? styles.profileTextSmall : ''} ${isVeryLongNickname ? styles.profileTextVerySmall : ''}`}>
               {isLoading ? (
                 '로딩 중...'
               ) : user ? (
