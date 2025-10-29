@@ -5,11 +5,12 @@ import styles from "./BottomSheet.module.css";
 import PlaceCard from "../PlaceCard/PlaceCard";
 import sampleImage from "../../assets/LoginPage/sample1.jpg";
 import { useAuth } from "../../contexts/AuthContext";
+import Loading from "../Loading/Loading";
 
 const BottomSheet = ({ 
   placeData, 
   isOpen, 
-  onClose, 
+  onClose,
   isSearchMode = false,
   searchQuery = "",
   searchResults = [],
@@ -17,7 +18,8 @@ const BottomSheet = ({
   setBottomSheetState,
   placeId,
   onBookmarkToggle,
-  onSearchResultClick
+  onSearchResultClick,
+  isLoading = false
 }) => {
   const { user } = useAuth();
   const [sheetState, setSheetState] = useState("peek"); // 'peek', 'half', 'full'
@@ -227,7 +229,7 @@ const BottomSheet = ({
     }
   };
 
-  if (!placeData && !isSearchMode) return null;
+  if (!placeData && !isSearchMode && !isLoading) return null;
 
   return (
     <>
@@ -253,8 +255,13 @@ const BottomSheet = ({
           <div className={styles.dragBar}></div>
         </div>
 
-        {/* 검색 모드 */}
-        {isSearchMode ? (
+        {/* 로딩 중 */}
+        {isLoading ? (
+          <div className={styles.loadingContainer}>
+            <Loading />
+          </div>
+        ) : isSearchMode ? (
+          /* 검색 모드 */
           <>
             <div className={styles.searchResultTitle}>
               '{searchQuery}' 검색결과
