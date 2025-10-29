@@ -82,8 +82,19 @@ const MapPage = () => {
 
         const token = localStorage.getItem("refreshToken");
 
+        // 연관 장소, 텍스트 설명, 오디오를 병렬로 가져오기 (에러가 발생해도 조용히 처리)
+        const silentFetch = async (url, options) => {
+          try {
+            const response = await fetch(url, options);
+            return response;
+          } catch (error) {
+            // 네트워크 에러는 조용히 처리 (콘솔에 출력하지 않음)
+            return { ok: false, status: 0 };
+          }
+        };
+
         // 장소 상세 정보를 먼저 가져오기
-        const detailResponse = await fetch(
+        const detailResponse = await silentFetch(
           API_ENDPOINTS.LOCATION_DETAIL(locationId),
           {
             method: "GET",
@@ -94,20 +105,6 @@ const MapPage = () => {
             credentials: "include",
           }
         );
-
-        // 연관 장소, 텍스트 설명, 오디오를 병렬로 가져오기 (에러가 발생해도 조용히 처리)
-        const silentFetch = async (url, options) => {
-          try {
-            const response = await fetch(url, options);
-            // 404 에러를 조용히 처리
-            if (!response.ok && response.status === 404) {
-              return { ok: false, status: 404 };
-            }
-            return response;
-          } catch {
-            return { ok: false };
-          }
-        };
 
         const [relatedResponse, textResponse, audioResponse] =
           await Promise.allSettled([
@@ -171,9 +168,8 @@ const MapPage = () => {
               mapInstance.current.setCenter(moveLatLng);
             }
           }
-        } else {
-          console.error("장소 상세 정보 응답 실패");
         }
+        // 응답이 실패해도 조용히 처리 (콘솔 에러 출력하지 않음)
 
         // 연관 장소 처리 (정보가 없어도 에러로 처리하지 않음)
         if (
@@ -238,8 +234,7 @@ const MapPage = () => {
         // 로딩 완료
         setIsLoadingPlace(false);
       } catch (error) {
-        console.error("장소 정보를 가져오는데 실패했습니다:", error);
-        // 에러 발생 시에도 로딩 종료
+        // 에러 발생 시에도 조용히 처리하고 로딩 종료
         setIsLoadingPlace(false);
       }
     },
@@ -268,13 +263,12 @@ const MapPage = () => {
               setLocations(result.data);
             }
           } catch (parseError) {
-            console.error("JSON 파싱 실패:", parseError);
+            // JSON 파싱 실패 시 조용히 처리
           }
-        } else {
-          console.error("장소 목록 API 응답 실패:", response.status);
         }
+        // 응답 실패 시 조용히 처리
       } catch (error) {
-        console.error("장소 목록을 가져오는데 실패했습니다:", error);
+        // 에러 발생 시 조용히 처리
       }
     };
 
@@ -290,8 +284,7 @@ const MapPage = () => {
           setUserLocation({ lat: latitude, lng: longitude });
         },
         (error) => {
-          console.error("위치 정보를 가져올 수 없습니다:", error);
-          // 위치 정보를 가져올 수 없을 때 서울 시청 좌표 사용
+          // 위치 정보를 가져올 수 없을 때 서울 시청 좌표 사용 (조용히 처리)
           setUserLocation({ lat: 37.5665, lng: 126.978 });
         }
       );
@@ -476,7 +469,7 @@ const MapPage = () => {
         // 오디오 재생
         if (audioRef.current) {
           audioRef.current.play().catch(error => {
-            console.error("오디오 재생 실패:", error);
+            // 오디오 재생 실패 시 조용히 처리
             setIsAudioPlaying(false);
           });
         }
@@ -583,7 +576,7 @@ const MapPage = () => {
         setIsAudioPlaying(false);
       } else {
         audioRef.current.play().catch(error => {
-          console.error("오디오 재생 실패:", error);
+          // 오디오 재생 실패 시 조용히 처리
           setIsAudioPlaying(false);
         });
         setIsAudioPlaying(true);
@@ -648,11 +641,11 @@ const MapPage = () => {
             setSearchResults([]);
           }
         } else {
-          console.error("검색 API 응답 실패:", response.status);
+          // 검색 API 응답 실패 시 조용히 처리
           setSearchResults([]);
         }
       } catch (error) {
-        console.error("검색 중 오류 발생:", error);
+        // 검색 중 오류 발생 시 조용히 처리
         setSearchResults([]);
       }
     }
@@ -715,10 +708,7 @@ const MapPage = () => {
         credentials: "include",
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API 오류 응답:", errorText);
-      }
+      // 응답 에러는 조용히 처리
 
       if (response.status === 401 && retryCount === 0) {
         // 401 에러 발생 시 토큰 재발급 시도
@@ -763,7 +753,7 @@ const MapPage = () => {
         }));
       }
     } catch (error) {
-      console.error("Location bookmark error:", error);
+      // 북마크 에러 발생 시 조용히 처리하고 상태 복구
       setSelectedPlace((prev) => ({
         ...prev,
         bookmarked: previousState,

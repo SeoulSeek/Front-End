@@ -274,3 +274,13 @@
   display: none;
 }
 
+/* 데스크탑 모드 (768px 이상) */
+@media (min-width: 768px) {
+  .bottomSheet {
+    left: 50%;
+    right: auto;
+    width: 390px;
+    transform: translateX(-50%);
+  }
+}
+
