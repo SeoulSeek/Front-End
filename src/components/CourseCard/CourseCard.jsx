@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./CourseCard.module.css";
 import sampleHistory from "../../assets/CoursesPage/sample_history.jpg";
 import sampleSpecial from "../../assets/CoursesPage/sample_special.png";
@@ -8,6 +9,7 @@ import { AiOutlineQuestionCircle, AiOutlineDollar } from "react-icons/ai";
 import { CgSandClock } from "react-icons/cg";
 
 const CourseCard = ({ 
+  id,
   title, 
   description, 
   type, 
@@ -16,6 +18,7 @@ const CourseCard = ({
   runtime, 
   cost 
 }) => {
+  const navigate = useNavigate();
   const [showOverlay, setShowOverlay] = useState(false);
 
   // type에 따라 이미지 선택 (image prop이 있으면 우선 사용)
@@ -48,6 +51,16 @@ const CourseCard = ({
     }
   };
 
+  const handleMapButtonClick = (e) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    console.log('Map button clicked, id:', id);
+    if (id) {
+      navigate(`/map/${id}?state=full`);
+    } else {
+      console.warn('Location id is missing');
+    }
+  };
+
   return (
     <div className={styles.cardContainer}>
       <div className={styles.titleArea} onClick={handleTextAreaClick}>
@@ -62,7 +75,12 @@ const CourseCard = ({
         />
         {showOverlay && (
           <div className={styles.overlay}>
-            <img src={mapButton} alt="지도 보기" className={styles.mapButton} />
+            <img 
+              src={mapButton} 
+              alt="지도 보기" 
+              className={styles.mapButton}
+              onClick={handleMapButtonClick}
+            />
           </div>
         )}
       </div>
