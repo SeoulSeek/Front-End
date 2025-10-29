@@ -1,35 +1,93 @@
+:root {
+  --splitter-width: 20px;
+  --splitter-border-color: #ccc;
+  --bubble-bg-color: rgba(0, 0, 0, 0.8);
+  --bubble-text-color: #fff;
+  --bubble-arrow-size: 8px;
+}
+
+.historyViewContainer {
+  position: relative; /* 나가기 버튼 absolute 기준 */
+  width: 100%;
+  height: 100vh; /* 화면 전체 높이 */
+  overflow: hidden;
+}
+.exitButtonWrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2010; /* 다른 요소 위에 */
+  display: flex; /* 버튼과 버블 정렬 위해 */
+  align-items: flex-start; /* 버블이 버튼 상단에 맞춰지도록 */
+}
+.exitButton {
+  background-color: inherit;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.exitButton:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+/* 메인 컨텐츠 영역 */
 .container {
   display: flex;
   width: 100%;
-  height: 764px;
+  height: 100%;
   position: relative;
-  overflow: hidden;
 }
 
+/* 왼쪽 영역 (로드뷰 + 시대 선택기) */
 .left {
   height: 100%;
-  background-color: #f0f0f0;
-  display: flex;
-  justify-content: center;
+  background-color: #eee; /* 로드뷰 로딩 중 배경 */
+  position: relative; /* 시대 선택기 absolute 기준 */
+  overflow: hidden; /* 내부 컨텐츠가 넘치지 않도록 */
+}
+
+/* 시대 선택기와 튜토리얼 래퍼 */
+.periodSelectorWrapper {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  z-index: 10; /* 로드뷰 위에 */
+  display: flex; /* 선택기와 버블 가로 배치 */
   align-items: center;
 }
 
+/* 로드뷰 컨테이너 */
 .roadview {
   width: 100%;
   height: 100%;
+  position: relative; /* 로딩/에러 메시지 absolute 기준 */
 }
 
+.splitterWrapper {
+  position: relative; /* 버블 absolute 기준 */
+  display: flex; /* 내부 스플리터 중앙 정렬 위해 (필요 시) */
+  align-items: center;
+}
 .splitter {
-  position: relative;
-  width: 30px;
-  border-left: 1px solid #000;
-  border-right: 1px solid #000;
-  background-color: #fff;
+  width: var(--splitter-width);
+  height: 100%;
+  border-left: 1px solid var(--splitter-border-color);
+  border-right: 1px solid var(--splitter-border-color);
+  background-color: #f8f8f8;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: col-resize;
-  z-index: 10;
+  z-index: 100; /* 다른 요소들 위에 */
+  color: #555;
 }
 
 .right {
@@ -48,69 +106,62 @@
   height: 100%;
 }
 
-.tutorialBubbleLeft {
+.tutorialBubbleLeft,
+.tutorialBubbleRight,
+.tutorialBubbleExit {
   position: absolute;
-  top: 30%;
-  left: 35%;
-  background: #000;
-  color: #fff;
-  font-family: "Noto Sans KR";
-  font-size: 16px;
-  font-style: normal;
+  background: var(--bubble-bg-color);
+  color: var(--bubble-text-color);
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 14px;
   font-weight: 300;
-  line-height: 19px;
-  padding: 24px 32px;
-  margin-right: 5px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-  z-index: 2000;
-  cursor: pointer;
-}
-
-.tutorialBubbleLeft::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 100%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #000;
-}
-
-.tutorialBubbleRight {
-  position: absolute;
-  bottom: 20px;
-  right: 50px;
-  background: #000;
-  color: #fff;
-  font-family: "Noto Sans KR";
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 300;
-  line-height: 19px;
-  padding: 24px 32px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  line-height: 1.4;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
   z-index: 2000;
   cursor: pointer;
-  animation: fadeIn 0.5s;
 }
-
-.tutorialBubbleRight::after {
+.tutorialBubbleLeft {
+  top: -200px;
+  left: calc(
+    100% + var(--bubble-arrow-size) + 125px
+  ); /* 선택기 오른쪽 + 화살표 너비 + 여백 */
+  transform: translateY(-50%);
+}
+.tutorialBubbleRight {
+  top: 80%; /* 중앙 정렬 */
+  right: calc(
+    100% + var(--bubble-arrow-size) + 5px
+  ); /* 스플리터 왼쪽 + 화살표 너비 + 여백 */
+  transform: translateY(-50%);
+}
+.arrowLeft {
+  top: 50%;
+  right: 100%; /* 버블 왼쪽에 붙음 */
+  transform: translateY(-50%);
+  border-top: var(--bubble-arrow-size) solid transparent;
+  border-bottom: var(--bubble-arrow-size) solid transparent;
+  border-right: var(--bubble-arrow-size) solid var(--bubble-bg-color); /* 왼쪽을 가리킴 */
+}
+.arrowRight {
+  top: 40%;
+  left: 100%; /* 버블 오른쪽에 붙음 */
+  transform: translateY(-50%);
+  border-top: var(--bubble-arrow-size) solid transparent;
+  border-bottom: var(--bubble-arrow-size) solid transparent;
+  border-left: var(--bubble-arrow-size) solid var(--bubble-bg-color); /* 오른쪽을 가리킴 */
+}
+.tutorialBubbleExit {
+  top: 0;
+  right: calc(100% + var(--bubble-arrow-size) + 5px); /* 버튼 오른쪽에 맞춤 */
+}
+.bubbleArrow {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 100%;
-  transform: translateY(-50%);
   width: 0;
   height: 0;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-left: 8px solid #000;
 }
 
 @keyframes fadeIn {
