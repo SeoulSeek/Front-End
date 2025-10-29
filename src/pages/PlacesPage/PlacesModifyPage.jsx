@@ -167,8 +167,8 @@ const ModifyPlacePage = () => {
     try {
       const token = localStorage.getItem("refreshToken");
 
-      console.log(`[ModifyPage] API Endpoint: ${API_ENDPOINTS.REVIEWS}`);
-      const response = await fetch(`${API_ENDPOINTS.REVIEWS}/${id}`, {
+      console.log(`[ModifyPage] API Endpoint: ${API_ENDPOINTS.REVIEWS_AUTH}`);
+      const response = await fetch(`${API_ENDPOINTS.REVIEWS_AUTH}/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

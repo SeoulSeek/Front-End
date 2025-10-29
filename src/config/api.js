@@ -16,7 +16,8 @@ export const API_ENDPOINTS = {
   AUTH_REFRESH: `${API_BASE_URL}/auth/refresh`,
   AUTH_LOGOUT: `${API_BASE_URL}/auth/logout`,
   EMAIL_VALID: `${API_BASE_URL}/valid`,
-  REVIEWS: `${API_BASE_URL}/auth/review`,
+  REVIEWS_AUTH: `${API_BASE_URL}/auth/review`,
+  REVIEWS: `${API_BASE_URL}/optional/review`,
   COMMENTS: `${API_BASE_URL}/auth/review/comment`,
   LOCATION_LIST: `${API_BASE_URL}/location`,
   DAILY_LOCATION: `${API_BASE_URL}/location/daily`,
@@ -32,4 +33,5 @@ export const API_ENDPOINTS = {
   LOCATION_TEXT: (id) => `${API_BASE_URL}/location/${id}/text`,
   LOCATION_AUDIO: (id) => `${API_BASE_URL}/location/${id}/repaudio`,
   USER_BOOKMARK: `${API_BASE_URL}/auth/user/book-mark`,
+  MINI_MAP: `${API_BASE_URL}/mini-map`,
 };

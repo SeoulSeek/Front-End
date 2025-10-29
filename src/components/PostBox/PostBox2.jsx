@@ -12,11 +12,11 @@ const PostBox = ({
   title,
   hashtags = [],
   author = { userId: 0, username: "알 수 없음", profileImage: null },
-  likes: initialLikes = 0,
+  likes = 0,
+  isLiked = false,
   comments = 0,
+  onLikeToggle,
 }) => {
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(initialLikes);
   const navigate = useNavigate();
 
   // 좋아요 버튼 클릭 핸들러
@@ -25,9 +25,9 @@ const PostBox = ({
     e.preventDefault();
     e.stopPropagation();
 
-    const newLiked = !liked;
-    setLiked(newLiked);
-    setLikes(newLiked ? likes + 1 : likes - 1);
+    if (onLikeToggle) {
+      onLikeToggle(id, !isLiked);
+    }
   };
 
   // 프로필 클릭 핸들러
@@ -73,7 +73,7 @@ const PostBox = ({
         {/* 2. 정보 (좋아요 + 댓글) */}
         <div className={$.postInfo}>
           <button className={$.infoButton} onClick={handleLikeClick}>
-            {liked ? (
+            {isLiked ? (
               <AiFillHeart size={16} color="#ff4d4d" />
             ) : (
               <AiOutlineHeart size={16} />
