@@ -75,6 +75,15 @@ const CoursesDetail = () => {
           setIsScrapped(scrappedValue);
           hasInitialized.current = true;
         }
+        
+        // 디버깅을 위해 첫 번째 location 구조 확인
+        if (result.data.categories && result.data.categories.length > 0) {
+          const firstCategory = result.data.categories[0];
+          if (firstCategory.locations && firstCategory.locations.length > 0) {
+            console.log('Location object structure:', firstCategory.locations[0]);
+            console.log('Available fields:', Object.keys(firstCategory.locations[0]));
+          }
+        }
       } catch (err) {
         console.error("Error fetching course detail:", err);
         alert("다시 시도해 주시기 바랍니다.");
@@ -282,18 +291,28 @@ const CoursesDetail = () => {
                 </div>
                 {expanded[tag.type] && (
                   <div className={styles.expandedArea}>
-                    {tag.locations?.map((location, locationIndex) => (
-                      <CourseCard
-                        key={locationIndex}
-                        title={location.name}
-                        description={location.description}
-                        image={location.imageUrl}
-                        type={tag.type}
-                        recommend={location.recommend}
-                        runtime={location.runtime}
-                        cost={location.cost}
-                      />
-                    ))}
+                    {tag.locations?.map((location, locationIndex) => {
+                      const locationId = location.tid || location.id;
+                      console.log('Rendering CourseCard with location:', {
+                        name: location.name,
+                        tid: location.tid,
+                        id: location.id,
+                        finalId: locationId
+                      });
+                      return (
+                        <CourseCard
+                          key={locationIndex}
+                          id={locationId}
+                          title={location.name}
+                          description={location.description}
+                          image={location.imageUrl}
+                          type={tag.type}
+                          recommend={location.recommend}
+                          runtime={location.runtime}
+                          cost={location.cost}
+                        />
+                      );
+                    })}
                   </div>
                 )}
               </div>
