@@ -16,7 +16,8 @@ const BottomSheet = ({
   bottomSheetState,
   setBottomSheetState,
   placeId,
-  onBookmarkToggle
+  onBookmarkToggle,
+  onSearchResultClick
 }) => {
   const { user } = useAuth();
   const [sheetState, setSheetState] = useState("peek"); // 'peek', 'half', 'full'
@@ -33,6 +34,20 @@ const BottomSheet = ({
       setSheetState(bottomSheetState);
     }
   }, [bottomSheetState]);
+
+  // peek 상태가 아닐 때 body 스크롤 방지 (half, full)
+  useEffect(() => {
+    if (sheetState !== 'peek') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    // 컴포넌트 언마운트 시 정리
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [sheetState]);
 
   // 터치 이벤트를 passive: false로 등록
   useEffect(() => {
@@ -245,15 +260,34 @@ const BottomSheet = ({
               '{searchQuery}' 검색결과
             </div>
             <div className={styles.searchResultList}>
-              {searchResults.map((result) => (
-                <PlaceCard
-                  key={result.id}
-                  placeName={result.placeName}
-                  distance={result.distance}
-                  imageUrl={result.imageUrl}
-                  variant="light"
-                />
-              ))}
+              {searchResults.length > 0 ? (
+                searchResults.map((result) => (
+                  <div 
+                    key={result.id}
+                    onClick={() => onSearchResultClick && onSearchResultClick(result.id, result.latitude, result.longitude)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <PlaceCard
+                      id={result.id}
+                      placeName={result.placeName}
+                      distance={result.distance}
+                      imageUrl={result.imageUrl}
+                      variant="light"
+                      hideDistance={true}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '40px 20px',
+                  color: '#666',
+                  fontSize: '16px',
+                  fontWeight: 500
+                }}>
+                  검색 결과가 없습니다.
+                </div>
+              )}
             </div>
           </>
         ) : (

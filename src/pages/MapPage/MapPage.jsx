@@ -41,6 +41,7 @@ const MapPage = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [locations, setLocations] = useState([]);
   const [selectedLocationId, setSelectedLocationId] = useState(null);
+  const [isMapReady, setIsMapReady] = useState(false);
   const [activeWidget, setActiveWidget] = useState(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
@@ -55,43 +56,10 @@ const MapPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [bottomSheetState, setBottomSheetState] = useState("peek");
+  const [searchResults, setSearchResults] = useState([]);
 
   const authContext = useAuth();
   const { user, refreshAuthToken } = authContext;
-
-  // 검색 결과 더미 데이터
-  const searchResults = [
-    {
-      id: 1,
-      placeName: "경복궁",
-      distance: "1.2km",
-      imageUrl: sampleImage,
-    },
-    {
-      id: 2,
-      placeName: "창덕궁",
-      distance: "2.5km",
-      imageUrl: sampleImage,
-    },
-    {
-      id: 3,
-      placeName: "북촌 한옥마을",
-      distance: "1.8km",
-      imageUrl: sampleImage,
-    },
-    {
-      id: 4,
-      placeName: "인사동",
-      distance: "1.5km",
-      imageUrl: sampleImage,
-    },
-    {
-      id: 5,
-      placeName: "종묘",
-      distance: "2.0km",
-      imageUrl: sampleImage,
-    },
-  ];
 
   // 장소 상세 정보 조회 및 바텀시트 표시
   const handleLocationMarkerClick = useCallback(
@@ -364,19 +332,22 @@ const MapPage = () => {
         infowindow.close();
       }
     );
+
+    // 지도가 준비되었음을 표시
+    setIsMapReady(true);
   }, [userLocation]);
 
   // URL 파라미터로 전달된 장소 자동 로드
   useEffect(() => {
-    if (locationId && mapInstance.current && locations.length > 0) {
+    if (locationId && isMapReady && locations.length > 0) {
       const numericLocationId = parseInt(locationId, 10);
       handleLocationMarkerClick(numericLocationId, true, "full");
     }
-  }, [locationId, mapInstance.current, locations, handleLocationMarkerClick]);
+  }, [locationId, isMapReady, locations, handleLocationMarkerClick]);
 
   // 장소 마커 표시
   useEffect(() => {
-    if (!mapInstance.current) {
+    if (!mapInstance.current || !isMapReady) {
       return;
     }
 
@@ -429,7 +400,7 @@ const MapPage = () => {
 
       locationMarkers.current.push(marker);
     });
-  }, [locations, selectedLocationId, handleLocationMarkerClick]);
+  }, [locations, selectedLocationId, handleLocationMarkerClick, isMapReady]);
 
   // 두 팝업이 모두 닫혔을 때 오디오 위젯 비활성화
   useEffect(() => {
@@ -583,7 +554,7 @@ const MapPage = () => {
     // setSelectedPlace(null);
   };
 
-  const handleSearchSubmit = (e) => {
+  const handleSearchSubmit = async (e) => {
     e.preventDefault();
     const inputValue = e.target.elements[0].value.trim();
 
@@ -591,7 +562,56 @@ const MapPage = () => {
       setSearchQuery(inputValue);
       setIsSearchMode(true);
       setBottomSheetState("full");
+      setIsBottomSheetOpen(true);
+
+      try {
+        const token = localStorage.getItem("refreshToken");
+        
+        const response = await fetch(API_ENDPOINTS.LOCATION_SEARCH(inputValue), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data) {
+            // API 응답을 BottomSheet에 맞는 형식으로 변환
+            const formattedResults = result.data.map((location) => ({
+              id: location.tid,
+              placeName: location.name,
+              imageUrl: location.imageUrl || sampleImage,
+              latitude: location.latitude,
+              longitude: location.longitude,
+            }));
+            setSearchResults(formattedResults);
+          } else {
+            setSearchResults([]);
+          }
+        } else {
+          console.error("검색 API 응답 실패:", response.status);
+          setSearchResults([]);
+        }
+      } catch (error) {
+        console.error("검색 중 오류 발생:", error);
+        setSearchResults([]);
+      }
     }
+  };
+
+  // 검색 결과 클릭 핸들러
+  const handleSearchResultClick = (locationId, latitude, longitude) => {
+    // 지도 중심을 선택한 장소로 이동하고 상세 정보 표시
+    if (mapInstance.current) {
+      const moveLatLng = new window.kakao.maps.LatLng(latitude, longitude);
+      mapInstance.current.setCenter(moveLatLng);
+    }
+    
+    // 장소 상세 정보 로드
+    handleLocationMarkerClick(locationId, false, "half");
   };
 
   // 북마크 토글 함수
@@ -951,6 +971,7 @@ const MapPage = () => {
         setBottomSheetState={setBottomSheetState}
         placeId={selectedLocationId}
         onBookmarkToggle={toggleBookmark}
+        onSearchResultClick={handleSearchResultClick}
       />
     </>
   );
