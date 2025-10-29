@@ -69,12 +69,12 @@ const Places = () => {
 
         console.log(
           `[방명록페이지] 요청 URL: ${
-            API_ENDPOINTS.REVIEW_LIST
+            API_ENDPOINTS.REVIEWS
           }?${params.toString()}`
         );
 
         const response = await fetch(
-          `${API_ENDPOINTS.REVIEW_LIST}?${params.toString()}`,
+          `${API_ENDPOINTS.REVIEWS}?${params.toString()}`,
           {
             headers: headers,
             credentials: "include",
@@ -130,6 +130,65 @@ const Places = () => {
   );
 
   // --- 이벤트 핸들러 ---
+  const handleLikeToggle = useCallback(
+    async (postId, newIsLiked) => {
+      if (!auth.user) {
+        alert("로그인이 필요한 기능입니다.");
+        navigate("/login");
+        return;
+      }
+
+      setDisplayedPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                isLiked: newIsLiked,
+                like: newIsLiked ? post.like + 1 : post.like - 1,
+              }
+            : post
+        )
+      );
+
+      try {
+        const token = localStorage.getItem("refreshToken");
+        if (!token) throw new Error("로그인이 필요합니다.");
+
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const response = await fetch(
+          `${API_ENDPOINTS.REVIEWS_AUTH}/${postId}/like`,
+          {
+            method: "PATCH",
+            headers: headers,
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("좋아요 처리에 실패했습니다.");
+        }
+        console.log(
+          `[PlacesPage Like] Post ${postId} like status updated successfully.`
+        );
+      } catch (error) {
+        console.log("[방명록 페이지 조회(좋아요)] 에러:", error);
+        alert(error.message);
+        setDisplayedPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  isLiked: !newIsLiked,
+                  like: !newIsLiked ? post.like + 1 : post.like - 1,
+                }
+              : post
+          )
+        );
+      }
+    },
+    [auth]
+  );
   const handleFilterChange = (key) => {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
     setCurrentPage(1); // 필터 변경 시 1페이지로 리셋
@@ -175,15 +234,21 @@ const Places = () => {
         {isLoading && currentPage === 1 && <Loading />}
         {error && <p>오류: {error}</p>}
 
-        <PostList posts={displayedPosts} lastPostRef={lastPostElementRef} />
+        <PostList
+          posts={displayedPosts}
+          lastPostRef={lastPostElementRef}
+          onLikeToggle={handleLikeToggle}
+        />
 
         {isLoading && currentPage > 1 && <Loading />}
       </div>
 
       {auth.user && (
-        <button onClick={handleCreatePost} className={$.postCreateBtn}>
-          <AiOutlineEdit /> 작성
-        </button>
+        <div className={$.postCreateBtnWrap}>
+          <button onClick={handleCreatePost} className={$.postCreateBtn}>
+            <AiOutlineEdit /> 작성
+          </button>
+        </div>
       )}
 
       {!isDesktop && (

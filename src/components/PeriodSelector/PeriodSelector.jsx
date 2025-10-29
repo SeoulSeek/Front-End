@@ -1,11 +1,16 @@
 import React from "react";
 import $ from "./PeriodSelector.module.css";
 
-const PeriodSelector = ({ eras, selectedEraIndex, onSelect }) => {
+const PeriodSelector = ({
+  eras,
+  selectedEraIndex,
+  onSelect,
+  availableEraKey,
+}) => {
   return (
     <div className={$.periodList}>
       {eras.map((era, index) => {
-        const isAvailable = era.image !== null;
+        const isAvailable = era.eraKey === availableEraKey;
         const isSelected = selectedEraIndex === index;
 
         return (

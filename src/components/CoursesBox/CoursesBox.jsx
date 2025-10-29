@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CoursesBox.module.css";
 import dummy1 from "../../assets/HomePage/dummy1.jpg";
@@ -12,16 +12,27 @@ const CoursesBox = ({
   id, 
   title = "고궁 스토리텔링", 
   image = dummy1,
+  scrapped = false,
   totalLocations = 0,
   landmarkTourElements = 0,
   specialTourElements = 0,
-  missionTourElements = 0
+  missionTourElements = 0,
+  onScrapChange
 }) => {
-  const [isStarFilled, setIsStarFilled] = useState(false);
+  const [isStarFilled, setIsStarFilled] = useState(scrapped);
+  const hasInitialized = useRef(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshAuthToken } = useAuth();
 
-  const toggleStarIcon = async () => {
+  // 첫 마운트 시에만 초기 상태 설정
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      setIsStarFilled(scrapped);
+      hasInitialized.current = true;
+    }
+  }, [scrapped]);
+
+  const toggleStarIcon = async (retryCount = 0) => {
     // 로그인 체크
     if (!user) {
       alert("로그인이 필요합니다.");
@@ -40,17 +51,35 @@ const CoursesBox = ({
       
       if (!token) {
         alert("로그인이 필요합니다.");
-        setIsStarFilled(previousState); // 원래 상태로 복구
+        setIsStarFilled(previousState);
         return;
       }
 
-      const response = await fetch(API_ENDPOINTS.COURSE_SCRAP(id), {
+      const url = API_ENDPOINTS.COURSE_SCRAP(id);
+
+      const response = await fetch(url, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
           'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include',
       });
+
+      if (response.status === 401 && retryCount === 0) {
+        // 401 에러 발생 시 토큰 재발급 시도
+        const newToken = await refreshAuthToken();
+        
+        if (newToken) {
+          // 토큰 재발급 성공 시 다시 시도
+          return toggleStarIcon(1);
+        } else {
+          // 토큰 재발급 실패
+          alert("로그인이 필요합니다.");
+          setIsStarFilled(previousState);
+          return;
+        }
+      }
 
       if (!response.ok) {
         // API 호출 실패 시 조용히 실패하고 원래 상태로 복구
@@ -62,7 +91,12 @@ const CoursesBox = ({
       
       // API 응답의 scrapped 값으로 상태 동기화
       if (result.error === false && result.data) {
-        setIsStarFilled(result.data.scrapped);
+        const newScrappedState = result.data.scrapped;
+        setIsStarFilled(newScrappedState);
+        // 부모 컴포넌트에 변경사항 알림 (북마크 해제된 경우에만)
+        if (onScrapChange) {
+          onScrapChange(id, newScrappedState);
+        }
       } else {
         // 에러 응답 시 원래 상태로 복구
         setIsStarFilled(previousState);

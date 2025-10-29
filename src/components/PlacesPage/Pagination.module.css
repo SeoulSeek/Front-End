@@ -1,23 +1,27 @@
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 50px;
+  margin-top: 50px;
 }
 .pagination button {
-  border: 1px solid #ddd;
-  background-color: white;
-  min-width: 36px;
-  height: 36px;
-  padding: 5px 10px;
-  border-radius: 6px;
+  border: none;
+  background-color: transparent;
+  min-width: auto;
+  height: auto;
+  padding: 0;
+  border-radius: 0;
   cursor: pointer;
+  font-size: 20px;
+  color: #000000;
+  font-weight: 300;
 }
 .pagination button:hover {
-  background-color: #f0f0f0;
+  background-color: transparent;
 }
 .pagination .activePage {
   font-weight: 700;
-  background-color: #333;
-  color: white;
-  border-color: #333;
+  background-color: transparent;
+  color: #000000;
+  border-color: transparent;
 }

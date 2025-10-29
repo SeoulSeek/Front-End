@@ -1,5 +1,5 @@
 import { useDropzone } from "react-dropzone";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineSearch,
@@ -7,38 +7,46 @@ import {
 } from "react-icons/ai";
 import $ from "./../../pages/PlacesPage/PostPlacePage2.module.css";
 
-const ImageUploader = ({ onFilesChange, initialFiles = [] }) => {
-  const [files, setFiles] = useState([]);
-  const [previews, setPreviews] = useState([]);
-  const [selectedPreview, setSelectedPreview] = useState(null);
+const ImageUploader = ({
+  onFilesChange,
+  initialFiles = [],
+  onInitialImageDelete,
+}) => {
+  // File 객체 (새로 추가된 것만)
+  const [addedFiles, setAddedFiles] = useState([]);
+  // 모든 미리보기 URL (초기 + 새로 추가된 것)
+  const [previews, setPreviews] = useState(initialFiles);
+  // 선택된 미리보기 URL
+  const [selectedPreview, setSelectedPreview] = useState(
+    initialFiles[0] || null
+  );
 
-  useEffect(() => {
-    // 초기 URL을 previews 상태에 설정
-    setPreviews(initialFiles);
-    // 첫 번째 초기 이미지를 기본 선택 이미지로 설정
-    if (initialFiles.length > 0) {
-      setSelectedPreview(initialFiles[0]);
-    }
-    // 초기 File 객체는 비어있음
-    setFiles([]);
-  }, [initialFiles]); // initialFiles가 변경될 때만 실행
+  const notifyParent = useCallback(
+    (updatedAddedFiles) => {
+      onFilesChange(updatedAddedFiles);
+    },
+    [onFilesChange]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { "image/*": [".jpeg", ".jpg", ".png"] },
     onDrop: (acceptedFiles) => {
-      const newFiles = acceptedFiles.map((file) =>
+      const newFileObjects = acceptedFiles.map((file) =>
         Object.assign(file, { preview: URL.createObjectURL(file) })
       );
-      const updatedPreviews = [
-        ...previews,
-        ...newFileObjects.map((f) => f.preview),
-      ].slice(0, 5);
-      const updatedFiles = [...files, ...newFileObjects].slice(0, 5); // File 객체도 업데이트
+
+      const newPreviews = newFileObjects.map((f) => f.preview);
+      const updatedPreviews = [...previews, ...newPreviews].slice(0, 5); // 최대 5개
+      const updatedAddedFiles = [...addedFiles, ...newFileObjects].slice(0, 5);
 
       setPreviews(updatedPreviews);
-      setFiles(updatedFiles);
-      onFilesChange(updatedFiles); // File 객체만 부모로 전달
-      if (!selectedPreview) setSelectedPreview(newFileObjects[0]?.preview);
+      setAddedFiles(updatedAddedFiles);
+      notifyParent(updatedAddedFiles); // File 객체만 부모로 전달
+
+      if (!selectedPreview && newFileObjects.length > 0) {
+        // selectedPreview가 없을 때만 자동 선택
+        setSelectedPreview(newFileObjects[0].preview);
+      }
     },
   });
 
@@ -47,14 +55,18 @@ const ImageUploader = ({ onFilesChange, initialFiles = [] }) => {
     const previewToDelete = previews[indexToDelete];
     const updatedPreviews = previews.filter((_, i) => i !== indexToDelete);
 
-    // File 객체 배열에서도 해당 preview URL을 가진 파일 제거
-    const updatedFiles = files.filter(
+    const wasInitialImage = initialFiles.includes(previewToDelete);
+    if (wasInitialImage && onInitialImageDelete) {
+      onInitialImageDelete(); // Notify parent that initial image was deleted
+    }
+    // addedFiles 배열에서 해당 미리보기를 가진 File 객체 제거
+    const updatedAddedFiles = addedFiles.filter(
       (file) => file.preview !== previewToDelete
     );
 
     setPreviews(updatedPreviews);
-    setFiles(updatedFiles);
-    onFilesChange(updatedFiles); // 변경된 File 객체 목록 전달
+    setAddedFiles(updatedAddedFiles);
+    onFilesChange(updatedAddedFiles); // 변경된 addedFiles 목록 전달
 
     if (selectedPreview === previewToDelete) {
       setSelectedPreview(updatedPreviews[0] || null);

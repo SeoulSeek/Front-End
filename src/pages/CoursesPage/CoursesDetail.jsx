@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./CoursesDetail.module.css";
 import { 
@@ -10,12 +10,18 @@ import {
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import CourseCard from "../../components/CourseCard/CourseCard";
 import { API_ENDPOINTS } from "../../config/api";
+import { useAuth } from "../../contexts/AuthContext";
+import starIcon from "../../assets/CoursesPage/AiStar.png";
+import starIconFill from "../../assets/CoursesPage/AiFillStar.png";
 
 const CoursesDetail = () => {
   const { id } = useParams();
+  const { user, refreshAuthToken } = useAuth();
 
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isScrapped, setIsScrapped] = useState(false);
+  const hasInitialized = useRef(false);
   const [expanded, setExpanded] = useState({
     landmark: false,
     special: false,
@@ -36,7 +42,22 @@ const CoursesDetail = () => {
     const fetchCourseDetail = async () => {
       try {
         setLoading(true);
-        const response = await fetch(API_ENDPOINTS.COURSE_DETAIL(id));
+        
+        // 인증 헤더 준비
+        const headers = {
+          'Content-Type': 'application/json;charset=UTF-8',
+        };
+        
+        const token = localStorage.getItem('refreshToken');
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(API_ENDPOINTS.COURSE_DETAIL(id), {
+          method: 'GET',
+          headers,
+          credentials: 'include',
+        });
         
         if (!response.ok) {
           throw new Error("Failed to fetch course detail");
@@ -49,6 +70,20 @@ const CoursesDetail = () => {
         }
         
         setCourseData(result.data);
+        if (!hasInitialized.current) {
+          const scrappedValue = result.data.scrapped || false;
+          setIsScrapped(scrappedValue);
+          hasInitialized.current = true;
+        }
+        
+        // 디버깅을 위해 첫 번째 location 구조 확인
+        if (result.data.categories && result.data.categories.length > 0) {
+          const firstCategory = result.data.categories[0];
+          if (firstCategory.locations && firstCategory.locations.length > 0) {
+            console.log('Location object structure:', firstCategory.locations[0]);
+            console.log('Available fields:', Object.keys(firstCategory.locations[0]));
+          }
+        }
       } catch (err) {
         console.error("Error fetching course detail:", err);
         alert("다시 시도해 주시기 바랍니다.");
@@ -65,6 +100,75 @@ const CoursesDetail = () => {
       ...prev,
       [type]: !prev[type],
     }));
+  };
+
+  const toggleScrap = async (retryCount = 0) => {
+    // 로그인 체크
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    // 현재 상태 저장 (실패 시 복구용)
+    const previousState = isScrapped;
+    
+    // 낙관적 업데이트 (UI 먼저 변경)
+    setIsScrapped((prev) => !prev);
+
+    try {
+      // refreshToken 가져오기
+      const token = localStorage.getItem('refreshToken');
+      
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        setIsScrapped(previousState);
+        return;
+      }
+
+      const url = API_ENDPOINTS.COURSE_SCRAP(id);
+
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${token}`,
+        },
+        credentials: 'include',
+      });
+
+      if (response.status === 401 && retryCount === 0) {
+        // 401 에러 발생 시 토큰 재발급 시도
+        const newToken = await refreshAuthToken();
+        
+        if (newToken) {
+          // 토큰 재발급 성공 시 다시 시도
+          return toggleScrap(1);
+        } else {
+          // 토큰 재발급 실패
+          alert("로그인이 필요합니다.");
+          setIsScrapped(previousState);
+          return;
+        }
+      }
+
+      if (!response.ok) {
+        setIsScrapped(previousState);
+        return;
+      }
+
+      const result = await response.json();
+      
+      // API 응답의 scrapped 값으로 상태 동기화
+      if (result.error === false && result.data) {
+        const newScrappedState = result.data.scrapped;
+        setIsScrapped(newScrappedState);
+      } else {
+        setIsScrapped(previousState);
+      }
+    } catch (error) {
+      console.error('Course scrap error:', error);
+      setIsScrapped(previousState);
+    }
   };
 
   // 로딩 중에는 빈 화면
@@ -98,11 +202,19 @@ const CoursesDetail = () => {
 
   return (
     <div className={styles.detailContainer}>
-      <img 
-        src={courseData.imageUrl} 
-        alt="코스 대표이미지" 
-        className={styles.courseImage} 
-      />
+      <div className={styles.imageWrapper}>
+        <img 
+          src={courseData.imageUrl} 
+          alt="코스 대표이미지" 
+          className={styles.courseImage} 
+        />
+        <img 
+          src={isScrapped ? starIconFill : starIcon}
+          alt="스크랩"
+          className={styles.scrapIcon}
+          onClick={toggleScrap}
+        />
+      </div>
       <h2 className={styles.title}>{courseData.title}</h2>
       <p className={styles.detailText}>
         {courseData.content}
@@ -179,18 +291,28 @@ const CoursesDetail = () => {
                 </div>
                 {expanded[tag.type] && (
                   <div className={styles.expandedArea}>
-                    {tag.locations?.map((location, locationIndex) => (
-                      <CourseCard
-                        key={locationIndex}
-                        title={location.name}
-                        description={location.description}
-                        image={location.imageUrl}
-                        type={tag.type}
-                        recommend={location.recommend}
-                        runtime={location.runtime}
-                        cost={location.cost}
-                      />
-                    ))}
+                    {tag.locations?.map((location, locationIndex) => {
+                      const locationId = location.tid || location.id;
+                      console.log('Rendering CourseCard with location:', {
+                        name: location.name,
+                        tid: location.tid,
+                        id: location.id,
+                        finalId: locationId
+                      });
+                      return (
+                        <CourseCard
+                          key={locationIndex}
+                          id={locationId}
+                          title={location.name}
+                          description={location.description}
+                          image={location.imageUrl}
+                          type={tag.type}
+                          recommend={location.recommend}
+                          runtime={location.runtime}
+                          cost={location.cost}
+                        />
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -11,7 +11,7 @@ const ScrollToTopBtn = () => {
       const footerEl = document.getElementById("footer");
       const windowHeight = window.innerHeight;
 
-      setVisible(scrollY > 20);
+      setVisible(scrollY > 450);
 
       if (footerEl) {
         const footerTop = footerEl.getBoundingClientRect().top;
