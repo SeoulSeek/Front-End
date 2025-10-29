@@ -38,9 +38,11 @@ const MapPage = () => {
   const mapInstance = useRef(null);
   const currentLocationMarker = useRef(null);
   const locationMarkers = useRef([]);
+  const audioRef = useRef(null);
   const [userLocation, setUserLocation] = useState(null);
   const [locations, setLocations] = useState([]);
   const [selectedLocationId, setSelectedLocationId] = useState(null);
+  const [isMapReady, setIsMapReady] = useState(false);
   const [activeWidget, setActiveWidget] = useState(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
@@ -55,55 +57,44 @@ const MapPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [bottomSheetState, setBottomSheetState] = useState("peek");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoadingPlace, setIsLoadingPlace] = useState(false);
 
   const authContext = useAuth();
   const { user, refreshAuthToken } = authContext;
-
-  // 검색 결과 더미 데이터
-  const searchResults = [
-    {
-      id: 1,
-      placeName: "경복궁",
-      distance: "1.2km",
-      imageUrl: sampleImage,
-    },
-    {
-      id: 2,
-      placeName: "창덕궁",
-      distance: "2.5km",
-      imageUrl: sampleImage,
-    },
-    {
-      id: 3,
-      placeName: "북촌 한옥마을",
-      distance: "1.8km",
-      imageUrl: sampleImage,
-    },
-    {
-      id: 4,
-      placeName: "인사동",
-      distance: "1.5km",
-      imageUrl: sampleImage,
-    },
-    {
-      id: 5,
-      placeName: "종묘",
-      distance: "2.0km",
-      imageUrl: sampleImage,
-    },
-  ];
 
   // 장소 상세 정보 조회 및 바텀시트 표시
   const handleLocationMarkerClick = useCallback(
     async (locationId, shouldMoveMap = false, sheetState = "half") => {
       try {
+        // 로딩 시작
+        setIsLoadingPlace(true);
+        
         // 선택된 장소 ID 업데이트
         setSelectedLocationId(locationId);
+        
+        // 바텀시트 상태를 명시적으로 설정
+        setBottomSheetState(sheetState);
+        
+        // 바텀시트 열기
+        setIsBottomSheetOpen(true);
+        setIsSearchMode(false);
 
         const token = localStorage.getItem("refreshToken");
 
+        // 연관 장소, 텍스트 설명, 오디오를 병렬로 가져오기 (에러가 발생해도 조용히 처리)
+        const silentFetch = async (url, options) => {
+          try {
+            const response = await fetch(url, options);
+            return response;
+          } catch (error) {
+            // 네트워크 에러는 조용히 처리 (콘솔에 출력하지 않음)
+            return { ok: false, status: 0 };
+          }
+        };
+
         // 장소 상세 정보를 먼저 가져오기
-        const detailResponse = await fetch(
+        const detailResponse = await silentFetch(
           API_ENDPOINTS.LOCATION_DETAIL(locationId),
           {
             method: "GET",
@@ -114,20 +105,6 @@ const MapPage = () => {
             credentials: "include",
           }
         );
-
-        // 연관 장소, 텍스트 설명, 오디오를 병렬로 가져오기 (에러가 발생해도 조용히 처리)
-        const silentFetch = async (url, options) => {
-          try {
-            const response = await fetch(url, options);
-            // 404 에러를 조용히 처리
-            if (!response.ok && response.status === 404) {
-              return { ok: false, status: 404 };
-            }
-            return response;
-          } catch {
-            return { ok: false };
-          }
-        };
 
         const [relatedResponse, textResponse, audioResponse] =
           await Promise.allSettled([
@@ -190,14 +167,9 @@ const MapPage = () => {
               );
               mapInstance.current.setCenter(moveLatLng);
             }
-
-            setIsBottomSheetOpen(true);
-            setBottomSheetState(sheetState);
-            setIsSearchMode(false);
           }
-        } else {
-          console.error("장소 상세 정보 응답 실패");
         }
+        // 응답이 실패해도 조용히 처리 (콘솔 에러 출력하지 않음)
 
         // 연관 장소 처리 (정보가 없어도 에러로 처리하지 않음)
         if (
@@ -258,8 +230,12 @@ const MapPage = () => {
         } else {
           setLocationAudio(null);
         }
+        
+        // 로딩 완료
+        setIsLoadingPlace(false);
       } catch (error) {
-        console.error("장소 정보를 가져오는데 실패했습니다:", error);
+        // 에러 발생 시에도 조용히 처리하고 로딩 종료
+        setIsLoadingPlace(false);
       }
     },
     [user]
@@ -287,13 +263,12 @@ const MapPage = () => {
               setLocations(result.data);
             }
           } catch (parseError) {
-            console.error("JSON 파싱 실패:", parseError);
+            // JSON 파싱 실패 시 조용히 처리
           }
-        } else {
-          console.error("장소 목록 API 응답 실패:", response.status);
         }
+        // 응답 실패 시 조용히 처리
       } catch (error) {
-        console.error("장소 목록을 가져오는데 실패했습니다:", error);
+        // 에러 발생 시 조용히 처리
       }
     };
 
@@ -309,8 +284,7 @@ const MapPage = () => {
           setUserLocation({ lat: latitude, lng: longitude });
         },
         (error) => {
-          console.error("위치 정보를 가져올 수 없습니다:", error);
-          // 위치 정보를 가져올 수 없을 때 서울 시청 좌표 사용
+          // 위치 정보를 가져올 수 없을 때 서울 시청 좌표 사용 (조용히 처리)
           setUserLocation({ lat: 37.5665, lng: 126.978 });
         }
       );
@@ -364,19 +338,25 @@ const MapPage = () => {
         infowindow.close();
       }
     );
+
+    // 지도가 준비되었음을 표시
+    setIsMapReady(true);
   }, [userLocation]);
 
-  // URL 파라미터로 전달된 장소 자동 로드
+  // URL 파라미터로 전달된 장소 자동 로드 및 URL 정리
   useEffect(() => {
-    if (locationId && mapInstance.current && locations.length > 0) {
+    if (locationId && isMapReady && locations.length > 0) {
       const numericLocationId = parseInt(locationId, 10);
       handleLocationMarkerClick(numericLocationId, true, "full");
+      
+      // URL에서 locationId 파라미터 제거 (히스토리 유지)
+      navigate('/map', { replace: true });
     }
-  }, [locationId, mapInstance.current, locations, handleLocationMarkerClick]);
+  }, [locationId, isMapReady, locations, handleLocationMarkerClick, navigate]);
 
   // 장소 마커 표시
   useEffect(() => {
-    if (!mapInstance.current) {
+    if (!mapInstance.current || !isMapReady) {
       return;
     }
 
@@ -429,7 +409,7 @@ const MapPage = () => {
 
       locationMarkers.current.push(marker);
     });
-  }, [locations, selectedLocationId, handleLocationMarkerClick]);
+  }, [locations, selectedLocationId, handleLocationMarkerClick, isMapReady]);
 
   // 두 팝업이 모두 닫혔을 때 오디오 위젯 비활성화
   useEffect(() => {
@@ -475,12 +455,24 @@ const MapPage = () => {
 
   const handleWidgetClick = (widgetId) => {
     if (widgetId === "audio") {
-      // 오디오 위젯은 두 팝업 모두 표시
-      if (!showAudioPlayer && !showAudioSummary) {
-        setShowAudioPlayer(true);
+      // 오디오 요약 팝업은 항상 표시
+      if (!showAudioSummary) {
         setShowAudioSummary(true);
-        setIsAudioPlaying(true);
         setActiveWidget("audio");
+      }
+      
+      // '재생중...' 팝업은 오디오 파일이 있을 때만 표시
+      if (locationAudio && locationAudio.audioUrl && !showAudioPlayer) {
+        setShowAudioPlayer(true);
+        setIsAudioPlaying(true);
+        
+        // 오디오 재생
+        if (audioRef.current) {
+          audioRef.current.play().catch(error => {
+            // 오디오 재생 실패 시 조용히 처리
+            setIsAudioPlaying(false);
+          });
+        }
       }
     } else if (widgetId === "text") {
       // 텍스트 위젯은 팝업 표시
@@ -540,6 +532,12 @@ const MapPage = () => {
         setShowAudioPlayer(false);
         setShowAudioSummary(false);
         setIsAudioPlaying(false);
+        
+        // 오디오 중지
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
       }
       // 텍스트 팝업도 닫기
       if (activeWidget === "text") {
@@ -559,6 +557,12 @@ const MapPage = () => {
   const handleAudioPlayerClose = () => {
     setShowAudioPlayer(false);
     setIsAudioPlaying(false);
+    
+    // 오디오 중지
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
   };
 
   const handleAudioSummaryClose = () => {
@@ -566,7 +570,18 @@ const MapPage = () => {
   };
 
   const handleAudioWaveformClick = () => {
-    setIsAudioPlaying(!isAudioPlaying);
+    if (audioRef.current) {
+      if (isAudioPlaying) {
+        audioRef.current.pause();
+        setIsAudioPlaying(false);
+      } else {
+        audioRef.current.play().catch(error => {
+          // 오디오 재생 실패 시 조용히 처리
+          setIsAudioPlaying(false);
+        });
+        setIsAudioPlaying(true);
+      }
+    }
   };
 
   const handleTextPopupClose = () => {
@@ -583,7 +598,12 @@ const MapPage = () => {
     // setSelectedPlace(null);
   };
 
-  const handleSearchSubmit = (e) => {
+  // 오디오 종료 이벤트 핸들러
+  const handleAudioEnded = () => {
+    setIsAudioPlaying(false);
+  };
+
+  const handleSearchSubmit = async (e) => {
     e.preventDefault();
     const inputValue = e.target.elements[0].value.trim();
 
@@ -591,7 +611,56 @@ const MapPage = () => {
       setSearchQuery(inputValue);
       setIsSearchMode(true);
       setBottomSheetState("full");
+      setIsBottomSheetOpen(true);
+
+      try {
+        const token = localStorage.getItem("refreshToken");
+        
+        const response = await fetch(API_ENDPOINTS.LOCATION_SEARCH(inputValue), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data) {
+            // API 응답을 BottomSheet에 맞는 형식으로 변환
+            const formattedResults = result.data.map((location) => ({
+              id: location.tid,
+              placeName: location.name,
+              imageUrl: location.imageUrl || sampleImage,
+              latitude: location.latitude,
+              longitude: location.longitude,
+            }));
+            setSearchResults(formattedResults);
+          } else {
+            setSearchResults([]);
+          }
+        } else {
+          // 검색 API 응답 실패 시 조용히 처리
+          setSearchResults([]);
+        }
+      } catch (error) {
+        // 검색 중 오류 발생 시 조용히 처리
+        setSearchResults([]);
+      }
     }
+  };
+
+  // 검색 결과 클릭 핸들러
+  const handleSearchResultClick = (locationId, latitude, longitude) => {
+    // 지도 중심을 선택한 장소로 이동하고 상세 정보 표시
+    if (mapInstance.current) {
+      const moveLatLng = new window.kakao.maps.LatLng(latitude, longitude);
+      mapInstance.current.setCenter(moveLatLng);
+    }
+    
+    // 장소 상세 정보 로드
+    handleLocationMarkerClick(locationId, false, "half");
   };
 
   // 북마크 토글 함수
@@ -639,10 +708,7 @@ const MapPage = () => {
         credentials: "include",
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API 오류 응답:", errorText);
-      }
+      // 응답 에러는 조용히 처리
 
       if (response.status === 401 && retryCount === 0) {
         // 401 에러 발생 시 토큰 재발급 시도
@@ -687,7 +753,7 @@ const MapPage = () => {
         }));
       }
     } catch (error) {
-      console.error("Location bookmark error:", error);
+      // 북마크 에러 발생 시 조용히 처리하고 상태 복구
       setSelectedPlace((prev) => ({
         ...prev,
         bookmarked: previousState,
@@ -697,6 +763,15 @@ const MapPage = () => {
 
   return (
     <>
+      {/* 숨겨진 오디오 플레이어 */}
+      {locationAudio && locationAudio.audioUrl && (
+        <audio
+          ref={audioRef}
+          src={locationAudio.audioUrl}
+          onEnded={handleAudioEnded}
+        />
+      )}
+      
       <div className={styles.container} onClick={handleContainerClick}>
         <div className={styles.search} onClick={(e) => e.stopPropagation()}>
           <form className={styles.searchWrap} onSubmit={handleSearchSubmit}>
@@ -951,6 +1026,8 @@ const MapPage = () => {
         setBottomSheetState={setBottomSheetState}
         placeId={selectedLocationId}
         onBookmarkToggle={toggleBookmark}
+        onSearchResultClick={handleSearchResultClick}
+        isLoading={isLoadingPlace}
       />
     </>
   );

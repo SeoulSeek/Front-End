@@ -5,18 +5,21 @@ import styles from "./BottomSheet.module.css";
 import PlaceCard from "../PlaceCard/PlaceCard";
 import sampleImage from "../../assets/LoginPage/sample1.jpg";
 import { useAuth } from "../../contexts/AuthContext";
+import Loading from "../Loading/Loading";
 
 const BottomSheet = ({ 
   placeData, 
   isOpen, 
-  onClose, 
+  onClose,
   isSearchMode = false,
   searchQuery = "",
   searchResults = [],
   bottomSheetState,
   setBottomSheetState,
   placeId,
-  onBookmarkToggle
+  onBookmarkToggle,
+  onSearchResultClick,
+  isLoading = false
 }) => {
   const { user } = useAuth();
   const [sheetState, setSheetState] = useState("peek"); // 'peek', 'half', 'full'
@@ -33,6 +36,20 @@ const BottomSheet = ({
       setSheetState(bottomSheetState);
     }
   }, [bottomSheetState]);
+
+  // peek 상태가 아닐 때 body 스크롤 방지 (half, full)
+  useEffect(() => {
+    if (sheetState !== 'peek') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    // 컴포넌트 언마운트 시 정리
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [sheetState]);
 
   // 터치 이벤트를 passive: false로 등록
   useEffect(() => {
@@ -212,7 +229,7 @@ const BottomSheet = ({
     }
   };
 
-  if (!placeData && !isSearchMode) return null;
+  if (!placeData && !isSearchMode && !isLoading) return null;
 
   return (
     <>
@@ -238,22 +255,46 @@ const BottomSheet = ({
           <div className={styles.dragBar}></div>
         </div>
 
-        {/* 검색 모드 */}
-        {isSearchMode ? (
+        {/* 로딩 중 */}
+        {isLoading ? (
+          <div className={styles.loadingContainer}>
+            <Loading />
+          </div>
+        ) : isSearchMode ? (
+          /* 검색 모드 */
           <>
             <div className={styles.searchResultTitle}>
               '{searchQuery}' 검색결과
             </div>
             <div className={styles.searchResultList}>
-              {searchResults.map((result) => (
-                <PlaceCard
-                  key={result.id}
-                  placeName={result.placeName}
-                  distance={result.distance}
-                  imageUrl={result.imageUrl}
-                  variant="light"
-                />
-              ))}
+              {searchResults.length > 0 ? (
+                searchResults.map((result) => (
+                  <div 
+                    key={result.id}
+                    onClick={() => onSearchResultClick && onSearchResultClick(result.id, result.latitude, result.longitude)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <PlaceCard
+                      id={result.id}
+                      placeName={result.placeName}
+                      distance={result.distance}
+                      imageUrl={result.imageUrl}
+                      variant="light"
+                      hideDistance={true}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '40px 20px',
+                  color: '#666',
+                  fontSize: '16px',
+                  fontWeight: 500
+                }}>
+                  검색 결과가 없습니다.
+                </div>
+              )}
             </div>
           </>
         ) : (
