@@ -310,7 +310,7 @@ const PlaceDetail = () => {
   if (!post)
     return <div className={$.statusMessage}>게시물을 찾을 수 없습니다.</div>;
 
-  const isAuthor = auth.user.name === post.username;
+  const isAuthor = auth.user?.name === post.username;
   // fileURL이 배열이 아니면 배열로 감싸서 처리
   const allImages = Array.isArray(post.fileURL)
     ? post.fileURL
