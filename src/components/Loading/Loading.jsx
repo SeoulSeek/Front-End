@@ -9,7 +9,7 @@ const Loading = () => {
   const loaders = [
     {
       icon: clock,
-      text: "서울시간여행을 떠나는중 ",
+      text: "서울 시간여행을 떠나는중 ",
     },
     {
       icon: foots,
