@@ -35,7 +35,7 @@ const mapUILanguagesToAPI = (uiLanguages) => {
 };
 
 const MyPage = () => {
-  const { user, isLoading, updateProfile, refreshAuthToken } = useAuth();
+  const { user, isLoading, updateProfile, refreshAuthToken, fetchUser } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("places");
   const [isPublic, setIsPublic] = useState(false);
@@ -61,6 +61,13 @@ const MyPage = () => {
 
   // 닉네임 길이 체크 (10자 이상이면 작은 크기 적용)
   const isVeryLongNickname = name && name.length >= 10;
+
+  // 페이지 진입 시 최신 사용자 정보 가져오기
+  useEffect(() => {
+    if (!isLoading) {
+      fetchUser();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 사용자 정보가 변경될 때 로컬 상태 업데이트
   useEffect(() => {
@@ -194,28 +201,9 @@ const MyPage = () => {
               const result = await retryResponse.json();
               if (result.error === false && result.data) {
                 setBookmarkedPlaces(result.data);
-                // 페이지네이션: 첫 페이지일 때만 다음 페이지 확인
-                if (currentPage === 0 && result.data.length === 3) {
-                  // 다음 페이지 확인
-                  fetch(`${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=1`, {
-                    method: 'GET',
-                    headers: {
-                      'Content-Type': 'application/json;charset=UTF-8',
-                      'Authorization': `Bearer ${newToken}`,
-                    },
-                    credentials: 'include',
-                  }).then(nextResponse => nextResponse.json())
-                    .then(nextResult => {
-                      if (nextResult.error === false && nextResult.data) {
-                        if (nextResult.data.length > 0) {
-                          setTotalPages(2);
-                        } else {
-                          setTotalPages(1);
-                        }
-                      }
-                    });
-                } else if (result.data.length < 3) {
-                  setTotalPages(currentPage + 1);
+                // pageInfo에서 전체 페이지 수 가져오기
+                if (result.pageInfo && result.pageInfo.totalPages !== undefined) {
+                  setTotalPages(result.pageInfo.totalPages);
                 }
               }
             }
@@ -227,28 +215,9 @@ const MyPage = () => {
           const result = await response.json();
           if (result.error === false && result.data) {
             setBookmarkedPlaces(result.data);
-            // 페이지네이션: 첫 페이지일 때만 다음 페이지 확인
-            if (currentPage === 0 && result.data.length === 3) {
-              // 다음 페이지 확인
-              fetch(`${API_ENDPOINTS.USER_BOOKMARK}?mobile=true&pageNumber=1`, {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json;charset=UTF-8',
-                  'Authorization': `Bearer ${token}`,
-                },
-                credentials: 'include',
-              }).then(nextResponse => nextResponse.json())
-                .then(nextResult => {
-                  if (nextResult.error === false && nextResult.data) {
-                    if (nextResult.data.length > 0) {
-                      setTotalPages(2);
-                    } else {
-                      setTotalPages(1);
-                    }
-                  }
-                });
-            } else if (result.data.length < 3) {
-              setTotalPages(currentPage + 1);
+            // pageInfo에서 전체 페이지 수 가져오기
+            if (result.pageInfo && result.pageInfo.totalPages !== undefined) {
+              setTotalPages(result.pageInfo.totalPages);
             }
           }
         }
@@ -550,6 +519,8 @@ const MyPage = () => {
                             if (filtered.length === 0 && currentPage > 0) {
                               setCurrentPage(currentPage - 1);
                             }
+                            // 사용자 정보 업데이트 (북마크 개수 갱신)
+                            fetchUser();
                           }
                         }}
                       />
@@ -601,6 +572,8 @@ const MyPage = () => {
                   if (!isScrapped) {
                     // 스크랩 해제 시 리스트에서 제거
                     setScrapCourses(prev => prev.filter(c => c.id !== courseId));
+                    // 사용자 정보 업데이트
+                    fetchUser();
                   }
                 }}
               />
