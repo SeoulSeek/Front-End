@@ -18,11 +18,11 @@ const MyPublicBtn = ({ isPublic, onClick }) => {
         공개
       </span>
       {isPublic ? (
-        <BiSolidLockAlt
+        <BiSolidLockOpenAlt
           className={`${styles.btnIcon} ${styles.activeIcon}`}
         />
       ) : (
-        <BiSolidLockOpenAlt className={styles.btnIcon} />
+        <BiSolidLockAlt className={styles.btnIcon} />
       )}
     </div>
   );

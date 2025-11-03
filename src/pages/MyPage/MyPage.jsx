@@ -14,6 +14,9 @@ import CoursesBox from "../../components/CoursesBox/CoursesBox";
 import { API_ENDPOINTS } from "../../config/api";
 import PlaceCard from "../../components/PlaceCard/PlaceCard";
 import Pagination from "../../components/PlacesPage/Pagination";
+import PostList from "../../components/PlacesPage/PostList";
+import PostBox from "../../components/PostBox/PostBox2";
+import { DISTRICT_ENG_TO_KOR } from "../../config/mapping";
 
 const LANGUAGES = ["한국어", "English", "中國語", "日本語"];
 
@@ -59,6 +62,16 @@ const MyPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  const [myReviews, setMyReviews] = useState([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const [reviewCurrentPage, setReviewCurrentPage] = useState(0);
+  const [reviewTotalPages, setReviewTotalPages] = useState(0);
+
+  const [likedReviews, setLikedReviews] = useState([]);
+  const [isLoadingLikedReviews, setIsLoadingLikedReviews] = useState(false);
+  const [likedReviewCurrentPage, setLikedReviewCurrentPage] = useState(0);
+  const [likedReviewTotalPages, setLikedReviewTotalPages] = useState(0);
+
   // 닉네임 길이 체크 (10자 이상이면 작은 크기 적용)
   const isVeryLongNickname = name && name.length >= 10;
 
@@ -88,6 +101,9 @@ const MyPage = () => {
       // API에서 받은 영어 언어 코드를 UI 언어로 변환
       const uiLanguages = mapApiLanguagesToUI(user.language || []);
       setSelectedLangs(uiLanguages);
+      
+      // 공개 여부 초기화 (openLocation과 openReview가 모두 true일 때만 공개로 설정)
+      setIsPublic(user.openLocation && user.openReview);
     }
   }, [user]);
 
@@ -231,6 +247,160 @@ const MyPage = () => {
     fetchBookmarkedPlaces();
   }, [user, activeTab, currentPage, refreshAuthToken]);
 
+  // 나의 방명록 목록 가져오기
+  useEffect(() => {
+    const fetchMyReviews = async () => {
+      if (!user || activeTab !== "guestbook") {
+        return;
+      }
+
+      try {
+        setIsLoadingReviews(true);
+        const token = localStorage.getItem('refreshToken');
+        
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch(
+          `${API_ENDPOINTS.USER_REVIEW}?mobile=true&pageNumber=${reviewCurrentPage}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8',
+              'Authorization': `Bearer ${token}`,
+            },
+            credentials: 'include',
+          }
+        );
+
+        if (response.status === 401) {
+          // 토큰 재발급 시도
+          const newToken = await refreshAuthToken();
+          if (newToken) {
+            const retryResponse = await fetch(
+              `${API_ENDPOINTS.USER_REVIEW}?mobile=true&pageNumber=${reviewCurrentPage}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8',
+                  'Authorization': `Bearer ${newToken}`,
+                },
+                credentials: 'include',
+              }
+            );
+            
+            if (retryResponse.ok) {
+              const result = await retryResponse.json();
+              if (result.error === false && result.data) {
+                setMyReviews(result.data);
+                // pageInfo에서 전체 페이지 수 가져오기
+                if (result.pageInfo && result.pageInfo.totalPages !== undefined) {
+                  setReviewTotalPages(result.pageInfo.totalPages);
+                }
+              }
+            }
+          }
+          return;
+        }
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.error === false && result.data) {
+            setMyReviews(result.data);
+            // pageInfo에서 전체 페이지 수 가져오기
+            if (result.pageInfo && result.pageInfo.totalPages !== undefined) {
+              setReviewTotalPages(result.pageInfo.totalPages);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('나의 방명록 목록 가져오기 실패:', error);
+      } finally {
+        setIsLoadingReviews(false);
+      }
+    };
+
+    fetchMyReviews();
+  }, [user, activeTab, reviewCurrentPage, refreshAuthToken]);
+
+  // 좋아요한 방명록 목록 가져오기
+  useEffect(() => {
+    const fetchLikedReviews = async () => {
+      if (!user) {
+        return;
+      }
+
+      try {
+        setIsLoadingLikedReviews(true);
+        const token = localStorage.getItem('refreshToken');
+        
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch(
+          `${API_ENDPOINTS.USER_REVIEW_LIKE}?mobile=true&pageNumber=${likedReviewCurrentPage}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8',
+              'Authorization': `Bearer ${token}`,
+            },
+            credentials: 'include',
+          }
+        );
+
+        if (response.status === 401) {
+          // 토큰 재발급 시도
+          const newToken = await refreshAuthToken();
+          if (newToken) {
+            const retryResponse = await fetch(
+              `${API_ENDPOINTS.USER_REVIEW_LIKE}?mobile=true&pageNumber=${likedReviewCurrentPage}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8',
+                  'Authorization': `Bearer ${newToken}`,
+                },
+                credentials: 'include',
+              }
+            );
+            
+            if (retryResponse.ok) {
+              const result = await retryResponse.json();
+              if (result.error === false && result.data) {
+                setLikedReviews(result.data);
+                // pageInfo에서 전체 페이지 수 가져오기
+                if (result.pageInfo && result.pageInfo.totalPages !== undefined) {
+                  setLikedReviewTotalPages(result.pageInfo.totalPages);
+                }
+              }
+            }
+          }
+          return;
+        }
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.error === false && result.data) {
+            setLikedReviews(result.data);
+            // pageInfo에서 전체 페이지 수 가져오기
+            if (result.pageInfo && result.pageInfo.totalPages !== undefined) {
+              setLikedReviewTotalPages(result.pageInfo.totalPages);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('좋아요한 방명록 목록 가져오기 실패:', error);
+      } finally {
+        setIsLoadingLikedReviews(false);
+      }
+    };
+
+    fetchLikedReviews();
+  }, [user, likedReviewCurrentPage, refreshAuthToken]);
+
   const handleEditClick = async () => {
     if (isEditing) {
       // 닉네임 길이 체크
@@ -244,25 +414,14 @@ const MyPage = () => {
       }
       
       try {
-        console.log('=== MyPage handleEditClick 시작 ===');
-        console.log('현재 사용자:', user);
-        console.log('선택된 언어(UI):', selectedLangs);
-        
         // API에 전송할 데이터 준비
         const apiLanguages = mapUILanguagesToAPI(selectedLangs);
-        console.log('변환된 언어(API):', apiLanguages);
         
         const profileData = {
           name: nameToUse,
           file: tempProfileFile || savedProfile, // 새 파일 객체 또는 기존 URL
           languages: apiLanguages
         };
-        
-        console.log('전송할 profileData:', {
-          name: profileData.name,
-          file: profileData.file instanceof File ? `[File] ${profileData.file.name}` : profileData.file,
-          languages: profileData.languages
-        });
 
         // API 호출
         const result = await updateProfile(profileData);
@@ -311,6 +470,244 @@ const MyPage = () => {
   const handleContainerClick = () => {
     if (!user) {
       navigate('/login');
+    }
+  };
+
+  // 공개/비공개 토글 핸들러
+  const handlePublicToggle = async () => {
+    try {
+      const token = localStorage.getItem('refreshToken');
+      if (!token) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      // 현재 상태의 반대값으로 설정
+      const newPublicState = !isPublic;
+      const requestBody = {
+        openLocation: newPublicState,
+        openReview: newPublicState,
+      };
+
+      const response = await fetch(API_ENDPOINTS.USER_LOCATION_PUBLIC, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${token}`,
+        },
+        credentials: 'include',
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.status === 401) {
+        // 토큰 재발급 시도
+        const newToken = await refreshAuthToken();
+        if (newToken) {
+          const retryResponse = await fetch(API_ENDPOINTS.USER_LOCATION_PUBLIC, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8',
+              'Authorization': `Bearer ${newToken}`,
+            },
+            credentials: 'include',
+            body: JSON.stringify(requestBody),
+          });
+          
+          if (retryResponse.ok) {
+            setIsPublic(newPublicState);
+            fetchUser(); // 사용자 정보 업데이트
+            return;
+          }
+        }
+        alert('인증에 실패했습니다.');
+        return;
+      }
+
+      if (response.ok) {
+        setIsPublic(newPublicState);
+        fetchUser(); // 사용자 정보 업데이트
+      } else {
+        alert('공개 설정 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('공개 설정 변경 중 오류:', error);
+      alert('공개 설정 변경 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 방명록 좋아요 토글 핸들러
+  const handleReviewLikeToggle = async (postId, newIsLiked) => {
+    // UI 먼저 업데이트
+    setMyReviews((prevReviews) =>
+      prevReviews.map((review) =>
+        review.id === postId
+          ? {
+              ...review,
+              isLiked: newIsLiked,
+              like: newIsLiked ? review.like + 1 : review.like - 1,
+            }
+          : review
+      )
+    );
+
+    try {
+      const token = localStorage.getItem('refreshToken');
+      if (!token) {
+        throw new Error('로그인이 필요합니다.');
+      }
+
+      const response = await fetch(
+        `${API_ENDPOINTS.REVIEWS_AUTH}/${postId}/like`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': `Bearer ${token}`,
+          },
+          credentials: 'include',
+        }
+      );
+
+      if (response.status === 401) {
+        // 토큰 재발급 시도
+        const newToken = await refreshAuthToken();
+        if (newToken) {
+          const retryResponse = await fetch(
+            `${API_ENDPOINTS.REVIEWS_AUTH}/${postId}/like`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${newToken}`,
+              },
+              credentials: 'include',
+            }
+          );
+          
+          if (!retryResponse.ok) {
+            throw new Error('좋아요 처리에 실패했습니다.');
+          }
+        } else {
+          throw new Error('인증에 실패했습니다.');
+        }
+      } else if (!response.ok) {
+        throw new Error('좋아요 처리에 실패했습니다.');
+      }
+
+      // 사용자 정보 업데이트 (좋아요 개수 갱신)
+      fetchUser();
+    } catch (error) {
+      console.error('방명록 좋아요 토글 실패:', error);
+      // 에러 발생 시 UI 롤백
+      setMyReviews((prevReviews) =>
+        prevReviews.map((review) =>
+          review.id === postId
+            ? {
+                ...review,
+                isLiked: !newIsLiked,
+                like: !newIsLiked ? review.like + 1 : review.like - 1,
+              }
+            : review
+        )
+      );
+    }
+  };
+
+  // 좋아요한 방명록의 좋아요 토글 핸들러 (해제 시 리스트에서 제거)
+  const handleLikedReviewToggle = async (postId, newIsLiked) => {
+    if (!newIsLiked) {
+      // 좋아요 해제 시 즉시 리스트에서 제거
+      setLikedReviews(prev => prev.filter(review => review.id !== postId));
+      
+      // 현재 페이지에 데이터가 없으면 이전 페이지로 이동
+      const filtered = likedReviews.filter(review => review.id !== postId);
+      if (filtered.length === 0 && likedReviewCurrentPage > 0) {
+        setLikedReviewCurrentPage(likedReviewCurrentPage - 1);
+      }
+    } else {
+      // 좋아요 추가 시 UI 업데이트
+      setLikedReviews((prevReviews) =>
+        prevReviews.map((review) =>
+          review.id === postId
+            ? {
+                ...review,
+                isLiked: newIsLiked,
+                like: review.like + 1,
+              }
+            : review
+        )
+      );
+    }
+
+    try {
+      const token = localStorage.getItem('refreshToken');
+      if (!token) {
+        throw new Error('로그인이 필요합니다.');
+      }
+
+      const response = await fetch(
+        `${API_ENDPOINTS.REVIEWS_AUTH}/${postId}/like`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': `Bearer ${token}`,
+          },
+          credentials: 'include',
+        }
+      );
+
+      if (response.status === 401) {
+        // 토큰 재발급 시도
+        const newToken = await refreshAuthToken();
+        if (newToken) {
+          const retryResponse = await fetch(
+            `${API_ENDPOINTS.REVIEWS_AUTH}/${postId}/like`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${newToken}`,
+              },
+              credentials: 'include',
+            }
+          );
+          
+          if (!retryResponse.ok) {
+            throw new Error('좋아요 처리에 실패했습니다.');
+          }
+        } else {
+          throw new Error('인증에 실패했습니다.');
+        }
+      } else if (!response.ok) {
+        throw new Error('좋아요 처리에 실패했습니다.');
+      }
+
+      // 사용자 정보 업데이트 (좋아요 개수 갱신)
+      fetchUser();
+    } catch (error) {
+      console.error('좋아요한 방명록 토글 실패:', error);
+      
+      // 에러 발생 시 UI 롤백
+      if (!newIsLiked) {
+        // 좋아요 해제 실패 시 다시 리스트에 추가해야 하므로 전체 다시 로드
+        // (순서를 유지하기 어려우므로)
+        // 간단하게는 페이지를 다시 로드하도록 트리거
+        setLikedReviewCurrentPage(prev => prev); // 강제로 재로드 트리거
+      } else {
+        // 좋아요 추가 실패 시 롤백
+        setLikedReviews((prevReviews) =>
+          prevReviews.map((review) =>
+            review.id === postId
+              ? {
+                  ...review,
+                  isLiked: false,
+                  like: review.like - 1,
+                }
+              : review
+          )
+        );
+      }
     }
   };
 
@@ -483,7 +880,7 @@ const MyPage = () => {
         <div className={styles.btnMenu}>
           <MyPublicBtn
             isPublic={isPublic}
-            onClick={() => setIsPublic((p) => !p)}
+            onClick={handlePublicToggle}
           />
           <MyEditBtn
             isEditing={isEditing}
@@ -545,9 +942,32 @@ const MyPage = () => {
 
         {activeTab === "guestbook" && (
           <div className={styles.logList}>
-            <span className={styles.emptyText}>
-              관광 기록을 방명록으로 남겨 보는 건 어떨까요?
-            </span>
+            {isLoadingReviews ? (
+              <span className={styles.emptyText}>로딩 중...</span>
+            ) : (
+              <>
+                {myReviews.length > 0 ? (
+                  <div className={styles.reviewsContainer}>
+                    <PostList
+                      posts={myReviews}
+                      lastPostRef={null}
+                      onLikeToggle={handleReviewLikeToggle}
+                    />
+                  </div>
+                ) : reviewCurrentPage === 0 ? (
+                  <span className={styles.emptyText}>
+                    관광 기록을 방명록으로 남겨 보는 건 어떨까요?
+                  </span>
+                ) : null}
+                {reviewTotalPages > 1 && (
+                  <Pagination
+                    currentPage={reviewCurrentPage + 1}
+                    totalPages={reviewTotalPages}
+                    onPageClick={(page) => setReviewCurrentPage(page - 1)}
+                  />
+                )}
+              </>
+            )}
           </div>
         )}
 
@@ -587,9 +1007,53 @@ const MyPage = () => {
 
         <span className={styles.listTitle}>좋아요를 누른 방명록</span>
         <div className={styles.likeList}>
-          <span className={styles.emptyText}>
-            좋아요한 방명록이 없습니다.
-          </span>
+          {isLoadingLikedReviews ? (
+            <span className={styles.emptyText}>로딩 중...</span>
+          ) : (
+            <>
+              {likedReviews.length > 0 ? (
+                likedReviews.map((post) => {
+                  const apiTags = post.tags || [];
+                  const placeName = apiTags[0];
+                  const districtEng = apiTags[1];
+                  const keywordTags = apiTags.slice(2);
+
+                  const districtKor = DISTRICT_ENG_TO_KOR[districtEng?.toUpperCase()] || districtEng;
+
+                  const displayHashtags = [];
+                  if (districtKor) displayHashtags.push(districtKor);
+                  if (placeName) displayHashtags.push(placeName);
+                  displayHashtags.push(...keywordTags);
+
+                  const postProps = {
+                    id: post.id,
+                    title: post.title,
+                    hashtags: displayHashtags,
+                    author: {
+                      userId: post.userId,
+                      username: post.username,
+                      profileImage: post.fileURL || null,
+                    },
+                    likes: post.like,
+                    isLiked: post.isLiked || false,
+                    comments: post.comments,
+                  };
+
+                  return (
+                    <PostBox 
+                      key={post.id}
+                      {...postProps}
+                      onLikeToggle={handleLikedReviewToggle}
+                    />
+                  );
+                })
+              ) : likedReviewCurrentPage === 0 ? (
+                <span className={styles.emptyText}>
+                  좋아요한 방명록이 없습니다.
+                </span>
+              ) : null}
+            </>
+          )}
         </div>
       </div>
     </div>

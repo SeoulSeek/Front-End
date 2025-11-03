@@ -18,6 +18,7 @@ import MapPage from "./pages/MapPage/MapPage";
 import MapHistoryView from "./pages/MapHistoryView/MapHistoryView";
 import NotFound from "./pages/NotFoundPage/NotFoundPage";
 import MyPage from "./pages/MyPage/MyPage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import ScrollToTopOnNavigation from "./components/ScrollToTop/ScrollToTopOnNavigation";
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             <Route path="/map/:locationId" element={<MapPage />} />
             <Route path="/view" element={<MapHistoryView />} />
             <Route path="/mypage" element={<MyPage />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/callback" element={<LoginCallback />} />

@@ -36,5 +36,11 @@ export const API_ENDPOINTS = {
   LOCATION_TEXT: (id) => `${API_BASE_URL}/location/${id}/text`,
   LOCATION_AUDIO: (id) => `${API_BASE_URL}/location/${id}/repaudio`,
   USER_BOOKMARK: `${API_BASE_URL}/auth/user/book-mark`,
+  USER_REVIEW: `${API_BASE_URL}/auth/user/review`,
+  USER_REVIEW_LIKE: `${API_BASE_URL}/auth/user/review/like`,
+  USER_LOCATION_PUBLIC: `${API_BASE_URL}/auth/user/location`,
+  OTHER_USER: (id) => `${API_BASE_URL}/user/${id}`,
+  OTHER_USER_BOOKMARK: (id) => `${API_BASE_URL}/user/${id}/book-mark`,
+  OTHER_USER_REVIEW: (id) => `${API_BASE_URL}/user/${id}/review`,
   MINI_MAP: `${API_BASE_URL}/mini-map`,
 };
