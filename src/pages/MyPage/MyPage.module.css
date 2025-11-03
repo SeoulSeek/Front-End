@@ -287,6 +287,11 @@
   display: none;
 }
 
+/* likeList 내부의 PostBox가 가로 스크롤에서 올바르게 작동하도록 설정 */
+.likeList > * {
+  flex-shrink: 0;
+}
+
 /* 데스크탑에서만 스크롤바 표시 */
 @media (min-width: 768px) {
   .scrapList:not(:has(.emptyText))::-webkit-scrollbar,

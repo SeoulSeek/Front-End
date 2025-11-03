@@ -28,7 +28,7 @@ const PostList = ({ posts, lastPostRef, onLikeToggle }) => {
           title: post.title,
           hashtags: displayHashtags,
           author: {
-            userId: null,
+            userId: post.userId,
             username: post.username,
             profileImage: post.fileURL || null,
           },

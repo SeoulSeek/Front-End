@@ -1,0 +1,177 @@
+.myContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.myInfoContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.profileWrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin-left: 20px;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.profileWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 100%;
+}
+
+.myInfo {
+  display: flex;
+  width: 250px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-right: 10px;
+}
+
+.myName {
+  color: #000;
+  font-family: "Noto Sans KR";
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  height: 30px;
+  flex-direction: row;
+  gap: 5px;
+  justify-content: start;
+  align-self: stretch;
+}
+
+/* 아주 긴 닉네임(10자 이상)일 때 작은 크기 */
+.myNameSmall {
+  font-size: 16px;
+}
+
+.myLang {
+  display: flex;
+  height: 30px;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.lang {
+  color: #000;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.myStats {
+  display: flex;
+  height: 30px;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.stats {
+  color: #303943;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.profilePic {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  aspect-ratio: 1/1;
+  border-radius: 100px;
+}
+
+.blue {
+  color: #6D8196;
+}
+
+.myMenuContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 45px;
+  padding-left: 40px;
+}
+
+.tabMenu {
+  margin-top: 34px;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+}
+
+.tab {
+  color: #000;
+  text-align: left;
+  font-family: "Noto Sans KR";
+  font-size: 32px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.placesList,
+.logList {
+  width: 390px;
+  display: flex;
+  min-height: 250px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: #FFF;
+  padding: 20px 0;
+}
+
+.bookmarkedPlacesContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0 20px;
+}
+
+.reviewsContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.emptyText {
+  color: #6D8196;
+  text-align: center;
+  font-family: "Noto Sans KR";
+  font-size: 15px;
+  font-weight: 600;
+}
+

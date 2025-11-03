@@ -6,6 +6,7 @@ import { FaRegComment } from "react-icons/fa";
 import $ from "./PostBox2.module.css";
 import HashTag from "../global/HashTag/HashTag";
 import defaultProfileImg from "../../assets/PlacePage/profile_a.jpg"; // 기본 프로필 이미지
+import { useAuth } from "../../contexts/AuthContext";
 
 const PostBox = ({
   id,
@@ -18,6 +19,7 @@ const PostBox = ({
   onLikeToggle,
 }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // 좋아요 버튼 클릭 핸들러
   const handleLikeClick = (e) => {
@@ -34,6 +36,17 @@ const PostBox = ({
   const handleProfileClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // 본인의 프로필인 경우 아무 동작도 하지 않음
+    // user.id와 author.userId 비교, 또는 user.name과 author.username 비교
+    if (user) {
+      const isSameUser = (user.id && String(user.id) === String(author.userId)) ||
+                         (user.name && user.name === author.username);
+      if (isSameUser) {
+        return;
+      }
+    }
+    
     navigate(`/profile/${author.userId}`);
   };
 

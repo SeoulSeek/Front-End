@@ -14,7 +14,8 @@ const PlaceCard = ({
   variant = "dark", 
   hideDistance = false,
   initialBookmarked = false,
-  onBookmarkChange
+  onBookmarkChange,
+  disableBookmark = false
 }) => {
   const { user, refreshAuthToken } = useAuth();
   const navigate = useNavigate();
@@ -22,6 +23,11 @@ const PlaceCard = ({
 
   const handleSaveClick = async (e) => {
     e.stopPropagation();
+    
+    // 북마크가 비활성화되어 있으면 아무 동작도 하지 않음
+    if (disableBookmark) {
+      return;
+    }
     
     // 로그인 체크
     if (!user) {
@@ -128,13 +134,15 @@ const PlaceCard = ({
       <div className={styles.placeHeader}>
         <h4 className={styles.placeName} style={{ color: textColor }}>{placeName}</h4>
         {!hideDistance && <span className={styles.distance} style={{ color: textColor }}>{distance}</span>}
-        <button className={styles.saveButton} onClick={handleSaveClick}>
-          {isSaved ? (
-            <FaBookmark size={30} color={textColor} />
-          ) : (
-            <FaRegBookmark size={30} color={textColor} />
-          )}
-        </button>
+        {!disableBookmark && (
+          <button className={styles.saveButton} onClick={handleSaveClick}>
+            {isSaved ? (
+              <FaBookmark size={30} color={textColor} />
+            ) : (
+              <FaRegBookmark size={30} color={textColor} />
+            )}
+          </button>
+        )}
       </div>
       <div className={styles.placeImageWrapper} style={{ borderColor: textColor }}>
         <img
