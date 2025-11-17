@@ -846,7 +846,7 @@ const MyPage = () => {
               북마크 개수 {user?.bookmark || 0}
             </span>
             <span className={styles.stats}>
-              좋아요 개수 {user?.like || 0}
+              작성한 방명록 수 {user?.like || 0}
             </span>
           </div>
         </div>
